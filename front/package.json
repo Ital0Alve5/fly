@@ -12,11 +12,13 @@
     "type-check": "vue-tsc --build",
     "lint": "eslint . --fix",
     "format": "prettier --write src/",
-    "prepare": "husky install"
+    "prepare": "cd .. && husky install front/.husky"
   },
   "lint-staged": {
     "src/**/*.{js,ts,vue,html,css}": "prettier --write",
-    "src/**/*.{js,ts,vue}": "eslint --fix"
+    "src/**/*.{js,ts,vue}": "eslint --fix",
+    "*.js": "eslint --cache --fix",
+    "*.src/": "prettier --write"
   },
   "dependencies": {
     "class-variance-authority": "^0.7.1",
