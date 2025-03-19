@@ -12,7 +12,6 @@
     "type-check": "vue-tsc --build",
     "lint": "eslint . --fix",
     "format": "prettier --write src/",
-    "prepare": "cd .. && husky install front/.husky",
     "pre-commit": "prettier --write . && git add -A ."
   },
   "lint-staged": {
@@ -46,7 +45,6 @@
     "eslint": "^9.22.0",
     "eslint-plugin-vue": "~10.0.0",
     "globals": "^16.0.0",
-    "husky": "^9.1.7",
     "jiti": "^2.4.2",
     "jsdom": "^26.0.0",
     "lint-staged": "^15.5.0",
