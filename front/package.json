@@ -12,7 +12,7 @@
     "type-check": "vue-tsc --build",
     "lint": "eslint . --fix",
     "format": "prettier --write src/",
-    "pre-commit": "prettier --write . && git add -A .",
+    "pre-commit": "prettier --write src/ && git add -A .",
     "prepare": "cd .. && front/.husky"
   },
   "lint-staged": {
