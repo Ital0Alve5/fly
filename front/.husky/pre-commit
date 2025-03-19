@@ -1,1 +1,1 @@
-cd ./front && npm run pre-commit
+cd ./front && npm run pre-commit && npx lint-staged
