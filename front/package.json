@@ -13,7 +13,7 @@
     "lint": "eslint . --fix",
     "format": "prettier --write src/",
     "pre-commit": "prettier --write . && git add -A .",
-    "prepare": "husky"
+    "prepare": "cd .. && husky front/.husky"
   },
   "lint-staged": {
     "src/**/*.{js,ts,vue,html,css}": "prettier --write",
