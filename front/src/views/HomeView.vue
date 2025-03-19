@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import TheWelcome from '../components/TheWelcome.vue'
+import FeatureTeste from '@/components/features/FeatureTeste/FeatureTeste.vue'
 </script>
 
 <template>
   <main>
-    <TheWelcome />
+    <FeatureTeste />
   </main>
 </template>
