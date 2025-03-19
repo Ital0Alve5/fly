@@ -12,7 +12,8 @@
     "type-check": "vue-tsc --build",
     "lint": "eslint . --fix",
     "format": "prettier --write src/",
-    "pre-commit": "prettier --write . && git add -A ."
+    "pre-commit": "prettier --write . && git add -A .",
+    "prepare": "husky"
   },
   "lint-staged": {
     "src/**/*.{js,ts,vue,html,css}": "prettier --write",
@@ -23,6 +24,7 @@
   "dependencies": {
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "husky": "^9.1.7",
     "lucide-vue-next": "^0.482.0",
     "pinia": "^3.0.1",
     "tailwind-merge": "^3.0.2",
