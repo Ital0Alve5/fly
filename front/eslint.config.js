@@ -15,4 +15,11 @@ export default [
     languageOptions: { parserOptions: { parser: tseslint.parser } },
     rules: { 'vue/multi-word-component-names': 'off' },
   },
+  {
+    files: ['**/ui/**/*.ts', '**/ui/**/*.vue', '**/lib/utils.ts'],
+    rules: {
+      '@typescript-eslint/no-unused-vars': 'off',
+      '@typescript-eslint/no-explicit-any': 'off',
+    },
+  },
 ]
