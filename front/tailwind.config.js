@@ -42,6 +42,7 @@ export const theme = {
         foreground: 'hsl(var(--destructive-foreground))',
       },
       border: 'hsl(var(--border))',
+      'active-link-border': 'hsl(var(--active-link-border))',
       input: 'hsl(var(--input))',
       ring: 'hsl(var(--ring))',
       chart: {
