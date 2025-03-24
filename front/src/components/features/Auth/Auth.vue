@@ -28,7 +28,7 @@ import { Button } from '../../ui/button'
         <CardContent class="space-y-2">
           <form @submit="onSubmit">
             <FormField name="name">
-              <FormItem>
+              <FormItem class="mb-2">
                 <FormLabel>Nome</FormLabel>
                 <FormControl>
                   <Input
@@ -43,7 +43,7 @@ import { Button } from '../../ui/button'
               </FormItem>
             </FormField>
             <FormField name="email">
-              <FormItem>
+              <FormItem class="mb-2">
                 <FormLabel>Email</FormLabel>
                 <FormControl>
                   <Input type="email" placeholder="Email" v-bind="componentField" />
@@ -52,7 +52,7 @@ import { Button } from '../../ui/button'
               </FormItem>
             </FormField>
             <FormField name="cpf">
-              <FormItem>
+              <FormItem class="mb-2">
                 <FormLabel>CPF</FormLabel>
                 <FormControl>
                   <Input
@@ -66,7 +66,7 @@ import { Button } from '../../ui/button'
               </FormItem>
             </FormField>
             <FormField name="cep">
-              <FormItem>
+              <FormItem class="mb-2">
                 <FormLabel>CEP</FormLabel>
                 <FormControl>
                   <Input
@@ -80,7 +80,7 @@ import { Button } from '../../ui/button'
               </FormItem>
             </FormField>
             <FormField name="rua">
-              <FormItem>
+              <FormItem class="mb-2">
                 <FormLabel>Rua</FormLabel>
                 <FormControl>
                   <Input type="text" placeholder="Rua" v-bind="componentField" />
@@ -90,7 +90,7 @@ import { Button } from '../../ui/button'
             </FormField>
             <div class="grid grid-cols-2 gap-4">
               <FormField name="numero">
-                <FormItem>
+                <FormItem class="mb-2">
                   <FormLabel>Número</FormLabel>
                   <FormControl>
                     <Input type="text" placeholder="Número" v-bind="componentField" />
@@ -99,7 +99,7 @@ import { Button } from '../../ui/button'
                 </FormItem>
               </FormField>
               <FormField name="complemento">
-                <FormItem>
+                <FormItem class="mb-2">
                   <FormLabel>Complemento</FormLabel>
                   <FormControl>
                     <Input type="text" placeholder="Complemento" v-bind="componentField" />
@@ -110,7 +110,7 @@ import { Button } from '../../ui/button'
             </div>
             <div class="grid grid-cols-2 gap-4">
               <FormField name="cidade">
-                <FormItem>
+                <FormItem class="mb-2">
                   <FormLabel>Cidade</FormLabel>
                   <FormControl>
                     <Input type="text" placeholder="Cidade" v-bind="componentField" />
@@ -119,7 +119,7 @@ import { Button } from '../../ui/button'
                 </FormItem>
               </FormField>
               <FormField name="estado">
-                <FormItem>
+                <FormItem class="mb-2">
                   <FormLabel>Estado</FormLabel>
                   <FormControl>
                     <Input type="text" placeholder="Estado" v-bind="componentField" />
@@ -146,7 +146,7 @@ import { Button } from '../../ui/button'
         <CardContent class="space-y-2">
           <form @submit="onSubmit">
             <FormField name="email">
-              <FormItem>
+              <FormItem class="mb-2">
                 <FormLabel>Email</FormLabel>
                 <FormControl>
                   <Input type="email" placeholder="Email" v-bind="componentField" />
@@ -155,7 +155,7 @@ import { Button } from '../../ui/button'
               </FormItem>
             </FormField>
             <FormField name="password">
-              <FormItem>
+              <FormItem class="mb-2">
                 <FormLabel>Senha</FormLabel>
                 <FormControl>
                   <Input type="password" placeholder="Senha" v-bind="componentField" />
