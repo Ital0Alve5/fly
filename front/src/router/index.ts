@@ -1,5 +1,6 @@
 import Auth from '@/views/Auth/index.vue'
 import Booking from '@/views/Client/Booking.vue'
+import Reservation from '@/views/Client/Reservation.vue'
 import Adm from '@/views/Manager/PaginaAdmTeste.vue'
 
 import { createRouter, createWebHistory } from 'vue-router'
@@ -17,6 +18,12 @@ const router = createRouter({
       path: '/reservas',
       name: 'reservas',
       component: Booking,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/reservas/reserva/:reservationId(\\d+)',
+      name: 'reserva',
+      component: Reservation,
       meta: { requiresAuth: true },
     },
     {
