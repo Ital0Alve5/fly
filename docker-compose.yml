@@ -1,0 +1,173 @@
+version: '3.8'
+
+services:
+  pgdb:
+    image: postgres:alpine 
+    ports:
+      - 5432:5432
+    volumes:
+      - .docker/pgdb/data:/var/lib/postgresql/data
+      - .docker/pgdb/entrypoint.sh:/docker-entrypoint-initdb.d/entrypoint.sh
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=admin
+      - POSTGRES_MULTIPLE_DATABASES=fly_service, employee_service, client_service, reservation_service_query, reservation_service_command
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U root"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - flynetwork
+
+  mongodb:
+    image: mongo:latest
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=admin
+      - MONGO_INITDB_DATABASE=auth_service    
+    ports:
+      - 27017:27017
+    volumes:
+      - .docker/mongodb:/data/db
+    networks:
+      - flynetwork
+
+  rabbitmq:
+    image: rabbitmq
+    command: rabbitmq-server
+    expose:
+      - "5672"
+      - "15672"
+    healthcheck:
+      test: [ "CMD", "nc", "-z", "localhost", "5672" ]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+    networks:
+      - flynetwork
+
+  api-gateway:
+    build:
+      context: ./back/api-gateway
+      dockerfile: Dockerfile
+    ports:
+      - 8000:8000
+    volumes:
+      - ./back/api-gateway:/app
+    depends_on:
+      - pgdb
+    networks:
+      - flynetwork
+
+  auth-service:
+    build:
+      context: ./back/auth-service
+      dockerfile: Dockerfile
+    ports:
+      - 8080:8080
+    volumes:
+      - ./back/auth-service:/app
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://pgdb:5432/auth_service
+      - SPRING_DATASOURCE_USERNAME=admin
+      - SPRING_DATASOURCE_PASSWORD=admin
+    depends_on:
+      - pgdb
+      - rabbitmq
+      - mongodb
+    networks:
+      - flynetwork
+
+  fly-service:
+    build:
+      context: ./back/fly-service
+      dockerfile: Dockerfile
+    ports:
+      - 8081:8080
+    volumes:
+      - ./back/fly-service:/app
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://pgdb:5432/fly_service
+      - SPRING_DATASOURCE_USERNAME=admin
+      - SPRING_DATASOURCE_PASSWORD=admin
+    depends_on:
+      - pgdb
+      - rabbitmq
+    networks:
+      - flynetwork
+
+  client-service:
+    build:
+      context: ./back/client-service
+      dockerfile: Dockerfile
+    ports:
+      - 8082:8080
+    volumes:
+      - ./back/client-service:/app
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://pgdb:5432/client_service
+      - SPRING_DATASOURCE_USERNAME=admin
+      - SPRING_DATASOURCE_PASSWORD=admin
+    depends_on:
+      - pgdb
+      - rabbitmq
+    networks:
+      - flynetwork
+
+  employee-service:
+    build:
+      context: ./back/employee-service
+      dockerfile: Dockerfile
+    ports:
+      - 8083:8080
+    volumes:
+      - ./back/employee-service:/app
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://pgdb:5432/employee_service
+      - SPRING_DATASOURCE_USERNAME=admin
+      - SPRING_DATASOURCE_PASSWORD=admin
+    depends_on:
+      - pgdb
+      - rabbitmq
+    networks:
+      - flynetwork
+
+  reservation-service:
+    build:
+      context: ./back/reservation-service
+      dockerfile: Dockerfile
+    ports:
+      - 8084:8080
+    volumes:
+      - ./back/reservation-service:/app
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://pgdb:5432/reservation_service_query
+      - SPRING_DATASOURCE_USERNAME=admin
+      - SPRING_DATASOURCE_PASSWORD=admin
+    depends_on:
+      - pgdb
+      - rabbitmq
+    networks:
+      - flynetwork
+
+  saga:
+    build:
+      context: ./back/saga
+      dockerfile: Dockerfile
+    ports:
+      - 8085:8080
+    volumes:
+      - ./back/saga:/app
+    environment:
+      - SPRING_DATASOURCE_USERNAME=admin
+      - SPRING_DATASOURCE_PASSWORD=admin
+    depends_on:
+      - pgdb
+      - rabbitmq
+    networks:
+      - flynetwork
+
+networks:
+  flynetwork:
+    driver: bridge

@@ -1,0 +1,2 @@
+.docker/pgdb/data/*
+.docker/mongodb/*
