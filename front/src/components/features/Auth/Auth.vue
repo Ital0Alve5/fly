@@ -3,7 +3,7 @@ import { useForm, useField } from 'vee-validate'
 import { useAuthStore } from '@/stores/authStore'
 import { useGlobalStore } from '@/stores/global'
 import { useRouter } from 'vue-router'
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import {
   Card,
   CardContent,
@@ -35,13 +35,46 @@ const cpf = useField('cpf', validateRequired)
 const cep = useField('cep', validateRequired)
 const password = useField('password', validatePassword)
 
+const street = ref('')
+const neighborhood = ref('')
+const city = ref('')
+const state = ref('')
+
+watch(cep.value, async (newCep) => {
+  const cleanedCep = newCep.replace(/\D/g, '')
+  if (cleanedCep.length === 8) {
+    try {
+      const response = await fetch(`https://viacep.com.br/ws/${cleanedCep}/json/`)
+      const data = await response.json()
+      if (!data.erro) {
+        street.value = data.logradouro || ''
+        neighborhood.value = data.bairro || ''
+        city.value = data.localidade || ''
+        state.value = data.uf || ''
+      } else {
+        street.value = ''
+        neighborhood.value = ''
+        city.value = ''
+        state.value = ''
+        alert('CEP não encontrado.')
+      }
+    } catch {
+      alert('Erro ao buscar o CEP.')
+    }
+  }
+})
+
 const onSubmit = handleSubmit(async (values) => {
   try {
     if (isLogin.value) {
       const userData = await authStore.login(values.email, values.password)
       if (userData) {
         globalStore.setAuthenticatedUserData(userData)
-        router.push('/home')
+        if (userData.isManager) {
+          router.push('/admTeste')
+        } else {
+          router.push('/reservas')
+        }
       } else {
         alert('Login inválido')
       }
@@ -51,13 +84,19 @@ const onSubmit = handleSubmit(async (values) => {
         email: values.email,
         cpf: values.cpf,
         cep: values.cep,
+        street: street.value,
+        neighborhood: neighborhood.value,
+        city: city.value,
+        state: state.value,
       }
-      const userData = await authStore.register(newUserData, values.password)
+      const userData = await authStore.register(newUserData)
       globalStore.setAuthenticatedUserData(userData)
-      router.push('/home')
+      alert('Cadastro realizado com sucesso. Verifique seu e-mail para a senha.')
+      router.push('/reservas')
     }
-  } catch {
-    console.error('erro')
+  } catch (error) {
+    console.error('Erro no processo de autenticação:', error)
+    alert('Erro no processo de autenticação. Verifique os dados e tente novamente.')
   }
 })
 </script>
@@ -117,19 +156,45 @@ const onSubmit = handleSubmit(async (values) => {
               </FormItem>
             </FormField>
 
-            <FormField name="password">
+            <FormField name="street">
               <FormItem>
-                <FormLabel>Senha</FormLabel>
+                <FormLabel>Rua</FormLabel>
                 <FormControl>
-                  <Input
-                    v-model="password.value.value"
-                    type="password"
-                    placeholder="Senha (4 dígitos)"
-                  />
+                  <Input v-model="street" type="text" disabled />
                 </FormControl>
-                <FormMessage>{{ password.errorMessage.value }}</FormMessage>
               </FormItem>
             </FormField>
+
+            <FormField name="neighborhood">
+              <FormItem>
+                <FormLabel>Bairro</FormLabel>
+                <FormControl>
+                  <Input v-model="neighborhood" type="text" disabled />
+                </FormControl>
+              </FormItem>
+            </FormField>
+
+            <FormField name="city">
+              <FormItem>
+                <FormLabel>Cidade</FormLabel>
+                <FormControl>
+                  <Input v-model="city" type="text" disabled />
+                </FormControl>
+              </FormItem>
+            </FormField>
+
+            <FormField name="state">
+              <FormItem>
+                <FormLabel>Estado</FormLabel>
+                <FormControl>
+                  <Input v-model="state" type="text" disabled />
+                </FormControl>
+              </FormItem>
+            </FormField>
+
+            <p class="text-sm text-muted-foreground mt-2">
+              A senha será enviada para o e-mail após o cadastro.
+            </p>
 
             <CardFooter class="p-0 pt-4">
               <Button type="submit" class="w-full">Cadastrar</Button>
@@ -143,9 +208,9 @@ const onSubmit = handleSubmit(async (values) => {
       <Card>
         <CardHeader>
           <CardTitle>Login</CardTitle>
-          <CardDescription
-            >Entre com sua conta para ter acesso a todos os recursos.</CardDescription
-          >
+          <CardDescription>
+            Entre com sua conta para ter acesso a todos os recursos.
+          </CardDescription>
         </CardHeader>
         <CardContent class="space-y-2">
           <form class="flex flex-col gap-3" @submit="onSubmit">
@@ -163,7 +228,11 @@ const onSubmit = handleSubmit(async (values) => {
               <FormItem>
                 <FormLabel>Senha</FormLabel>
                 <FormControl>
-                  <Input v-model="password.value.value" type="password" placeholder="Senha" />
+                  <Input
+                    v-model="password.value.value"
+                    type="password"
+                    placeholder="Senha (4 dígitos)"
+                  />
                 </FormControl>
                 <FormMessage>{{ password.errorMessage.value }}</FormMessage>
               </FormItem>

@@ -1,7 +1,12 @@
 import type { AuthenticatedUserData } from '@/types/Auth/AuthenticatedUserData'
 import { ref } from 'vue'
 
-type ClientData = AuthenticatedUserData & { cpf: string; cep: string }
+type ClientData = AuthenticatedUserData & {
+  cpf: string
+  cep: string
+  password: string
+  miles: number
+}
 
 const registeredClients = ref<ClientData[]>([
   {
@@ -10,13 +15,8 @@ const registeredClients = ref<ClientData[]>([
     cpf: '123.456.789-00',
     cep: '01001-000',
     isManager: false,
-  },
-  {
-    name: 'João Pedro',
-    email: 'joao.pedro@example.com',
-    cpf: '987.654.321-00',
-    cep: '22041-001',
-    isManager: false,
+    password: '1234',
+    miles: 0,
   },
 ])
 
