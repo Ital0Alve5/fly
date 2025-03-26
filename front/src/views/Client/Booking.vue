@@ -1,2 +1,7 @@
-<script setup lang="ts"></script>
-<template>Página de reservas</template>
+<script setup lang="ts">
+import Booking from '@/components/features/Client/Booking/Booking.vue'
+</script>
+
+<template>
+  <Booking />
+</template>

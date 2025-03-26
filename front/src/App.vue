@@ -14,11 +14,11 @@ const globalStore = useGlobalStore()
 //   isManager: true,
 // })
 
-// globalStore.setAuthenticatedUserData({
-//   name: 'italo',
-//   email: 'string',
-//   isManager: false,
-// })
+globalStore.setAuthenticatedUserData({
+  name: 'italo',
+  email: 'string',
+  isManager: false,
+})
 
 const isAuthenticated = computed(() => {
   const userData = globalStore.getAuthenticatedUserData()
