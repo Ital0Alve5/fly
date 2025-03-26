@@ -33,9 +33,9 @@ router.beforeEach((to) => {
   const userData = globalStore.getAuthenticatedUserData()
 
   if (
-    (!userData.value && to.meta.requiresAuth) ||
-    (userData.value && !userData.value.isManager && to.meta.isManager) ||
-    (userData.value && userData.value.isManager && !to.meta.isManager && to.name !== 'auth')
+    (!userData && to.meta.requiresAuth) ||
+    (userData && !userData.isManager && to.meta.isManager) ||
+    (userData && userData.isManager && !to.meta.isManager && to.name !== 'auth')
   ) {
     return { name: 'auth' }
   }

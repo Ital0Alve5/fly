@@ -1,5 +1,5 @@
-import { ref } from 'vue'
 import { defineStore } from 'pinia'
+import { ref } from 'vue'
 import type { AuthenticatedUserData } from '@/types/Auth/AuthenticatedUserData'
 
 export const useGlobalStore = defineStore('global', () => {
@@ -9,9 +9,13 @@ export const useGlobalStore = defineStore('global', () => {
     authenticatedUser.value = userData
   }
 
-  function getAuthenticatedUserData() {
-    return authenticatedUser
+  function getAuthenticatedUserData(): AuthenticatedUserData | null {
+    return authenticatedUser.value
   }
 
-  return { setAuthenticatedUserData, getAuthenticatedUserData }
+  return {
+    authenticatedUser,
+    setAuthenticatedUserData,
+    getAuthenticatedUserData,
+  }
 })

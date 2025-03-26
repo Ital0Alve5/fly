@@ -23,7 +23,7 @@ const globalStore = useGlobalStore()
 const isAuthenticated = computed(() => {
   const userData = globalStore.getAuthenticatedUserData()
 
-  return !!userData.value
+  return userData ? true : false
 })
 </script>
 
@@ -31,5 +31,7 @@ const isAuthenticated = computed(() => {
   <Authenticated v-if="isAuthenticated && $route.name !== 'auth'">
     <RouterView />
   </Authenticated>
-  <Default v-else> <RouterView /> </Default>
+  <Default v-else>
+    <RouterView />
+  </Default>
 </template>
