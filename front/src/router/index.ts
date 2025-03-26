@@ -1,9 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import { useGlobalStore } from '@/stores/global';
 import Auth from '@/views/Auth/index.vue';
-import Booking from '@/views/Client/Booking.vue';
+import Booking from '@/views/Client/BookingView.vue';
 import Adm from '@/views/Manager/PaginaAdmTeste.vue';
-import ClientHome from '@/views/Client/ClientHome.vue';
 
 const routes = [
   {
@@ -22,12 +21,6 @@ const routes = [
     name: 'admTeste',
     component: Adm,
     meta: { requiresAuth: true, isManager: true },
-  },
-  {
-    path: '/cliente',
-    name: 'clienteHome',
-    component: ClientHome,
-    meta: { requiresAuth: false },
   },
 ];
 

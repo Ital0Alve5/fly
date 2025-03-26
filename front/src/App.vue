@@ -15,9 +15,9 @@ const globalStore = useGlobalStore()
 // })
 
 // globalStore.setAuthenticatedUserData({
-//   name: 'italo',
-//   email: 'string',
-//   isManager: false,
+// name: 'italo',
+// email: 'string',
+// isManager: false,
 // })
 
 const isAuthenticated = computed(() => {
