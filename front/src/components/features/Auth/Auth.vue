@@ -69,7 +69,6 @@ const onSubmit = handleSubmit(async (values) => {
       <TabsTrigger value="login" @click="isLogin = true">Login</TabsTrigger>
     </TabsList>
 
-    <!-- Aba Cadastro -->
     <TabsContent value="register">
       <Card>
         <CardHeader>
@@ -140,7 +139,6 @@ const onSubmit = handleSubmit(async (values) => {
       </Card>
     </TabsContent>
 
-    <!-- Aba Login -->
     <TabsContent value="login">
       <Card>
         <CardHeader>
