@@ -76,7 +76,7 @@ const onSubmit = handleSubmit(async (values) => {
           <CardDescription>Crie sua conta para ter acesso a todos os recursos.</CardDescription>
         </CardHeader>
         <CardContent class="space-y-2">
-          <form @submit="onSubmit">
+          <form class="flex flex-col gap-3" @submit="onSubmit">
             <FormField name="name">
               <FormItem>
                 <FormLabel>Nome</FormLabel>
@@ -148,7 +148,7 @@ const onSubmit = handleSubmit(async (values) => {
           >
         </CardHeader>
         <CardContent class="space-y-2">
-          <form @submit="onSubmit">
+          <form class="flex flex-col gap-3" @submit="onSubmit">
             <FormField name="email">
               <FormItem>
                 <FormLabel>Email</FormLabel>
