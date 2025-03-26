@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
-import { Button } from '../ui/button'
-import { Table, TableHead, TableRow, TableHeader, TableBody, TableCell } from '../ui/table'
+import { Card, CardContent, CardHeader, CardTitle } from '../../../ui/card'
+import { Button } from '../../../ui/button'
+import { Table, TableHead, TableRow, TableHeader, TableBody, TableCell } from '../../../ui/table'
 
 // Mock de dados da tabelinha
 const saldoMilhas = ref(5000)
@@ -29,7 +29,7 @@ const cancelarReserva = (id: number) => {
 </script>
 
 <template>
-  <div class="min-h-screen">
+  <div class="flex flex-col justify-center h-screen">
     <nav class="p-4 shadow-md mt-8">
       <div class="container mx-auto flex justify-between items-center">
         <span class="text-white text-lg"

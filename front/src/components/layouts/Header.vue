@@ -32,7 +32,7 @@ function handleLogout() {
 }
 </script>
 <template>
-  <header class="flex justify-end p-4 m-2 rounded-xl">
+  <header class="flex justify-end p-4 rounded-xl w-full fixed">
     <ul class="ml-auto flex gap-4">
       <li
         v-for="navigation in isUserManager ? managerNavigationLinks : clientNavigationLinks"
