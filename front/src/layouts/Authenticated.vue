@@ -4,7 +4,7 @@ import Header from '@/components/layouts/Header.vue'
 <template>
   <div class="flex flex-col">
     <Header />
-    <main class="px-5 min-h-screen">
+    <main class="px-5">
       <slot />
     </main>
   </div>

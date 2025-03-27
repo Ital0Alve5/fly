@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import router from '@/router'
-import { useGlobalStore } from '@/stores/global'
+import { useAuthStore } from '@/stores/auth'
 import { LogOut } from 'lucide-vue-next'
-import { computed } from 'vue'
 
 const clientNavigationLinks = [
   {
@@ -18,24 +17,20 @@ const managerNavigationLinks = [
   },
 ]
 
-const globalStore = useGlobalStore()
-
-const isUserManager = computed(() => {
-  const userData = globalStore.getAuthenticatedUserData()
-
-  return userData.value?.isManager
-})
+const authStore = useAuthStore()
 
 function handleLogout() {
   router.replace('/')
-  globalStore.setAuthenticatedUserData(null)
+  authStore.logout()
 }
 </script>
 <template>
-  <header class="flex justify-end p-4 rounded-xl w-full fixed">
+  <header class="flex justify-end p-4 rounded-xl fixed w-full">
     <ul class="ml-auto flex gap-4">
       <li
-        v-for="navigation in isUserManager ? managerNavigationLinks : clientNavigationLinks"
+        v-for="navigation in authStore.user?.isManager
+          ? managerNavigationLinks
+          : clientNavigationLinks"
         :key="navigation.link"
       >
         <RouterLink :to="navigation.link" activeClass="border-b border-b-active-link-border"
@@ -43,9 +38,7 @@ function handleLogout() {
         </RouterLink>
       </li>
     </ul>
-    <p class="ml-auto font-semibold">
-      Olá, {{ globalStore.getAuthenticatedUserData().value?.name }}!
-    </p>
+    <p class="ml-auto font-semibold">Olá, {{ authStore.user?.name.split(' ')[0] }}!</p>
     <LogOut @click="handleLogout" class="ml-6 cursor-pointer" />
   </header>
 </template>

@@ -1,20 +1,25 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { useLocalStorage } from '@vueuse/core'
 import type { AuthenticatedUserData } from '@/types/Auth/AuthenticatedUserData'
 import clientsMock from '@/mock/clients'
 import employeesMock from '@/mock/employees'
 
-function gerarSenhaAleatoria(): string {
+function generatedRandomPassword(): string {
   return Math.floor(1000 + Math.random() * 9000).toString()
 }
 
-function enviarSenhaPorEmail(email: string, senha: string): void {
+function sendPasswordOnEmail(email: string, senha: string): void {
   console.log(`Senha enviada para ${email}: ${senha}`)
 }
 
 export const useAuthStore = defineStore('auth', () => {
-  const isAuthenticated = ref(false)
-  const user = ref<AuthenticatedUserData | null>(null)
+  const isAuthenticated = useLocalStorage('auth/isAuthenticated', false)
+  const user = useLocalStorage<AuthenticatedUserData | null>('auth/user', null, {
+    serializer: {
+      read: (v) => (v ? JSON.parse(v) : null),
+      write: (v) => JSON.stringify(v),
+    },
+  })
 
   async function login(email: string, password: string): Promise<AuthenticatedUserData | null> {
     const client = clientsMock.getClientByEmail(email)
@@ -43,7 +48,7 @@ export const useAuthStore = defineStore('auth', () => {
       throw new Error('Todos os campos são obrigatórios.')
     }
 
-    const senha = gerarSenhaAleatoria()
+    const senha = generatedRandomPassword()
     const newClient = {
       ...newUser,
       isManager: false,
@@ -52,7 +57,7 @@ export const useAuthStore = defineStore('auth', () => {
     }
 
     clientsMock.registerClient(newClient)
-    enviarSenhaPorEmail(newClient.email, senha)
+    sendPasswordOnEmail(newClient.email, senha)
     isAuthenticated.value = true
     user.value = newClient
 

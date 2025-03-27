@@ -11,7 +11,7 @@ type ClientData = AuthenticatedUserData & {
 const registeredClients = ref<ClientData[]>([
   {
     name: 'Heitor Plinta Pagodeiro',
-    email: 'plinta.pagode@example.com',
+    email: 'heitor@gmail.com',
     cpf: '123.456.789-00',
     cep: '01001-000',
     isManager: false,

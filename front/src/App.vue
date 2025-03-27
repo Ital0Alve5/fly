@@ -1,19 +1,21 @@
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
-import { useGlobalStore } from '@/stores/global'
-import { computed } from 'vue'
-import employeesMock from '@/mock/employees'
+import { useAuthStore } from '@/stores/auth'
+import Toaster from '@/components/ui/toast/Toaster.vue'
 
 import Authenticated from '@/layouts/Authenticated.vue'
 import Default from '@/layouts/Default.vue'
+import { useNotificationListener } from '@/composables/useNotificationListener'
 
-const globalStore = useGlobalStore()
+useNotificationListener()
 
-const isAuthenticated = computed(() => globalStore.authenticatedUser !== null)
+const authStore = useAuthStore()
 </script>
 
 <template>
-  <Authenticated v-if="isAuthenticated && $route.name !== 'auth'">
+  <Toaster />
+
+  <Authenticated v-if="authStore.isAuthenticated && $route.name !== 'auth'">
     <RouterView />
   </Authenticated>
   <Default v-else>
