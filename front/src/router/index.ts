@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { useGlobalStore } from '@/stores/global'
 import Auth from '@/views/Auth/index.vue'
 import Booking from '@/views/Client/Booking.vue'
+import Reservation from '@/views/Client/Reservation.vue'
 import Adm from '@/views/Manager/PaginaAdmTeste.vue'
 
 const routes = [
@@ -16,6 +17,13 @@ const routes = [
     component: Booking,
     meta: { requiresAuth: true },
   },
+      {
+      path: '/reservas/reserva/:reservationId(\\d+)',
+      name: 'reserva',
+      component: Reservation,
+      meta: { requiresAuth: true },
+    },
+
   {
     path: '/admTeste',
     name: 'admTeste',
@@ -34,9 +42,9 @@ router.beforeEach((to) => {
   const userData = globalStore.getAuthenticatedUserData()
 
   if (
-    (!userData.value && to.meta.requiresAuth) ||
-    (userData.value && !userData.value.isManager && to.meta.isManager) ||
-    (userData.value && userData.value.isManager && !to.meta.isManager && to.name !== 'auth')
+    (!userData && to.meta.requiresAuth) ||
+    (userData && !userData.isManager && to.meta.isManager) ||
+    (userData && userData.isManager && !to.meta.isManager && to.name !== 'auth')
   ) {
     return { name: 'auth' }
   }
