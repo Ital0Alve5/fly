@@ -3,8 +3,9 @@ import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
-} from '@/components/ui/resizable'
+} from '../../../components/ui/resizable'
 import MilesQuantity from './components/MilesQuantity.vue';
+import MilesCheckout from './components/MilesCheckout.vue';
 </script>
 
 <template>
@@ -28,7 +29,9 @@ import MilesQuantity from './components/MilesQuantity.vue';
         <ResizablePanelGroup id="demo-group-2" direction="vertical">
           <ResizablePanel id="demo-panel-4" :default-size="75" class="bg-black">
             <div class="flex h-full items-center justify-center p-6">
-              <span class="font-semibold">Three</span>
+              <div class="w-full max-w-md">
+                <MilesCheckout />
+              </div>
             </div>
           </ResizablePanel>
         </ResizablePanelGroup>

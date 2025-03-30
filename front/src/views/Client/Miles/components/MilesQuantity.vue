@@ -1,26 +1,31 @@
 <script setup lang="ts">
+import { computed } from 'vue';
 import { ref } from 'vue'
-import { Label } from '@/components/ui/label'
+import { Label } from '../../../../components/ui/label'
 import {
   NumberField,
   NumberFieldContent,
   NumberFieldDecrement,
   NumberFieldIncrement,
   NumberFieldInput,
-} from '@/components/ui/number-field'
-import { useRouter } from 'vue-router'
-import { Separator } from '@/components/ui/separator'
-import { useAuthStore } from '@/stores/auth'
+} from '../../../../components/ui/number-field'
+import { Separator } from '../../../../components/ui/separator'
+import { useAuthStore } from '../../../../stores/auth'
+import { Card, CardContent, CardHeader, CardTitle } from '../../../../components/ui/card';
+import { useMilesPurchaseStore } from '../../../../stores/miles-purchase'
 
-const router = useRouter()
 const authStore = useAuthStore()
+const milesPurchaseStore = useMilesPurchaseStore()
 
 const user = ref({
   firstName: authStore.user?.name.split(' ')[0],
   miles: authStore.user?.miles
 })
 
-const miles = ref(10)
+const miles = computed({
+  get: () => milesPurchaseStore.miles,
+  set: (value: number) => milesPurchaseStore.setMiles(value)
+})
 </script>
 
 <template>
@@ -46,7 +51,6 @@ const miles = ref(10)
       <h2 class="text-lg font-semibold text-center">
         Selecione a quantidade de milhas
       </h2>
-      <p class="pt-4 text-center">1 milha = R$5,00</p>
     </div>
     
     <div class="px-6 pb-6">
@@ -60,8 +64,29 @@ const miles = ref(10)
       </NumberField>
     </div>
 
-    <div class="p-6 pt-12">
-      <p class="text-lg pt-4 text-center">{{miles}} milhas custam R${{ miles * 5 }},00</p>
+    <div class="px-6 pb-6">
+      <Card>
+        <CardHeader>
+          <CardTitle class="text-center">
+            Resumo da compra
+          </CardTitle>
+        </CardHeader>
+        <CardContent class="space-y-4">
+          <div class="flex justify-between">
+            <span class="font-medium">Milhas:</span>
+            <span>{{ miles }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="font-medium">Preço por milha:</span>
+            <span>R$5,00</span>
+          </div>
+          <Separator />
+          <div class="flex justify-between font-bold">
+            <span>Total:</span>
+            <span>R${{ miles * 5 }},00</span>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   </div>
 </template>
