@@ -2,7 +2,7 @@ import Auth from '@/views/Auth/index.vue'
 import Booking from '@/views/Client/Booking.vue'
 import Reservation from '@/views/Client/Reservation.vue'
 import Adm from '@/views/Manager/PaginaAdmTeste.vue'
-import BuyMiles from '@/components/features/Client/Miles/BuyMiles.vue'
+import BuyMiles from '@/views/Client/Miles/BuyMiles.vue'
 
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
