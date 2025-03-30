@@ -37,7 +37,7 @@ const onSubmit = handleSubmit((values) => {
             class="rounded-none"
             v-bind="componentField"
             type="text"
-            placeholder="Aeroporto de origem"
+            placeholder="Aeroporto de destino"
           />
         </FormControl>
       </FormItem>
