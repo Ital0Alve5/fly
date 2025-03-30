@@ -3,6 +3,10 @@ import { ref } from 'vue'
 import { Card, CardContent, CardHeader, CardTitle } from '../../../ui/card'
 import { Button } from '../../../ui/button'
 import { Table, TableHead, TableRow, TableHeader, TableBody, TableCell } from '../../../ui/table'
+import { useRouter } from 'vue-router'
+
+const router = useRouter();
+
 // Mock de dados da tabelinha
 const saldoMilhas = ref(5000)
 const reservas = ref([
@@ -11,7 +15,7 @@ const reservas = ref([
   { id: 3, status: 'Cancelado', dataHora: '2025-03-15 16:45', origem: 'BSB', destino: 'LIS' },
 ])
 // Métodos pros botões
-const comprarMilhas = () => {}
+const comprarMilhas = () => router.push('/comprar-milhas')
 const consultarExtrato = () => {}
 const efetuarReserva = () => {}
 const consultarReserva = () => {}

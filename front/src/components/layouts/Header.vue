@@ -8,6 +8,10 @@ const clientNavigationLinks = [
     label: 'Reservas',
     link: '/reservas',
   },
+  {
+    label: 'Comprar milhas',
+    link: '/comprar-milhas',
+  },
 ]
 
 const managerNavigationLinks = [
