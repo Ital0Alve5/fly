@@ -2,9 +2,11 @@ import Auth from '@/views/Auth/index.vue'
 import Booking from '@/views/Client/Booking.vue'
 import Reservation from '@/views/Client/Reservation.vue'
 import Adm from '@/views/Manager/PaginaAdmTeste.vue'
+import Search from '@/views/Flights/Search.vue'
 
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -24,6 +26,12 @@ const router = createRouter({
       path: '/reservas/reserva/:reservationId(\\d+)',
       name: 'reserva',
       component: Reservation,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/voos',
+      name: 'voos',
+      component: Search,
       meta: { requiresAuth: true },
     },
     {

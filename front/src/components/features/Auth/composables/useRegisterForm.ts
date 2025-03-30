@@ -10,7 +10,7 @@ const registerSchema = toTypedSchema(
       .email('E-mail inválido')
       .min(1, 'Campo obrigatório'),
     cpf: z.string({ required_error: 'CPF é obrigatório' }).min(1, 'Campo obrigatório'),
-    cep: z.string({ required_error: 'CEP é obrigatório' }).min(1, 'Campo obrigatório'),
+    cep: z.string({ required_error: 'CEP é obrigatório' }).min(2, 'Campo obrigatório'),
   }),
 )
 
