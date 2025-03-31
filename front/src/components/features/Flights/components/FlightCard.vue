@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { useRouter } from 'vue-router'
 
 defineProps<{
   flight: {
@@ -12,13 +13,18 @@ defineProps<{
   }
 }>()
 
-function handleClickCard(){
+const router = useRouter()
 
+function handleClickCard() {
+  router.push('/voos/voo')
 }
 </script>
 
 <template>
-  <Card @click="handleClickCard" class="w-full max-w-md col-span-3 cursor-pointer hover:opacity-80 transition-opacity">
+  <Card
+    @click="handleClickCard"
+    class="w-full max-w-md col-span-3 cursor-pointer hover:opacity-80 transition-opacity"
+  >
     <CardHeader>
       <CardTitle>Voo de {{ flight.originAirport }} à {{ flight.destinationAirport }}</CardTitle>
       <CardDescription>Informações do vôo:</CardDescription>
