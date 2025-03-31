@@ -3,6 +3,7 @@ import { useLocalStorage } from '@vueuse/core'
 import type { AuthenticatedUserData } from '@/types/Auth/AuthenticatedUserData'
 import clientsMock from '@/mock/clients'
 import employeesMock from '@/mock/employees'
+import { useUserInfoStore } from './user'
 
 function generatedRandomPassword(): string {
   return Math.floor(1000 + Math.random() * 9000).toString()
@@ -25,13 +26,17 @@ export const useAuthStore = defineStore('auth', () => {
     const client = clientsMock.getClientByEmail(email)
     const employee = employeesMock.getEmployeeByEmail(email)
 
-    if (
-      (client || employee) &&
-      (client?.password === password || employee?.password === password)
-    ) {
+    const authenticatedUser = client || employee
+    const passwordMatches = authenticatedUser?.password === password
+
+    if (authenticatedUser && passwordMatches) {
       isAuthenticated.value = true
-      user.value = client || employee
-      return user.value
+      user.value = authenticatedUser
+      
+      const userInfoStore = useUserInfoStore()
+      userInfoStore.setUserId(authenticatedUser.userId)
+      
+      return authenticatedUser
     }
 
     return null
@@ -51,6 +56,7 @@ export const useAuthStore = defineStore('auth', () => {
     const senha = generatedRandomPassword()
     const newClient = {
       ...newUser,
+      userId: Date.now(),
       isManager: false,
       password: senha,
       miles: 0,
@@ -60,8 +66,11 @@ export const useAuthStore = defineStore('auth', () => {
     sendPasswordOnEmail(newClient.email, senha)
     isAuthenticated.value = true
     user.value = newClient
+    
+    const userInfoStore = useUserInfoStore()
+    userInfoStore.setUserId(newClient.userId)
 
-    return user.value
+    return newClient
   }
 
   function logout() {
