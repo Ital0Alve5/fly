@@ -36,13 +36,10 @@ const userId = computed(() => userInfoStore.userId)
 const data = ref<ExtractItem[]>([])
 
 watchEffect(() => {
-  console.log('userId:', userId.value)
   if (userId.value) {
     const extractedData = getExtractByUserId(userId.value)
-    console.log('Extracted data:', extractedData)
     data.value = extractedData
   } else {
-    console.log('No userId available')
     data.value = []
   }
 })
