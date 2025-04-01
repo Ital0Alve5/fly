@@ -2,7 +2,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { useRouter } from 'vue-router'
 
-defineProps<{
+const props = defineProps<{
   flight: {
     originAirport: string
     destinationAirport: string
@@ -16,7 +16,7 @@ defineProps<{
 const router = useRouter()
 
 function handleClickCard() {
-  router.push('/voos/voo')
+  router.push({ name: 'flightDetails', params: { code: props.flight.code } })
 }
 </script>
 

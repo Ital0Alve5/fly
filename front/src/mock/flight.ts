@@ -66,26 +66,29 @@ export const flights = [
   },
 ]
 
+export function getFlightByCode(code: string): Flight | undefined {
+  return flights.find((f) => f.code === code)
+}
+
 export async function searchFlights(
   originAirport: string,
   destinationAirport: string,
 ): Promise<Flight[]> {
-  const searchOrigin = originAirport.toLowerCase().trim();
-  const searchDestination = destinationAirport.toLowerCase().trim();
+  const searchOrigin = originAirport.toLowerCase().trim()
+  const searchDestination = destinationAirport.toLowerCase().trim()
 
   // Sleep de 2 segundos para simular chamada a API
-  await new Promise((resolve) => setTimeout(() => resolve(undefined), 2000));
+  await new Promise((resolve) => setTimeout(() => resolve(undefined), 2000))
 
   return flights.filter((flight) => {
-    const flightOrigin = flight.originAirport.toLowerCase();
-    const flightDestination = flight.destinationAirport.toLowerCase();
+    const flightOrigin = flight.originAirport.toLowerCase()
+    const flightDestination = flight.destinationAirport.toLowerCase()
 
-    const matchesOrigin = !searchOrigin || flightOrigin.includes(searchOrigin);
-    const matchesDestination = !searchDestination || flightDestination.includes(searchDestination);
+    const matchesOrigin = !searchOrigin || flightOrigin.includes(searchOrigin)
+    const matchesDestination = !searchDestination || flightDestination.includes(searchDestination)
 
-    return matchesOrigin && matchesDestination;
-  });
+    return matchesOrigin && matchesDestination
+  })
 }
-
 
 export default { flights, searchFlights }

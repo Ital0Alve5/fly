@@ -8,7 +8,6 @@ import FlightDetails from '@/views/Flights/FlightDetails.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 
-
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -36,8 +35,8 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
-      path: '/voos/voo',
-      name: 'detalhesVoo',
+      path: '/voos/voo/:code',
+      name: 'flightDetails',
       component: FlightDetails,
       meta: { requiresAuth: true },
     },
