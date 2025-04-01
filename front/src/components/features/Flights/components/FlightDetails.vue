@@ -20,7 +20,7 @@ onMounted(() => {
       <CardTitle>Detalhes do voo</CardTitle>
       <CardDescription>Veja mais detalhes do voo abaixo:</CardDescription>
     </CardHeader>
-    <CardContent>
+    <CardContent class="flex items-end gap-16">
       <ul class="flex flex-col gap-3">
         <li class="flex gap-2">
           <b>Código do voo:</b>
@@ -39,6 +39,8 @@ onMounted(() => {
           <p>{{ flight.dateTime }}</p>
         </li>
       </ul>
+
+      <span class="text-xl font-bold">R${{ flight.price }}</span>
     </CardContent>
   </Card>
 </template>
