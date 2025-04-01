@@ -65,12 +65,15 @@ const onSubmit = handleSubmit(async (values) => {
 
   registerExtract(newExtract)
 
+  userInfoStore.addMiles(milesQunatity.value)
+
   console.log('Informações de pagamento:', values);
   
   toast({
     title: 'Pagamento efetuado com sucesso',
     description: 'Suas milhas foram compradas com sucesso!',
     variant: 'default',
+    duration: 2000,
   });
 
   resetForm();

@@ -82,6 +82,20 @@ const columns: ColumnDef<ExtractItem>[] = [
       }, () => ['Valor', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })])
     },
     cell: ({ row }) => h('div', row.getValue('value')),
+    sortingFn: (rowA, rowB, columnId) => {
+      const extractNumber = (value: string) => {
+        const cleaned = value
+          .replace('R$', '')
+          .replace(/\./g, '')
+          .replace(',', '.')
+        return parseFloat(cleaned) || 0
+      }
+
+      const valueA = extractNumber(rowA.getValue(columnId))
+      const valueB = extractNumber(rowB.getValue(columnId))
+      
+      return valueA - valueB
+    },
   },
   {
     accessorKey: 'miles',

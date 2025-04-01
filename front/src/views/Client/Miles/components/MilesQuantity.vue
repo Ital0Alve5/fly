@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import { ref } from 'vue'
 import { Label } from '../../../../components/ui/label'
 import {
   NumberField,
@@ -10,17 +9,17 @@ import {
   NumberFieldInput,
 } from '../../../../components/ui/number-field'
 import { Separator } from '../../../../components/ui/separator'
-import { useAuthStore } from '../../../../stores/auth'
 import { Card, CardContent, CardHeader, CardTitle } from '../../../../components/ui/card';
 import { useMilesPurchaseStore } from '../../../../stores/miles-purchase'
+import { useUserInfoStore } from '../../../../stores/user';
 
-const authStore = useAuthStore()
+const userInfoStore = useUserInfoStore()
 const milesPurchaseStore = useMilesPurchaseStore()
 
-const user = ref({
-  firstName: authStore.user?.name.split(' ')[0],
-  miles: authStore.user?.miles
-})
+const user = computed(() => ({
+  firstName: userInfoStore.name?.split(' ')[0] || '',
+  miles: userInfoStore.miles || 0
+}))
 
 const miles = computed({
   get: () => milesPurchaseStore.miles,
