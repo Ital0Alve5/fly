@@ -21,7 +21,7 @@ onMounted(() => {
       <CardDescription>Veja mais detalhes do voo abaixo:</CardDescription>
     </CardHeader>
     <CardContent>
-      <ul>
+      <ul class="flex flex-col gap-3">
         <li class="flex gap-2">
           <b>Código do voo:</b>
           <p>{{ flight.code }}</p>

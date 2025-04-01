@@ -3,15 +3,8 @@ import FlightDetailsCard from '@/components/features/Flights/components/FlightDe
 import FlightingPayment from '@/components/features/Flights/components/FlightingPayment.vue'
 </script>
 <template>
-  <main class="flex items-center mt-36 flex-col">
-    <section>
-      <div class="flex flex-col">
-        <h1 class="text-4xl font-bold">Detalhes do voo</h1>
-      </div>
-    </section>
-    <section class="flex mt-28">
-      <FlightDetailsCard />
-      <FlightingPayment />
-    </section>
-  </main>
+  <div class="flex items-center min-h-screen justify-center">
+    <FlightDetailsCard />
+    <FlightingPayment />
+  </div>
 </template>
