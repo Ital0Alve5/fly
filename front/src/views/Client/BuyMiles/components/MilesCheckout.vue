@@ -6,10 +6,10 @@ import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
 import { useToast } from '@/components/ui/toast'
 import { useCheckoutForm } from '../composables/useCheckoutForm'
-import { useMilesPurchaseStore } from '@/stores/miles-purchase'
+import { useMilesStore } from '@/stores/miles'
 
 const { toast } = useToast()
-const milesPurchaseStore = useMilesPurchaseStore()
+const milesPurchaseStore = useMilesStore()
 
 const { handleSubmit, cardNumber, cardName, expiryDate, cvv } = useCheckoutForm()
 

@@ -1,17 +1,10 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import type { Flight } from '@/mock/flight'
-import { getFlightByCode } from '@/mock/flight'
 
-const route = useRoute()
-const flight = ref<Flight | null>(null)
-
-onMounted(() => {
-  const code = route.params.code as string
-  flight.value = getFlightByCode(code) ?? null
-})
+defineProps<{
+  flight: Flight | null
+}>()
 </script>
 
 <template>
@@ -21,7 +14,7 @@ onMounted(() => {
       <CardDescription>Veja mais detalhes do voo abaixo:</CardDescription>
     </CardHeader>
     <CardContent class="flex items-end gap-16">
-      <ul class="flex flex-col gap-3">
+      <ul class="flex flex-col gap-4">
         <li class="flex gap-2">
           <b>Código do voo:</b>
           <p>{{ flight.code }}</p>
@@ -39,8 +32,6 @@ onMounted(() => {
           <p>{{ flight.dateTime }}</p>
         </li>
       </ul>
-
-      <span class="text-xl font-bold">R${{ flight.price }}</span>
     </CardContent>
   </Card>
 </template>

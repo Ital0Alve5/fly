@@ -5,7 +5,7 @@ export type Flight = {
   code: string
   origin: string
   destination: string
-  price: string
+  price: number
 }
 
 export const flights = [
@@ -16,7 +16,7 @@ export const flights = [
     code: 'ABC123',
     origin: 'São Paulo',
     destination: 'Nova York',
-    price: '2000,00',
+    price: 2000,
   },
   {
     originAirport: 'GRU',
@@ -25,7 +25,7 @@ export const flights = [
     code: 'DEF456',
     origin: 'São Paulo',
     destination: 'Paris',
-    price: '3450,00',
+    price: 3450,
   },
   {
     originAirport: 'LAX',
@@ -34,7 +34,7 @@ export const flights = [
     code: 'GHI789',
     origin: 'Los Angeles',
     destination: 'Nova York',
-    price: '500,00',
+    price: 500,
   },
   {
     originAirport: 'LAX',
@@ -43,7 +43,7 @@ export const flights = [
     code: 'JKL012',
     origin: 'Los Angeles',
     destination: 'Londres',
-    price: '1400,00',
+    price: 1400,
   },
   {
     originAirport: 'CDG',
@@ -52,7 +52,7 @@ export const flights = [
     code: 'MNO345',
     origin: 'Paris',
     destination: 'São Paulo',
-    price: '2300,00',
+    price: 2300,
   },
   {
     originAirport: 'JFK',
@@ -61,7 +61,7 @@ export const flights = [
     code: 'PQR678',
     origin: 'Nova York',
     destination: 'Los Angeles',
-    price: '380,00',
+    price: 380,
   },
   {
     originAirport: 'GRU',
@@ -70,7 +70,7 @@ export const flights = [
     code: 'STU901',
     origin: 'São Paulo',
     destination: 'Nova York',
-    price: '1980,00',
+    price: 1980,
   },
 ]
 

@@ -12,10 +12,10 @@ import {
 import { Separator } from '@/components/ui/separator'
 import { useAuthStore } from '@/stores/auth'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { useMilesPurchaseStore } from '@/stores/miles-purchase'
+import { useMilesStore } from '@/stores/miles'
 
 const authStore = useAuthStore()
-const milesPurchaseStore = useMilesPurchaseStore()
+const milesPurchaseStore = useMilesStore()
 
 const user = ref({
   firstName: authStore.user?.name.split(' ')[0],
