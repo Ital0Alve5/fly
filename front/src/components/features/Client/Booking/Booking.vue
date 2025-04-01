@@ -5,7 +5,7 @@ import { Button } from '../../../ui/button'
 import { Table, TableHead, TableRow, TableHeader, TableBody, TableCell } from '../../../ui/table'
 import { useRouter } from 'vue-router'
 
-const router = useRouter();
+const router = useRouter()
 
 // Mock de dados da tabelinha
 const saldoMilhas = ref(5000)
@@ -17,7 +17,9 @@ const reservas = ref([
 // Métodos pros botões
 const comprarMilhas = () => router.push('/comprar-milhas')
 const consultarExtrato = () => {}
-const efetuarReserva = () => {}
+const efetuarReserva = () => {
+  router.push('/voos')
+}
 const consultarReserva = () => {}
 const fazerCheckin = () => {}
 const verReserva = (id: number) => {
