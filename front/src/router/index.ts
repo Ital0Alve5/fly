@@ -3,6 +3,7 @@ import Booking from '@/views/Client/Booking.vue'
 import Reservation from '@/views/Client/Reservation.vue'
 import Adm from '@/views/Manager/PaginaAdmTeste.vue'
 import Search from '@/views/Flights/Search.vue'
+import BuyMiles from '@/views/Client/Miles/BuyMiles.vue'
 
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
@@ -39,6 +40,12 @@ const router = createRouter({
       name: 'admTeste',
       component: Adm,
       meta: { requiresAuth: true, isManager: true },
+    },
+    {
+      path: '/comprar-milhas',
+      name: 'comprarMilhas',
+      component: BuyMiles,
+      meta: { requiresAuth: true },
     },
   ],
 })

@@ -15,7 +15,7 @@ const reservas = ref([
   { id: 3, status: 'Cancelado', dataHora: '2025-03-15 16:45', origem: 'BSB', destino: 'LIS' },
 ])
 // Métodos pros botões
-const comprarMilhas = () => {}
+const comprarMilhas = () => router.push('/comprar-milhas')
 const consultarExtrato = () => {}
 const efetuarReserva = () => {
   router.push('/voos')
