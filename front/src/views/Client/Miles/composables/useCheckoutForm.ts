@@ -35,7 +35,7 @@ const checkoutSchema = toTypedSchema(
 )
 
 export function useCheckoutForm() {
-  const { handleSubmit } = useForm({
+  const { handleSubmit, resetForm } = useForm({
     validationSchema: checkoutSchema,
   })
 
@@ -46,6 +46,7 @@ export function useCheckoutForm() {
 
   return {
     handleSubmit,
+    resetForm,
     cardNumber,
     cardName,
     expiryDate,

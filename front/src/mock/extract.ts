@@ -3,7 +3,7 @@ import { ref } from 'vue'
 export type ExtractItem = {
   userId: number
   date: string
-  reservationCode: string
+  reservationCode: string | null
   value: string
   miles: number
   description: string
@@ -23,7 +23,7 @@ const ExtractHistory = ref<ExtractItem[]>([
   {
     userId: 1,
     date: '12/03/2025',
-    reservationCode: 'HT-782',
+    reservationCode: '',
     value: 'R$189,90',
     miles: 0,
     description: 'COMPRA DE MILHAS',
@@ -32,7 +32,7 @@ const ExtractHistory = ref<ExtractItem[]>([
   {
     userId: 1,
     date: '15/03/2025',
-    reservationCode: 'ML-459',
+    reservationCode: '',
     value: 'R$1.250,00',
     miles: 25000,
     description: 'COMPRA DE MILHAS',
@@ -41,7 +41,7 @@ const ExtractHistory = ref<ExtractItem[]>([
   {
     userId: 1,
     date: '18/03/2025',
-    reservationCode: 'CC-901',
+    reservationCode: '',
     value: 'R$75,30',
     miles: 1506,
     description: 'COMPRA DE MILHAS',
@@ -59,7 +59,7 @@ const ExtractHistory = ref<ExtractItem[]>([
   {
     userId: 1,
     date: '22/03/2025',
-    reservationCode: 'BN-112',
+    reservationCode: '',
     value: 'R$0,00',
     miles: 1000,
     description: 'COMPRA DE MILHAS',
@@ -68,7 +68,7 @@ const ExtractHistory = ref<ExtractItem[]>([
   {
     userId: 1,
     date: '25/03/2025',
-    reservationCode: 'RT-335',
+    reservationCode: '',
     value: 'R$412,75',
     miles: 0,
     description: 'COMPRA DE MILHAS',
@@ -77,7 +77,7 @@ const ExtractHistory = ref<ExtractItem[]>([
   {
     userId: 1,
     date: '28/03/2025',
-    reservationCode: 'ML-002',
+    reservationCode: '',
     value: 'R$600,00',
     miles: 12000,
     description: 'COMPRA DE MILHAS',
@@ -113,7 +113,7 @@ const ExtractHistory = ref<ExtractItem[]>([
   {
     userId: 1,
     date: '08/04/2025',
-    reservationCode: 'ML-555',
+    reservationCode: '',
     value: 'R$750,00',
     miles: 15000,
     description: 'COMPRA DE MILHAS',
@@ -125,8 +125,8 @@ export function getExtractByUserId(userId: number): ExtractItem[] {
   return ExtractHistory.value.filter((extract) => extract.userId === userId)
 }
 
-export function registeExtractByUserId(extract: ExtractItem): void {
+export function registerExtract(extract: ExtractItem): void {
     ExtractHistory.value.push(extract)
 }
 
-export default { ExtractHistory, registeExtractByUserId, getExtractByUserId }
+export default { ExtractHistory, registerExtract, getExtractByUserId }
