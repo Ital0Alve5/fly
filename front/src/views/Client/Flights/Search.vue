@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import FlightCard from '@/components/features/Flights/components/FlightCard.vue'
-import FlightCardsGrid from '@/components/features/Flights/components/FlightCardsGrid.vue'
-import SearchFlightForm from '@/components/features/Flights/components/SearchFlightForm.vue'
+import FlightCard from './components/FlightCard.vue'
+import FlightCardsGrid from './components/FlightCardsGrid.vue'
+import SearchFlightForm from './components/SearchFlightForm.vue'
 import { searchFlights, type Flight } from '@/mock/flight'
 import { useAuthStore } from '@/stores/auth'
 import { useGlobalStore } from '@/stores/global'
@@ -23,7 +23,8 @@ async function handleSearch(originAipoirt: string, destinationAirpoirt: string) 
 
     const flights = await searchFlights(originAipoirt, destinationAirpoirt)
     flightsList.value = flights
-  } catch (err) {
+  } catch (error) {
+    console.log(error)
     globalStore.setNotification({
       title: 'Erro ao buscar vôos!',
       description: 'Tente novamente mais tarde',
