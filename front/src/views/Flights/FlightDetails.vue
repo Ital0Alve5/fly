@@ -9,7 +9,7 @@ import FlightingPayment from '@/components/features/Flights/components/Flighting
         <h1 class="text-4xl font-bold">Detalhes do voo</h1>
       </div>
     </section>
-    <section>
+    <section class="flex mt-28">
       <FlightDetailsCard />
       <FlightingPayment />
     </section>
