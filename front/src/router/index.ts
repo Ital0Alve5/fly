@@ -3,7 +3,7 @@ import Booking from '@/views/Client/Booking.vue'
 import Reservation from '@/views/Client/Reservation.vue'
 import Adm from '@/views/Manager/PaginaAdmTeste.vue'
 import Search from '@/views/Flights/Search.vue'
-import FlightDetails from '@/views/Flights/FlightDetails.vue'
+import details from '@/views/Flights/Details.vue'
 
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
@@ -37,7 +37,7 @@ const router = createRouter({
     {
       path: '/voos/voo/:code',
       name: 'flightDetails',
-      component: FlightDetails,
+      component: details,
       meta: { requiresAuth: true },
     },
     {
