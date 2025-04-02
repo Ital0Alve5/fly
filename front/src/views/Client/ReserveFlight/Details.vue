@@ -25,11 +25,15 @@ import { getFlightByCode, type Flight } from '@/mock/flight'
 import { generateUniqueCode } from '@/utils/generateRandomCode'
 import booking from '@/mock/booking'
 import { getCurrentDateTime } from '@/utils/date/getCurrentDateTime'
+import { registerExtract } from '@/mock/extract'
+import { useAuthStore } from '@/stores/auth'
+import { getTodayDate } from '@/utils/date/getTodayDate'
 
 const route = useRoute()
 const router = useRouter()
 
 const milesStore = useMilesStore()
+const authStore = useAuthStore()
 
 const code = route.params.code as string
 const flight = ref<Flight | null>(getFlightByCode(code) ?? null)
@@ -52,6 +56,16 @@ function handleReserveFlight(value: boolean) {
     dataHora: getCurrentDateTime(),
     origem: flight.value?.originAirport ?? '',
     destino: flight.value?.destinationAirport ?? '',
+  })
+
+  registerExtract({
+    userId: authStore.user?.userId as number,
+    date: getTodayDate(),
+    reservationCode: generatedCode.value,
+    value: `R$${valueToPay.value},00`,
+    miles: miles.value,
+    description: `${flight.value?.originAirport}->${flight.value?.destinationAirport}`,
+    type: 'SAÍDA',
   })
 
   router.push('/reservas')
@@ -102,7 +116,7 @@ function handleReserveFlight(value: boolean) {
             </NumberField>
 
             <p class="text-xl">
-              Valor a pagar: <b>{{ valueToPay }}</b>
+              Valor a pagar: <b>R${{ valueToPay }},00</b>
             </p>
 
             <DialogTrigger as-child>

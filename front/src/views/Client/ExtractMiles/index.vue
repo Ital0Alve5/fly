@@ -27,12 +27,12 @@ import {
 } from '@tanstack/vue-table'
 import { ArrowUpDown } from 'lucide-vue-next'
 import { h, ref } from 'vue'
-import { useUserInfoStore } from '@/stores/user'
+import { useAuthStore } from '@/stores/auth'
 import { getExtractByUserId, type ExtractItem } from '@/mock/extract'
 
-const userInfoStore = useUserInfoStore()
+const authtore = useAuthStore()
 
-const userId = computed(() => userInfoStore.userId)
+const userId = computed(() => authtore.user?.userId)
 const data = ref<ExtractItem[]>([])
 
 watchEffect(() => {

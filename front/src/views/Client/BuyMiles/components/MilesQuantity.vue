@@ -15,16 +15,16 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useMilesStore } from '@/stores/miles'
 
 const authStore = useAuthStore()
-const milesPurchaseStore = useMilesStore()
+const milesStore = useMilesStore()
 
 const user = ref({
   firstName: authStore.user?.name.split(' ')[0],
-  miles: authStore.user?.miles,
+  miles: milesStore.miles,
 })
 
 const miles = computed({
-  get: () => milesPurchaseStore.miles,
-  set: (value: number) => milesPurchaseStore.setMiles(value),
+  get: () => milesStore.miles,
+  set: (value: number) => milesStore.setMiles(value),
 })
 </script>
 
