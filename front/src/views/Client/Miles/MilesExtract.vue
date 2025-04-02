@@ -7,7 +7,7 @@ import type {
   VisibilityState,
 } from '@tanstack/vue-table'
 import { Button } from '../../../components/ui/button'
-import { valueUpdater } from '../../../lib/utils';
+import { valueUpdater } from '../../../lib/utils'
 import {
   Table,
   TableBody,
@@ -44,28 +44,31 @@ watchEffect(() => {
   }
 })
 
-
 const columns: ColumnDef<ExtractItem>[] = [
   {
     accessorKey: 'date',
     header: ({ column }) => {
-      return h(Button, {
-        variant: 'ghost',
-        onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
-      }, () => ['Data', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })])
+      return h(
+        Button,
+        {
+          variant: 'ghost',
+          onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
+        },
+        () => ['Data', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })],
+      )
     },
     cell: ({ row }) => h('div', row.getValue('date')),
     sortingFn: (rowA, rowB, columnId) => {
-      const dateA = rowA.getValue(columnId) as string;
-      const dateB = rowB.getValue(columnId) as string;
-      
-      const [dayA, monthA, yearA] = dateA.split('/').map(Number);
-      const [dayB, monthB, yearB] = dateB.split('/').map(Number);
-      
-      const parsedDateA = new Date(yearA, monthA - 1, dayA);
-      const parsedDateB = new Date(yearB, monthB - 1, dayB);
-      
-      return parsedDateA.getTime() - parsedDateB.getTime();
+      const dateA = rowA.getValue(columnId) as string
+      const dateB = rowB.getValue(columnId) as string
+
+      const [dayA, monthA, yearA] = dateA.split('/').map(Number)
+      const [dayB, monthB, yearB] = dateB.split('/').map(Number)
+
+      const parsedDateA = new Date(yearA, monthA - 1, dayA)
+      const parsedDateB = new Date(yearB, monthB - 1, dayB)
+
+      return parsedDateA.getTime() - parsedDateB.getTime()
     },
   },
   {
@@ -76,34 +79,39 @@ const columns: ColumnDef<ExtractItem>[] = [
   {
     accessorKey: 'value',
     header: ({ column }) => {
-      return h(Button, {
-        variant: 'ghost',
-        onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
-      }, () => ['Valor', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })])
+      return h(
+        Button,
+        {
+          variant: 'ghost',
+          onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
+        },
+        () => ['Valor', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })],
+      )
     },
     cell: ({ row }) => h('div', row.getValue('value')),
     sortingFn: (rowA, rowB, columnId) => {
       const extractNumber = (value: string) => {
-        const cleaned = value
-          .replace('R$', '')
-          .replace(/\./g, '')
-          .replace(',', '.')
+        const cleaned = value.replace('R$', '').replace(/\./g, '').replace(',', '.')
         return parseFloat(cleaned) || 0
       }
 
       const valueA = extractNumber(rowA.getValue(columnId))
       const valueB = extractNumber(rowB.getValue(columnId))
-      
+
       return valueA - valueB
     },
   },
   {
     accessorKey: 'miles',
     header: ({ column }) => {
-      return h(Button, {
-        variant: 'ghost',
-        onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
-      }, () => ['Milhas', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })])
+      return h(
+        Button,
+        {
+          variant: 'ghost',
+          onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
+        },
+        () => ['Milhas', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })],
+      )
     },
     cell: ({ row }) => h('div', row.getValue('miles')),
   },
@@ -132,15 +140,23 @@ const table = useVueTable({
   getSortedRowModel: getSortedRowModel(),
   getFilteredRowModel: getFilteredRowModel(),
   getExpandedRowModel: getExpandedRowModel(),
-  onColumnFiltersChange: updaterOrValue => valueUpdater(updaterOrValue, columnFilters),
-  onColumnVisibilityChange: updaterOrValue => valueUpdater(updaterOrValue, columnVisibility),
-  onRowSelectionChange: updaterOrValue => valueUpdater(updaterOrValue, rowSelection),
-  onExpandedChange: updaterOrValue => valueUpdater(updaterOrValue, expanded),
+  onColumnFiltersChange: (updaterOrValue) => valueUpdater(updaterOrValue, columnFilters),
+  onColumnVisibilityChange: (updaterOrValue) => valueUpdater(updaterOrValue, columnVisibility),
+  onRowSelectionChange: (updaterOrValue) => valueUpdater(updaterOrValue, rowSelection),
+  onExpandedChange: (updaterOrValue) => valueUpdater(updaterOrValue, expanded),
   state: {
-    get columnFilters() { return columnFilters.value },
-    get columnVisibility() { return columnVisibility.value },
-    get rowSelection() { return rowSelection.value },
-    get expanded() { return expanded.value },
+    get columnFilters() {
+      return columnFilters.value
+    },
+    get columnVisibility() {
+      return columnVisibility.value
+    },
+    get rowSelection() {
+      return rowSelection.value
+    },
+    get expanded() {
+      return expanded.value
+    },
   },
 })
 </script>
@@ -154,16 +170,17 @@ const table = useVueTable({
             <TableHeader>
               <TableRow v-for="headerGroup in table.getHeaderGroups()" :key="headerGroup.id">
                 <TableHead v-for="header in headerGroup.headers" :key="header.id">
-                  <FlexRender v-if="!header.isPlaceholder" :render="header.column.columnDef.header" :props="header.getContext()" />
+                  <FlexRender
+                    v-if="!header.isPlaceholder"
+                    :render="header.column.columnDef.header"
+                    :props="header.getContext()"
+                  />
                 </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               <template v-if="table.getRowModel().rows?.length">
-                <TableRow
-                  v-for="row in table.getRowModel().rows"
-                  :key="row.id"
-                >
+                <TableRow v-for="row in table.getRowModel().rows" :key="row.id">
                   <TableCell v-for="cell in row.getVisibleCells()" :key="cell.id">
                     <FlexRender :render="cell.column.columnDef.cell" :props="cell.getContext()" />
                   </TableCell>
@@ -171,10 +188,7 @@ const table = useVueTable({
               </template>
 
               <TableRow v-else>
-                <TableCell
-                  :colspan="columns.length"
-                  class="h-24 text-center"
-                >
+                <TableCell :colspan="columns.length" class="h-24 text-center">
                   No results.
                 </TableCell>
               </TableRow>

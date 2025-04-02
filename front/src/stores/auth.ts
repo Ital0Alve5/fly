@@ -32,10 +32,10 @@ export const useAuthStore = defineStore('auth', () => {
     if (authenticatedUser && passwordMatches) {
       isAuthenticated.value = true
       user.value = authenticatedUser
-      
+
       const userInfoStore = useUserInfoStore()
       userInfoStore.setUserId(authenticatedUser.userId)
-      
+
       return authenticatedUser
     }
 
@@ -66,7 +66,7 @@ export const useAuthStore = defineStore('auth', () => {
     sendPasswordOnEmail(newClient.email, senha)
     isAuthenticated.value = true
     user.value = newClient
-    
+
     const userInfoStore = useUserInfoStore()
     userInfoStore.setUserId(newClient.userId)
 

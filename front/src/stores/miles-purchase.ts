@@ -2,7 +2,6 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 
 export const useMilesPurchaseStore = defineStore('milesPurchase', () => {
-  
   const miles = ref(10)
   const pricePerMile = ref(5)
 
@@ -16,6 +15,6 @@ export const useMilesPurchaseStore = defineStore('milesPurchase', () => {
     miles,
     pricePerMile,
     totalPrice,
-    setMiles
+    setMiles,
   }
 })

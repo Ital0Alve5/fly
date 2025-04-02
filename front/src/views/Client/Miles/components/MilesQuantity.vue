@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed } from 'vue'
 import { Label } from '../../../../components/ui/label'
 import {
   NumberField,
@@ -9,32 +9,30 @@ import {
   NumberFieldInput,
 } from '../../../../components/ui/number-field'
 import { Separator } from '../../../../components/ui/separator'
-import { Card, CardContent, CardHeader, CardTitle } from '../../../../components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '../../../../components/ui/card'
 import { useMilesPurchaseStore } from '../../../../stores/miles-purchase'
-import { useUserInfoStore } from '../../../../stores/user';
+import { useUserInfoStore } from '../../../../stores/user'
 
 const userInfoStore = useUserInfoStore()
 const milesPurchaseStore = useMilesPurchaseStore()
 
 const user = computed(() => ({
   firstName: userInfoStore.name?.split(' ')[0] || '',
-  miles: userInfoStore.miles || 0
+  miles: userInfoStore.miles || 0,
 }))
 
 const miles = computed({
   get: () => milesPurchaseStore.miles,
-  set: (value: number) => milesPurchaseStore.setMiles(value)
+  set: (value: number) => milesPurchaseStore.setMiles(value),
 })
 </script>
 
 <template>
   <div class="h-full w-full flex flex-col border-0 space-y-6">
     <div class="p-6">
-      <h2 class="text-lg font-semibold text-center">
-        Informações de {{ user.firstName }}
-      </h2>
+      <h2 class="text-lg font-semibold text-center">Informações de {{ user.firstName }}</h2>
     </div>
-    
+
     <div class="px-6 pb-6">
       <ul class="space-y-4">
         <li>
@@ -43,15 +41,13 @@ const miles = computed({
         </li>
       </ul>
     </div>
-    
-    <Separator/>
-    
+
+    <Separator />
+
     <div class="p-6 pt-12">
-      <h2 class="text-lg font-semibold text-center">
-        Selecione a quantidade de milhas
-      </h2>
+      <h2 class="text-lg font-semibold text-center">Selecione a quantidade de milhas</h2>
     </div>
-    
+
     <div class="px-6 pb-6">
       <NumberField id="miles" v-model="miles" :min="0">
         <Label>Milhas</Label>
@@ -66,9 +62,7 @@ const miles = computed({
     <div class="px-6 pb-6">
       <Card>
         <CardHeader>
-          <CardTitle class="text-center">
-            Resumo da compra
-          </CardTitle>
+          <CardTitle class="text-center"> Resumo da compra </CardTitle>
         </CardHeader>
         <CardContent class="space-y-4">
           <div class="flex justify-between">

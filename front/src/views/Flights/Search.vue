@@ -23,7 +23,8 @@ async function handleSearch(originAipoirt: string, destinationAirpoirt: string) 
 
     const flights = await searchFlights(originAipoirt, destinationAirpoirt)
     flightsList.value = flights
-  } catch (err) {
+  } catch (error) {
+    console.log(error)
     globalStore.setNotification({
       title: 'Erro ao buscar vôos!',
       description: 'Tente novamente mais tarde',

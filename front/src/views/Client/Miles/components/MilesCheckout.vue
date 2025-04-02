@@ -1,56 +1,56 @@
 <script setup lang="ts">
-import { computed } from 'vue';
-import { Button } from '../../../../components/ui/button';
+import { computed } from 'vue'
+import { Button } from '../../../../components/ui/button'
 import {
   FormControl,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
-} from '../../../../components/ui/form';
-import { Input } from '../../../../components/ui/input';
-import { Separator } from '../../../../components/ui/separator';
-import { useToast } from '../../../../components/ui/toast';
-import { useCheckoutForm } from '../composables/useCheckoutForm';
-import { useMilesPurchaseStore } from '../../../../stores/miles-purchase';
-import { registerExtract, type ExtractItem } from '../../../../mock/extract';
-import { useUserInfoStore } from '../../../../stores/user';
+} from '../../../../components/ui/form'
+import { Input } from '../../../../components/ui/input'
+import { Separator } from '../../../../components/ui/separator'
+import { useToast } from '../../../../components/ui/toast'
+import { useCheckoutForm } from '../composables/useCheckoutForm'
+import { useMilesPurchaseStore } from '../../../../stores/miles-purchase'
+import { registerExtract, type ExtractItem } from '../../../../mock/extract'
+import { useUserInfoStore } from '../../../../stores/user'
 
 const userInfoStore = useUserInfoStore()
 
-const { toast } = useToast();
-const milesPurchaseStore = useMilesPurchaseStore();
+const { toast } = useToast()
+const milesPurchaseStore = useMilesPurchaseStore()
 
 const { handleSubmit, cardNumber, cardName, expiryDate, cvv, resetForm } = useCheckoutForm()
 
-const totalPrice = computed(() => milesPurchaseStore.totalPrice);
-const milesQunatity = computed(() => milesPurchaseStore.miles);
+const totalPrice = computed(() => milesPurchaseStore.totalPrice)
+const milesQunatity = computed(() => milesPurchaseStore.miles)
 
 const formatCardNumber = (e: Event) => {
-  const target = e.target as HTMLInputElement;
-  let value = target.value.replace(/\s+/g, '');
+  const target = e.target as HTMLInputElement
+  let value = target.value.replace(/\s+/g, '')
   if (value.length > 0) {
-    value = value.match(new RegExp('.{1,4}', 'g'))!.join(' ');
+    value = value.match(new RegExp('.{1,4}', 'g'))!.join(' ')
   }
-  cardNumber.value.value = value;
-};
+  cardNumber.value.value = value
+}
 
 const formatExpiryDate = (e: Event) => {
-  const target = e.target as HTMLInputElement;
-  let value = target.value.replace(/\D/g, '');
-  
+  const target = e.target as HTMLInputElement
+  let value = target.value.replace(/\D/g, '')
+
   if (value.length <= 2 && target.value.includes('/')) {
-    value = value.substring(0, 2);
-    expiryDate.value.value = value;
-    return;
+    value = value.substring(0, 2)
+    expiryDate.value.value = value
+    return
   }
-  
+
   if (value.length >= 2) {
-    value = value.substring(0, 2) + '/' + value.substring(2, 4);
+    value = value.substring(0, 2) + '/' + value.substring(2, 4)
   }
-  
-  expiryDate.value.value = value;
-};
+
+  expiryDate.value.value = value
+}
 
 const onSubmit = handleSubmit(async (values) => {
   const newExtract: ExtractItem = {
@@ -60,43 +60,38 @@ const onSubmit = handleSubmit(async (values) => {
     value: totalPrice.value.toString(),
     miles: milesQunatity.value,
     description: 'COMPRA DE MILHAS',
-    type: 'ENTRADA'
+    type: 'ENTRADA',
   }
 
   registerExtract(newExtract)
 
   userInfoStore.addMiles(milesQunatity.value)
 
-  console.log('Informações de pagamento:', values);
-  
+  console.log('Informações de pagamento:', values)
+
   toast({
     title: 'Pagamento efetuado com sucesso',
     description: 'Suas milhas foram compradas com sucesso!',
     variant: 'default',
     duration: 2000,
-  });
+  })
 
-  resetForm();
-});
-
+  resetForm()
+})
 </script>
 
 <template>
   <div class="h-full w-full flex flex-col border-0 space-y-6">
     <div class="p-6">
-      <h2 class="text-lg font-semibold text-center">
-        Finalização de pagamento
-      </h2>
+      <h2 class="text-lg font-semibold text-center">Finalização de pagamento</h2>
     </div>
-    
+
     <div class="px-6 pb-6">
       <Separator />
     </div>
-    
+
     <div class="px-6 pb-6">
-      <h3 class="text-lg font-semibold text-center pb-4">
-        Detalhes do pagamento
-      </h3>
+      <h3 class="text-lg font-semibold text-center pb-4">Detalhes do pagamento</h3>
       <form @submit.prevent="onSubmit">
         <div class="space-y-4">
           <FormField v-slot="{ componentField }" name="cardNumber">
@@ -119,11 +114,7 @@ const onSubmit = handleSubmit(async (values) => {
             <FormItem>
               <FormLabel>Nome do titular</FormLabel>
               <FormControl>
-                <Input
-                  type="text"
-                  placeholder="Maria João"
-                  v-bind="componentField"
-                />
+                <Input type="text" placeholder="Maria João" v-bind="componentField" />
               </FormControl>
               <FormMessage>{{ cardName.errorMessage.value }}</FormMessage>
             </FormItem>
@@ -150,21 +141,14 @@ const onSubmit = handleSubmit(async (values) => {
               <FormItem>
                 <FormLabel>CVV</FormLabel>
                 <FormControl>
-                  <Input
-                    type="text"
-                    placeholder="123"
-                    v-bind="componentField"
-                    maxlength="4"
-                  />
+                  <Input type="text" placeholder="123" v-bind="componentField" maxlength="4" />
                 </FormControl>
                 <FormMessage>{{ cvv.errorMessage.value }}</FormMessage>
               </FormItem>
             </FormField>
           </div>
 
-          <Button type="submit" class="w-full mt-6">
-            Pagar R${{ totalPrice }},00
-          </Button>
+          <Button type="submit" class="w-full mt-6"> Pagar R${{ totalPrice }},00 </Button>
         </div>
       </form>
     </div>

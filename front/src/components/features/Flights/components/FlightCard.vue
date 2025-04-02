@@ -9,16 +9,18 @@ defineProps<{
     code: string
     origin: string
     destination: string
+    price: number
   }
 }>()
 
-function handleClickCard(){
-
-}
+function handleClickCard() {}
 </script>
 
 <template>
-  <Card @click="handleClickCard" class="w-full max-w-md col-span-3 cursor-pointer hover:opacity-80 transition-opacity">
+  <Card
+    @click="handleClickCard"
+    class="w-full max-w-md col-span-3 cursor-pointer hover:opacity-80 transition-opacity"
+  >
     <CardHeader>
       <CardTitle>Voo de {{ flight.originAirport }} à {{ flight.destinationAirport }}</CardTitle>
       <CardDescription>Informações do vôo:</CardDescription>

@@ -4,10 +4,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '../../../ui/card'
 import { Button } from '../../../ui/button'
 import { Table, TableHead, TableRow, TableHeader, TableBody, TableCell } from '../../../ui/table'
 import { useRouter } from 'vue-router'
-import { useUserInfoStore } from '../../../../stores/user';
+import { useUserInfoStore } from '../../../../stores/user'
 
 const userInfoStore = useUserInfoStore()
-const router = useRouter();
+const router = useRouter()
 
 const miles = computed(() => userInfoStore.miles || 0)
 

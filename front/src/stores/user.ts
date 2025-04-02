@@ -13,30 +13,37 @@ interface UserInfo {
 }
 
 export const useUserInfoStore = defineStore('userInfo', () => {
-  const userInfo = useLocalStorage<UserInfo>('userInfo/data', {
-    userId: null,
-    cep: '',
-    cpf: '',
-    email: '',
-    isManager: false,
-    miles: 0,
-    name: '',
-    password: ''
-  }, {
-    serializer: {
-      read: (v) => v ? JSON.parse(v) : {
-        userId: null,
-        cep: '',
-        cpf: '',
-        email: '',
-        isManager: false,
-        miles: 0,
-        name: '',
-        password: ''
+  const userInfo = useLocalStorage<UserInfo>(
+    'userInfo/data',
+    {
+      userId: null,
+      cep: '',
+      cpf: '',
+      email: '',
+      isManager: false,
+      miles: 0,
+      name: '',
+      password: '',
+    },
+    {
+      serializer: {
+        read: (v) =>
+          v
+            ? JSON.parse(v)
+            : {
+                userId: null,
+                cep: '',
+                cpf: '',
+                email: '',
+                isManager: false,
+                miles: 0,
+                name: '',
+                password: '',
+              },
+        write: (v) => JSON.stringify(v),
       },
-      write: (v) => JSON.stringify(v)
-    }
-  })
+    },
+  )
 
   const userId = computed(() => userInfo.value.userId)
   const cep = computed(() => userInfo.value.cep)
