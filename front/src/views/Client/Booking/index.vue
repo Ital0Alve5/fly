@@ -1,24 +1,22 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { Card, CardContent, CardHeader, CardTitle } from '../../../ui/card'
-import { Button } from '../../../ui/button'
-import { Table, TableHead, TableRow, TableHeader, TableBody, TableCell } from '../../../ui/table'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import {
+  Table,
+  TableHead,
+  TableRow,
+  TableHeader,
+  TableBody,
+  TableCell,
+} from '@/components/ui/table'
 import { useRouter } from 'vue-router'
-import { useUserInfoStore } from '../../../../stores/user';
+import { useMilesStore } from '@/stores/miles'
+import booking from '@/mock/booking'
+const router = useRouter()
+const milesStore = useMilesStore()
 
-const userInfoStore = useUserInfoStore()
-const router = useRouter();
-
-const miles = computed(() => userInfoStore.miles || 0)
-
-const reservas = ref([
-  { id: 1, status: 'Reservado', dataHora: '2025-03-25 14:00', origem: 'GRU', destino: 'JFK' },
-  { id: 2, status: 'Concluído', dataHora: '2025-03-20 08:30', origem: 'GIG', destino: 'MIA' },
-  { id: 3, status: 'Cancelado', dataHora: '2025-03-15 16:45', origem: 'BSB', destino: 'LIS' },
-])
-// Métodos pros botões
 const comprarMilhas = () => router.push('/comprar-milhas')
-const consultarExtrato = () => {}
+const consultarExtrato = () => router.push('/extrato-milhas')
 const efetuarReserva = () => {
   router.push('/voos')
 }
@@ -37,7 +35,7 @@ const cancelarReserva = (id: number) => {
     <nav class="p-4 shadow-md mt-8">
       <div class="container mx-auto flex justify-between items-center">
         <span class="text-lg"
-          >Saldo de Milhas: <strong>{{ miles }}</strong></span
+          >Saldo de Milhas: <strong>{{ milesStore.miles }}</strong></span
         >
       </div>
       <div class="container mx-auto mt-4 flex justify-around">
@@ -66,16 +64,16 @@ const cancelarReserva = (id: number) => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              <TableRow v-for="reserva in reservas" :key="reserva.id">
+              <TableRow v-for="reserva in booking" :key="reserva.id">
                 <TableCell class="text-center px-6 py-4 text-lg">{{ reserva.dataHora }}</TableCell>
                 <TableCell class="text-center px-6 py-4 text-lg">{{ reserva.origem }}</TableCell>
                 <TableCell class="text-center px-6 py-4 text-lg">{{ reserva.destino }}</TableCell>
                 <TableCell class="text-center px-6 py-4 text-lg">
                   <span
                     :class="{
-                      'text-green-500': reserva.status === 'Concluído',
-                      'text-blue-500': reserva.status === 'Reservado',
-                      'text-red-500': reserva.status === 'Cancelado',
+                      'text-green-500': reserva.status === 'REALIZADA',
+                      'text-blue-500': reserva.status === 'CRIADA',
+                      'text-red-500': reserva.status === 'CANCELADA',
                     }"
                   >
                     {{ reserva.status }}
@@ -83,13 +81,13 @@ const cancelarReserva = (id: number) => {
                 </TableCell>
                 <TableCell class="text-center">
                   <Button
-                    v-if="reserva.status === 'Reservado'"
+                    v-if="reserva.status === 'CRIADA'"
                     class="mr-2"
                     @click="verReserva(reserva.id)"
                     >Ver Reserva</Button
                   >
                   <Button
-                    v-if="reserva.status === 'Reservado'"
+                    v-if="reserva.status === 'CRIADA'"
                     variant="destructive"
                     @click="cancelarReserva(reserva.id)"
                     >Cancelar</Button
