@@ -11,7 +11,7 @@ import {
   TableCell,
 } from '@/components/ui/table';
 import { useMilesStore } from '@/stores/miles';
-import CancelDialog from '../CancelFlight/Cancel.vue';
+import CancelDialog from '../CancelFlight/index.vue';
 import bookingData from '@/mock/booking';
 
 const milesStore = useMilesStore();
