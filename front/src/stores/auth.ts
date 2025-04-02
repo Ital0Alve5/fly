@@ -3,6 +3,7 @@ import { useLocalStorage } from '@vueuse/core'
 import type { AuthenticatedUserData } from '@/types/Auth/AuthenticatedUserData'
 import clientsMock from '@/mock/clients'
 import employeesMock from '@/mock/employees'
+import { useUserInfoStore } from './user'
 
 function generatedRandomPassword(): string {
   return Math.floor(1000 + Math.random() * 9000).toString()
@@ -31,7 +32,6 @@ export const useAuthStore = defineStore('auth', () => {
     if (authenticatedUser && passwordMatches) {
       isAuthenticated.value = true
       user.value = authenticatedUser
-
       return authenticatedUser
     }
 
@@ -62,6 +62,9 @@ export const useAuthStore = defineStore('auth', () => {
     sendPasswordOnEmail(newClient.email, senha)
     isAuthenticated.value = true
     user.value = newClient
+
+    const userInfoStore = useUserInfoStore()
+    userInfoStore.setUserId(newClient.userId)
 
     return newClient
   }
