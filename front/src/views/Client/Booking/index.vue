@@ -34,9 +34,9 @@ const cancelarReserva = (id: number) => {
   <div class="flex flex-col justify-center h-screen">
     <nav class="p-4 shadow-md mt-8">
       <div class="container mx-auto flex justify-between items-center">
-        <span class="text-lg"
-          >Saldo de Milhas: <strong>{{ milesStore.miles }}</strong></span
-        >
+        <span class="text-lg">
+          Saldo de Milhas: <strong>{{ milesStore.miles }}</strong>
+        </span>
       </div>
       <div class="container mx-auto mt-4 flex justify-around">
         <Button @click="comprarMilhas">Comprar Milhas</Button>

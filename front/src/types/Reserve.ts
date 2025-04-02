@@ -4,4 +4,7 @@ export type Reserve = {
   dataHora: string // yyyy-mm-dd hh:mm
   origem: string
   destino: string
+  codigo: string
+  valor: string
+  milhas: number
 }

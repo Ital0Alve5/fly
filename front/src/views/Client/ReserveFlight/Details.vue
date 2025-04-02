@@ -56,6 +56,9 @@ function handleReserveFlight(value: boolean) {
     dataHora: getCurrentDateTime(),
     origem: flight.value?.originAirport ?? '',
     destino: flight.value?.destinationAirport ?? '',
+    codigo: generatedCode.value,
+    valor: `R$${valueToPay.value},00`,
+    milhas: miles.value,
   })
 
   registerExtract({

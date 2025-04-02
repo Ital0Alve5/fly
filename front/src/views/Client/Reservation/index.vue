@@ -53,7 +53,7 @@ const reservation = ref({
               <b>Destino:</b>
               <p>{{ reservation.destination }}</p>
             </li>
-            <li class="flex gDateap-2">
+            <li class="flex gap-2">
               <b>Valor:</b>
               <p>{{ reservation.price }}</p>
             </li>
