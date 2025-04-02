@@ -126,7 +126,7 @@ export function getExtractByUserId(userId: number): ExtractItem[] {
 }
 
 export function registerExtract(extract: ExtractItem): void {
-  ExtractHistory.value.push(extract)
+    ExtractHistory.value.push(extract)
 }
 
 export default { ExtractHistory, registerExtract, getExtractByUserId }

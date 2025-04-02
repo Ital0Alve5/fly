@@ -5,7 +5,6 @@ export type Flight = {
   code: string
   origin: string
   destination: string
-  price: number
 }
 
 export const flights = [
@@ -16,7 +15,6 @@ export const flights = [
     code: 'ABC123',
     origin: 'São Paulo',
     destination: 'Nova York',
-    price: 2000,
   },
   {
     originAirport: 'GRU',
@@ -25,7 +23,6 @@ export const flights = [
     code: 'DEF456',
     origin: 'São Paulo',
     destination: 'Paris',
-    price: 3450,
   },
   {
     originAirport: 'LAX',
@@ -34,7 +31,6 @@ export const flights = [
     code: 'GHI789',
     origin: 'Los Angeles',
     destination: 'Nova York',
-    price: 500,
   },
   {
     originAirport: 'LAX',
@@ -43,7 +39,6 @@ export const flights = [
     code: 'JKL012',
     origin: 'Los Angeles',
     destination: 'Londres',
-    price: 1400,
   },
   {
     originAirport: 'CDG',
@@ -52,7 +47,6 @@ export const flights = [
     code: 'MNO345',
     origin: 'Paris',
     destination: 'São Paulo',
-    price: 2300,
   },
   {
     originAirport: 'JFK',
@@ -61,7 +55,6 @@ export const flights = [
     code: 'PQR678',
     origin: 'Nova York',
     destination: 'Los Angeles',
-    price: 380,
   },
   {
     originAirport: 'GRU',
@@ -70,33 +63,29 @@ export const flights = [
     code: 'STU901',
     origin: 'São Paulo',
     destination: 'Nova York',
-    price: 1980,
   },
 ]
-
-export function getFlightByCode(code: string): Flight | undefined {
-  return flights.find((f) => f.code === code)
-}
 
 export async function searchFlights(
   originAirport: string,
   destinationAirport: string,
 ): Promise<Flight[]> {
-  const searchOrigin = originAirport.toLowerCase().trim()
-  const searchDestination = destinationAirport.toLowerCase().trim()
+  const searchOrigin = originAirport.toLowerCase().trim();
+  const searchDestination = destinationAirport.toLowerCase().trim();
 
   // Sleep de 2 segundos para simular chamada a API
-  await new Promise((resolve) => setTimeout(() => resolve(undefined), 2000))
+  await new Promise((resolve) => setTimeout(() => resolve(undefined), 2000));
 
   return flights.filter((flight) => {
-    const flightOrigin = flight.originAirport.toLowerCase()
-    const flightDestination = flight.destinationAirport.toLowerCase()
+    const flightOrigin = flight.originAirport.toLowerCase();
+    const flightDestination = flight.destinationAirport.toLowerCase();
 
-    const matchesOrigin = !searchOrigin || flightOrigin.includes(searchOrigin)
-    const matchesDestination = !searchDestination || flightDestination.includes(searchDestination)
+    const matchesOrigin = !searchOrigin || flightOrigin.includes(searchOrigin);
+    const matchesDestination = !searchDestination || flightDestination.includes(searchDestination);
 
-    return matchesOrigin && matchesDestination
-  })
+    return matchesOrigin && matchesDestination;
+  });
 }
+
 
 export default { flights, searchFlights }

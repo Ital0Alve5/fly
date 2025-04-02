@@ -1,5 +1,5 @@
 export type AuthenticatedUserData = {
-  userId: number
+  userId: number,
   name: string
   email: string
   isManager: boolean
