@@ -47,7 +47,7 @@ const confirmCancellation = () => {
 
 <template>
   <div class="flex flex-col justify-center h-screen">
-    <nav class="p-4 shadow-md mt-8">
+    <nav class="p-1 shadow-md mt-6">
       <div class="container mx-auto flex justify-between items-center">
         <span class="text-lg">
           Saldo de Milhas: <strong>{{ milesStore.miles }}</strong>
@@ -89,14 +89,14 @@ const confirmCancellation = () => {
                 </TableCell>
                 <TableCell class="text-center">
                   <Button
-                    v-if="reservation.status === 'CRIADA'"
+                    v-if="reservation.status === 'CRIADA'|| reservation.status === 'CHECK-IN'"
                     class="mr-2"
                     @click="viewReservation(reservation.id)"
                   >
                     Ver Reserva
                   </Button>
                   <Button
-                    v-if="reservation.status === 'CRIADA'"
+                    v-if="reservation.status === 'CRIADA'|| reservation.status === 'CHECK-IN'"
                     variant="destructive"
                     @click="openCancelDialog(reservation.id)"
                   >
