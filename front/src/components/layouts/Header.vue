@@ -12,6 +12,10 @@ const clientNavigationLinks = [
     label: 'Comprar milhas',
     link: '/comprar-milhas',
   },
+  {
+    label: 'Extrato de milhas',
+    link: '/extrato-milhas',
+  },
 ]
 
 const managerNavigationLinks = [

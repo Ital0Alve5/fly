@@ -25,13 +25,14 @@ export const useAuthStore = defineStore('auth', () => {
     const client = clientsMock.getClientByEmail(email)
     const employee = employeesMock.getEmployeeByEmail(email)
 
-    if (
-      (client || employee) &&
-      (client?.password === password || employee?.password === password)
-    ) {
+    const authenticatedUser = client || employee
+    const passwordMatches = authenticatedUser?.password === password
+
+    if (authenticatedUser && passwordMatches) {
       isAuthenticated.value = true
-      user.value = client || employee
-      return user.value
+      user.value = authenticatedUser
+
+      return authenticatedUser
     }
 
     return null
@@ -51,6 +52,7 @@ export const useAuthStore = defineStore('auth', () => {
     const senha = generatedRandomPassword()
     const newClient = {
       ...newUser,
+      userId: Date.now(),
       isManager: false,
       password: senha,
       miles: 0,
@@ -61,7 +63,7 @@ export const useAuthStore = defineStore('auth', () => {
     isAuthenticated.value = true
     user.value = newClient
 
-    return user.value
+    return newClient
   }
 
   function logout() {

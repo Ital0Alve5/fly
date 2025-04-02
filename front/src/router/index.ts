@@ -9,6 +9,8 @@ import BuyMiles from '@/views/Client/BuyMiles/index.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 
+import ExtractMiles from '@/views/Client/ExtractMiles/index.vue'
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -51,6 +53,12 @@ const router = createRouter({
       path: '/comprar-milhas',
       name: 'comprarMilhas',
       component: BuyMiles,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/extrato-milhas',
+      name: 'extratoDeMilhas',
+      component: ExtractMiles,
       meta: { requiresAuth: true },
     },
   ],

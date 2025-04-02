@@ -7,12 +7,16 @@ type EmployeeData = AuthenticatedUserData & {
 
 const registeredEmployees = ref<EmployeeData[]>([
   {
+    userId: 11,
+    miles: 0,
     name: 'Ítalo Zedelinski',
     email: 'italo@empresa.com',
     isManager: true,
     password: '1234',
   },
   {
+    userId: 12,
+    miles: 0,
     name: 'Jully Juju',
     email: 'jully@empresa.com',
     isManager: false,

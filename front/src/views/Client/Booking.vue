@@ -16,7 +16,7 @@ const router = useRouter()
 const milesStore = useMilesStore()
 
 const comprarMilhas = () => router.push('/comprar-milhas')
-const consultarExtrato = () => {}
+const consultarExtrato = () => router.push('/extrato-milhas')
 const efetuarReserva = () => {
   router.push('/voos')
 }

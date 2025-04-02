@@ -7,11 +7,15 @@ import { Separator } from '@/components/ui/separator'
 import { useToast } from '@/components/ui/toast'
 import { useCheckoutForm } from '../composables/useCheckoutForm'
 import { useMilesStore } from '@/stores/miles'
+import { registerExtract, type ExtractItem } from '@/mock/extract'
+import { useUserInfoStore } from '@/stores/user'
+const userInfoStore = useUserInfoStore()
 
 const { toast } = useToast()
 const milesPurchaseStore = useMilesStore()
 
-const { handleSubmit, cardNumber, cardName, expiryDate, cvv } = useCheckoutForm()
+const { handleSubmit, cardNumber, cardName, expiryDate, cvv, resetForm } = useCheckoutForm()
+const milesQunatity = computed(() => milesPurchaseStore.miles)
 
 const formatCardNumber = (e: Event) => {
   const target = e.target as HTMLInputElement
@@ -40,13 +44,27 @@ const formatExpiryDate = (e: Event) => {
 }
 
 const onSubmit = handleSubmit(async (values) => {
+  const newExtract: ExtractItem = {
+    userId: userInfoStore.userId || 0,
+    date: new Date().toLocaleDateString('pt-BR'),
+    reservationCode: null,
+    value: totalPrice.value.toString(),
+    miles: milesQunatity.value,
+    description: 'COMPRA DE MILHAS',
+    type: 'ENTRADA',
+  }
+  registerExtract(newExtract)
+
   console.log('Informações de pagamento:', values)
 
   toast({
     title: 'Pagamento efetuado com sucesso',
     description: 'Suas milhas foram compradas com sucesso!',
     variant: 'default',
+    duration: 2000,
   })
+
+  resetForm()
 })
 
 const totalPrice = computed(() => milesPurchaseStore.totalPrice)
