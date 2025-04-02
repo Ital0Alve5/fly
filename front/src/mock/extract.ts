@@ -13,7 +13,7 @@ export type ExtractItem = {
 const ExtractHistory = ref<ExtractItem[]>([
   {
     userId: 1,
-    date: '05/03/2025',
+    date: '01/03/2025',
     reservationCode: 'FL-316',
     value: 'R$245,50',
     miles: 4200,
@@ -94,7 +94,7 @@ const ExtractHistory = ref<ExtractItem[]>([
   },
   {
     userId: 1,
-    date: '02/04/2025',
+    date: '01/04/2025',
     reservationCode: 'PG-001',
     value: 'R$2.000,00',
     miles: 40000,
@@ -103,7 +103,7 @@ const ExtractHistory = ref<ExtractItem[]>([
   },
   {
     userId: 1,
-    date: '05/04/2025',
+    date: '023/03/2025',
     reservationCode: 'FL-413',
     value: 'R$0,00',
     miles: 8000,
@@ -112,7 +112,7 @@ const ExtractHistory = ref<ExtractItem[]>([
   },
   {
     userId: 1,
-    date: '08/04/2025',
+    date: '29/03/2025',
     reservationCode: null,
     value: 'R$750,00',
     miles: 15000,

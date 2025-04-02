@@ -145,6 +145,14 @@ const table = computed(() =>
     onColumnVisibilityChange: (updaterOrValue) => valueUpdater(updaterOrValue, columnVisibility),
     onRowSelectionChange: (updaterOrValue) => valueUpdater(updaterOrValue, rowSelection),
     onExpandedChange: (updaterOrValue) => valueUpdater(updaterOrValue, expanded),
+    initialState: {
+      sorting: [
+        {
+          id: 'date',
+          desc: true,
+        },
+      ],
+    },
     state: {
       get columnFilters() {
         return columnFilters.value
