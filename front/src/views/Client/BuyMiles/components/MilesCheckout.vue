@@ -1,30 +1,23 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import { Button } from '../../../../components/ui/button'
-import {
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '../../../../components/ui/form'
-import { Input } from '../../../../components/ui/input'
-import { Separator } from '../../../../components/ui/separator'
-import { useToast } from '../../../../components/ui/toast'
+import { computed, ref } from 'vue'
+import { Button } from '@/components/ui/button'
+import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
+import { Separator } from '@/components/ui/separator'
+import { useToast } from '@/components/ui/toast'
 import { useCheckoutForm } from '../composables/useCheckoutForm'
-import { useMilesPurchaseStore } from '../../../../stores/miles-purchase'
-import { registerExtract, type ExtractItem } from '../../../../mock/extract'
-import { useUserInfoStore } from '../../../../stores/user'
+import { useMilesStore } from '@/stores/miles'
+import { registerExtract, type ExtractItem } from '@/mock/extract'
+import { useAuthStore } from '@/stores/auth'
+import router from '@/router'
 
-const userInfoStore = useUserInfoStore()
+const authStore = useAuthStore()
 
 const { toast } = useToast()
-const milesPurchaseStore = useMilesPurchaseStore()
+const milesStore = useMilesStore()
 
 const { handleSubmit, cardNumber, cardName, expiryDate, cvv, resetForm } = useCheckoutForm()
-
-const totalPrice = computed(() => milesPurchaseStore.totalPrice)
-const milesQunatity = computed(() => milesPurchaseStore.miles)
+const milesQuantity = ref(milesStore.miles)
 
 const formatCardNumber = (e: Event) => {
   const target = e.target as HTMLInputElement
@@ -54,18 +47,18 @@ const formatExpiryDate = (e: Event) => {
 
 const onSubmit = handleSubmit(async (values) => {
   const newExtract: ExtractItem = {
-    userId: userInfoStore.userId || 0,
+    userId: authStore.user?.userId || 0,
     date: new Date().toLocaleDateString('pt-BR'),
     reservationCode: null,
     value: totalPrice.value.toString(),
-    miles: milesQunatity.value,
+    miles: milesQuantity.value,
     description: 'COMPRA DE MILHAS',
     type: 'ENTRADA',
   }
 
   registerExtract(newExtract)
 
-  userInfoStore.addMiles(milesQunatity.value)
+  milesStore.setMiles(milesStore.miles + milesQuantity.value)
 
   console.log('Informações de pagamento:', values)
 
@@ -77,7 +70,10 @@ const onSubmit = handleSubmit(async (values) => {
   })
 
   resetForm()
+  router.push('/reservas')
 })
+
+const totalPrice = computed(() => milesStore.totalPrice)
 </script>
 
 <template>

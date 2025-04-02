@@ -1,9 +1,5 @@
 <script setup lang="ts">
-import {
-  ResizableHandle,
-  ResizablePanel,
-  ResizablePanelGroup,
-} from '../../../components/ui/resizable'
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable'
 import MilesQuantity from './components/MilesQuantity.vue'
 import MilesCheckout from './components/MilesCheckout.vue'
 </script>

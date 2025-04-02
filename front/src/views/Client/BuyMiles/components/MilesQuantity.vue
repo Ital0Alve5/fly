@@ -1,29 +1,30 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { Label } from '../../../../components/ui/label'
+import { ref } from 'vue'
+import { Label } from '@/components/ui/label'
 import {
   NumberField,
   NumberFieldContent,
   NumberFieldDecrement,
   NumberFieldIncrement,
   NumberFieldInput,
-} from '../../../../components/ui/number-field'
-import { Separator } from '../../../../components/ui/separator'
-import { Card, CardContent, CardHeader, CardTitle } from '../../../../components/ui/card'
-import { useMilesPurchaseStore } from '../../../../stores/miles-purchase'
-import { useUserInfoStore } from '../../../../stores/user'
+} from '@/components/ui/number-field'
+import { Separator } from '@/components/ui/separator'
+import { useAuthStore } from '@/stores/auth'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { useMilesStore } from '@/stores/miles'
 
-const userInfoStore = useUserInfoStore()
-const milesPurchaseStore = useMilesPurchaseStore()
+const authStore = useAuthStore()
+const milesStore = useMilesStore()
 
-const user = computed(() => ({
-  firstName: userInfoStore.name?.split(' ')[0] || '',
-  miles: userInfoStore.miles || 0,
-}))
+const user = ref({
+  firstName: authStore.user?.name.split(' ')[0],
+  miles: milesStore.miles,
+})
 
 const miles = computed({
-  get: () => milesPurchaseStore.miles,
-  set: (value: number) => milesPurchaseStore.setMiles(value),
+  get: () => milesStore.miles,
+  set: (value: number) => milesStore.setMiles(value),
 })
 </script>
 
