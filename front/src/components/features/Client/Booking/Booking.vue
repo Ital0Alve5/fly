@@ -1,14 +1,16 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { Card, CardContent, CardHeader, CardTitle } from '../../../ui/card'
 import { Button } from '../../../ui/button'
 import { Table, TableHead, TableRow, TableHeader, TableBody, TableCell } from '../../../ui/table'
 import { useRouter } from 'vue-router'
+import { useUserInfoStore } from '../../../../stores/user';
 
-const router = useRouter()
+const userInfoStore = useUserInfoStore()
+const router = useRouter();
 
-// Mock de dados da tabelinha
-const saldoMilhas = ref(5000)
+const miles = computed(() => userInfoStore.miles || 0)
+
 const reservas = ref([
   { id: 1, status: 'Reservado', dataHora: '2025-03-25 14:00', origem: 'GRU', destino: 'JFK' },
   { id: 2, status: 'Concluído', dataHora: '2025-03-20 08:30', origem: 'GIG', destino: 'MIA' },
@@ -35,7 +37,7 @@ const cancelarReserva = (id: number) => {
     <nav class="p-4 shadow-md mt-8">
       <div class="container mx-auto flex justify-between items-center">
         <span class="text-lg"
-          >Saldo de Milhas: <strong>{{ saldoMilhas }}</strong></span
+          >Saldo de Milhas: <strong>{{ miles }}</strong></span
         >
       </div>
       <div class="container mx-auto mt-4 flex justify-around">

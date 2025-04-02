@@ -1,0 +1,208 @@
+<script setup lang="ts">
+import { computed, watchEffect } from 'vue'
+import type {
+  ColumnDef,
+  ColumnFiltersState,
+  ExpandedState,
+  VisibilityState,
+} from '@tanstack/vue-table'
+import { Button } from '../../../components/ui/button'
+import { valueUpdater } from '../../../lib/utils';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '../../../components/ui/table'
+import {
+  FlexRender,
+  getCoreRowModel,
+  getExpandedRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  useVueTable,
+} from '@tanstack/vue-table'
+import { ArrowUpDown } from 'lucide-vue-next'
+import { h, ref } from 'vue'
+import { useUserInfoStore } from '../../../stores/user'
+import { getExtractByUserId, type ExtractItem } from '../../../mock/extract'
+
+const userInfoStore = useUserInfoStore()
+
+const userId = computed(() => userInfoStore.userId)
+const data = ref<ExtractItem[]>([])
+
+watchEffect(() => {
+  if (userId.value) {
+    const extractedData = getExtractByUserId(userId.value)
+    data.value = extractedData
+  } else {
+    data.value = []
+  }
+})
+
+
+const columns: ColumnDef<ExtractItem>[] = [
+  {
+    accessorKey: 'date',
+    header: ({ column }) => {
+      return h(Button, {
+        variant: 'ghost',
+        onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
+      }, () => ['Data', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })])
+    },
+    cell: ({ row }) => h('div', row.getValue('date')),
+    sortingFn: (rowA, rowB, columnId) => {
+      const dateA = rowA.getValue(columnId) as string;
+      const dateB = rowB.getValue(columnId) as string;
+      
+      const [dayA, monthA, yearA] = dateA.split('/').map(Number);
+      const [dayB, monthB, yearB] = dateB.split('/').map(Number);
+      
+      const parsedDateA = new Date(yearA, monthA - 1, dayA);
+      const parsedDateB = new Date(yearB, monthB - 1, dayB);
+      
+      return parsedDateA.getTime() - parsedDateB.getTime();
+    },
+  },
+  {
+    accessorKey: 'reservationCode',
+    header: 'Código de reserva',
+    cell: ({ row }) => h('div', row.getValue('reservationCode')),
+  },
+  {
+    accessorKey: 'value',
+    header: ({ column }) => {
+      return h(Button, {
+        variant: 'ghost',
+        onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
+      }, () => ['Valor', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })])
+    },
+    cell: ({ row }) => h('div', row.getValue('value')),
+    sortingFn: (rowA, rowB, columnId) => {
+      const extractNumber = (value: string) => {
+        const cleaned = value
+          .replace('R$', '')
+          .replace(/\./g, '')
+          .replace(',', '.')
+        return parseFloat(cleaned) || 0
+      }
+
+      const valueA = extractNumber(rowA.getValue(columnId))
+      const valueB = extractNumber(rowB.getValue(columnId))
+      
+      return valueA - valueB
+    },
+  },
+  {
+    accessorKey: 'miles',
+    header: ({ column }) => {
+      return h(Button, {
+        variant: 'ghost',
+        onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
+      }, () => ['Milhas', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })])
+    },
+    cell: ({ row }) => h('div', row.getValue('miles')),
+  },
+  {
+    accessorKey: 'description',
+    header: 'Descrição',
+    cell: ({ row }) => h('div', row.getValue('description')),
+  },
+  {
+    accessorKey: 'type',
+    header: 'Tipo',
+    cell: ({ row }) => h('div', row.getValue('type')),
+  },
+]
+
+const columnFilters = ref<ColumnFiltersState>([])
+const columnVisibility = ref<VisibilityState>({})
+const rowSelection = ref({})
+const expanded = ref<ExpandedState>({})
+
+const table = useVueTable({
+  data: data,
+  columns,
+  getCoreRowModel: getCoreRowModel(),
+  getPaginationRowModel: getPaginationRowModel(),
+  getSortedRowModel: getSortedRowModel(),
+  getFilteredRowModel: getFilteredRowModel(),
+  getExpandedRowModel: getExpandedRowModel(),
+  onColumnFiltersChange: updaterOrValue => valueUpdater(updaterOrValue, columnFilters),
+  onColumnVisibilityChange: updaterOrValue => valueUpdater(updaterOrValue, columnVisibility),
+  onRowSelectionChange: updaterOrValue => valueUpdater(updaterOrValue, rowSelection),
+  onExpandedChange: updaterOrValue => valueUpdater(updaterOrValue, expanded),
+  state: {
+    get columnFilters() { return columnFilters.value },
+    get columnVisibility() { return columnVisibility.value },
+    get rowSelection() { return rowSelection.value },
+    get expanded() { return expanded.value },
+  },
+})
+</script>
+
+<template>
+  <div class="flex h-screen w-full items-center justify-center p-4">
+    <div class="w-full max-w-full rounded-lg border shadow-sm overflow-hidden">
+      <div class="w-full p-4">
+        <div class="rounded-md border">
+          <Table>
+            <TableHeader>
+              <TableRow v-for="headerGroup in table.getHeaderGroups()" :key="headerGroup.id">
+                <TableHead v-for="header in headerGroup.headers" :key="header.id">
+                  <FlexRender v-if="!header.isPlaceholder" :render="header.column.columnDef.header" :props="header.getContext()" />
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              <template v-if="table.getRowModel().rows?.length">
+                <TableRow
+                  v-for="row in table.getRowModel().rows"
+                  :key="row.id"
+                >
+                  <TableCell v-for="cell in row.getVisibleCells()" :key="cell.id">
+                    <FlexRender :render="cell.column.columnDef.cell" :props="cell.getContext()" />
+                  </TableCell>
+                </TableRow>
+              </template>
+
+              <TableRow v-else>
+                <TableCell
+                  :colspan="columns.length"
+                  class="h-24 text-center"
+                >
+                  No results.
+                </TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+        </div>
+
+        <div class="flex items-center justify-end space-x-2 py-4">
+          <div class="space-x-2">
+            <Button
+              variant="outline"
+              size="sm"
+              :disabled="!table.getCanPreviousPage()"
+              @click="table.previousPage()"
+            >
+              Anterior
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              :disabled="!table.getCanNextPage()"
+              @click="table.nextPage()"
+            >
+              Próximo
+            </Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
