@@ -55,7 +55,7 @@ const confirmCancellation = () => {
       </div>
     </nav>
 
-    <div class="container mx-auto p-8">
+    <div class="max-h-[500px] overflow-y-auto">
       <Card>
         <CardHeader>
           <CardTitle class="text-2xl">Minhas Reservas e Voos</CardTitle>
