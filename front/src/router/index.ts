@@ -3,12 +3,11 @@ import Booking from '@/views/Client/Booking/index.vue'
 import Reservation from '@/views/Client/Reservation/index.vue'
 import Adm from '@/views/Manager/PaginaAdmTeste.vue'
 import Search from '@/views/Client/FlightListing/Search.vue'
-import details from '@/views/Client/ReserveFlight/Details.vue'
 import BuyMiles from '@/views/Client/BuyMiles/index.vue'
+import Details from '@/views/Client/ReserveFlight/Details.vue'
 
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-
 import ExtractMiles from '@/views/Client/ExtractMiles/index.vue'
 
 const router = createRouter({
@@ -40,7 +39,7 @@ const router = createRouter({
     {
       path: '/voos/voo/:code',
       name: 'flightDetails',
-      component: details,
+      component: Details,
       meta: { requiresAuth: true },
     },
     {

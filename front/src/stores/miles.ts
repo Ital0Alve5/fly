@@ -1,5 +1,5 @@
-import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
+import { ref, computed } from 'vue'
 
 export const useMilesStore = defineStore('miles', () => {
   const miles = ref(10)

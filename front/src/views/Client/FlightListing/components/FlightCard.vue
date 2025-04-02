@@ -10,7 +10,7 @@ const props = defineProps<{
     code: string
     origin: string
     destination: string
-    price: string
+    price: number
   }
 }>()
 

@@ -31,6 +31,7 @@ export const useAuthStore = defineStore('auth', () => {
     if (authenticatedUser && passwordMatches) {
       isAuthenticated.value = true
       user.value = authenticatedUser
+
       return authenticatedUser
     }
 

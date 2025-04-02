@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { Button } from '@/components/ui/button'
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
@@ -17,7 +17,7 @@ const { toast } = useToast()
 const milesStore = useMilesStore()
 
 const { handleSubmit, cardNumber, cardName, expiryDate, cvv, resetForm } = useCheckoutForm()
-const milesQuantity = computed(() => milesStore.miles)
+const milesQuantity = ref(milesStore.miles)
 
 const formatCardNumber = (e: Event) => {
   const target = e.target as HTMLInputElement
