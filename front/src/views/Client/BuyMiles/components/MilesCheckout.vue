@@ -70,7 +70,7 @@ const onSubmit = handleSubmit(async (values) => {
   })
 
   resetForm()
-  router.push('/reserva')
+  router.push('/reservas')
 })
 
 const totalPrice = computed(() => milesStore.totalPrice)
