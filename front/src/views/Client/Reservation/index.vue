@@ -1,73 +1,60 @@
 <script setup lang="ts">
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, onMounted } from 'vue'
+import booking from '@/mock/booking'
+import type { Reserve } from '@/types/Reserve'
+import { useRoute } from 'vue-router'
 
-const router = useRouter()
+const route = useRoute()
+const reservation = ref<Reserve | null>(null)
 
-const goBack = () => {
-  router.push('/reservas')
-}
-
-const reservation = ref({
-  date: '05/03/2025',
-  time: '14:30',
-  code: 'ABC123',
-  origin: 'Curitiba',
-  destination: 'Havana',
-  originAirport: 'CWB',
-  destinationAirport: 'CUB',
-  price: 'R$ 450,00',
-  milesSpent: 15000,
-  status: 'Confirmado',
+onMounted(() => {
+  const foundReservation = booking.find(res => 
+    res.codigo.toLowerCase() === (route.params.code as string).toLowerCase()
+  )
+  
+  if (foundReservation) {
+    reservation.value = foundReservation
+  }
 })
+
+const formatDateTime = (dateTimeString: string) => {
+  const date = new Date(dateTimeString)
+  return {
+    date: date.toLocaleDateString('pt-BR'),
+    time: date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+  }
+}
 </script>
 
 <template>
   <div class="flex items-center justify-center min-h-screen">
-    <button @click="goBack" class="absolute top-16 left-6 text-white px-4 py-2">← Voltar</button>
-    <Card class="w-full max-w-md">
+    <Card v-if="reservation" class="w-full max-w-md">
       <CardHeader>
-        <CardTitle
-          >Reserva do voo de {{ reservation.originAirport }} à
-          {{ reservation.destinationAirport }}</CardTitle
-        >
+        <CardTitle>
+          Reserva do voo de {{ reservation.origem }} à {{ reservation.destino }}
+        </CardTitle>
         <CardDescription>Informações de sua reserva:</CardDescription>
       </CardHeader>
       <CardContent>
         <section>
           <ul class="space-y-2">
-            <li class="flex gap-2">
-              <b>Data:</b>
-              <p>{{ reservation.date }} às {{ reservation.time }}</p>
-            </li>
-            <li class="flex gap-2">
-              <b>Código:</b>
-              <p>{{ reservation.code }}</p>
-            </li>
-            <li class="flex gap-2">
-              <b>Origem:</b>
-              <p>{{ reservation.origin }}</p>
-            </li>
-            <li class="flex gap-2">
-              <b>Destino:</b>
-              <p>{{ reservation.destination }}</p>
-            </li>
-            <li class="flex gap-2">
-              <b>Valor:</b>
-              <p>{{ reservation.price }}</p>
-            </li>
-            <li class="flex gap-2">
-              <b>Milhas gastas:</b>
-              <p>{{ reservation.milesSpent }}</p>
-            </li>
-            <li class="flex gap-2">
-              <b>Estado da reserva:</b>
-              <p>{{ reservation.status }}</p>
-            </li>
+            <li class="flex gap-2"><b>Data:</b><p>{{ formatDateTime(reservation.dataHora).date }} às {{ formatDateTime(reservation.dataHora).time }}</p></li>
+            <li class="flex gap-2"><b>Código:</b><p>{{ reservation.codigo }}</p></li>
+            <li class="flex gap-2"><b>Origem:</b><p>{{ reservation.origem }}</p></li>
+            <li class="flex gap-2"><b>Destino:</b><p>{{ reservation.destino }}</p></li>
+            <li class="flex gap-2"><b>Valor:</b><p>{{ reservation.valor }}</p></li>
+            <li class="flex gap-2"><b>Milhas gastas:</b><p>{{ reservation.milhas }}</p></li>
+            <li class="flex gap-2"><b>Estado da reserva:</b><p>{{ reservation.status }}</p></li>
           </ul>
         </section>
       </CardContent>
     </Card>
+
+    <div v-else class="text-center p-8">
+      <h2 class="text-2xl font-bold mb-4">Reserva não encontrada</h2>
+      <p class="text-lg">O código da reserva "{{ route.params.code }}" não foi localizado.</p>
+      <p class="text-muted-foreground mt-2">Verifique o código e tente novamente.</p>
+    </div>
   </div>
 </template>

@@ -23,7 +23,10 @@ const efetuarReserva = () => {
 const consultarReserva = () => {}
 const fazerCheckin = () => {}
 const verReserva = (id: number) => {
-  console.log('Ver reserva', id)
+const reserva = booking.find(r => r.id === id)
+  if (reserva) {
+    router.push({ name: 'reserva', params: { code: reserva.codigo } })
+  }
 }
 const cancelarReserva = (id: number) => {
   console.log('Cancelar reserva', id)
@@ -84,14 +87,12 @@ const cancelarReserva = (id: number) => {
                     v-if="reserva.status === 'CRIADA'"
                     class="mr-2"
                     @click="verReserva(reserva.id)"
-                    >Ver Reserva</Button
-                  >
+                    >Ver Reserva</Button>
                   <Button
                     v-if="reserva.status === 'CRIADA'"
                     variant="destructive"
                     @click="cancelarReserva(reserva.id)"
-                    >Cancelar</Button
-                  >
+                    >Cancelar</Button>
                 </TableCell>
               </TableRow>
             </TableBody>

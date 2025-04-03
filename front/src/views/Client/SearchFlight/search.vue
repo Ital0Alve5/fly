@@ -1,25 +1,54 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { searchReserves } from '@/mock/booking'
 import type { Reserve } from '@/types/Reserve'
 import { Button } from '@/components/ui/button'
+import { useToast } from '@/components/ui/toast'
 
-const openDialog = ref(false)
+const { toast } = useToast()
+
+const props = defineProps<{
+  open: boolean
+}>()
+
+const emit = defineEmits<{
+  (e: 'update:open', value: boolean): void
+}>()
 
 const reserveCode = ref('')
 const reserveFound = ref<Reserve[]>([])
 
+const openDialog = ref(props.open)
+watch(() => props.open, (newVal) => {
+  openDialog.value = newVal
+})
+watch(openDialog, (newVal) => {
+  emit('update:open', newVal)
+})
+
 const fazerCheckin = (reserva: Reserve) => {
   reserva.status = 'CHECK-IN'
   openDialog.value = false
+  toast({
+    title: 'Status atualizado',
+    description: `O status foi alterado para ${reserva.status}.`,
+    variant: 'default',
+    duration: 2000,
+  })
 }
 
 const cancelarReserva = (reserva: Reserve) => { 
   reserva.status = 'CANCELADA'
   openDialog.value = false
+  toast({
+    title: 'Status atualizado',
+    description: `O status foi alterado para ${reserva.status}.`,
+    variant: 'default',
+    duration: 2000,
+  })
 }
 
 const isWithin48Hours = (reserva: Reserve): boolean => {
@@ -62,8 +91,8 @@ const checkReserveCode = async () => {
               <li class="flex gap-2"><b>Estado da reserva:</b> <p>{{ reserva.status }}</p></li>
             </ul>
           </section>
-          <div class="mt-4">
-            <Button v-if="reserva.status === 'CRIADA' && isWithin48Hours(reserva)" class="ml-2" @click="fazerCheckin(reserva)">Check-in</Button>
+          <div class="mt-4 flex justify-center gap-4">
+            <Button v-if="reserva.status === 'CRIADA' && isWithin48Hours(reserva)" @click="fazerCheckin(reserva)">Check-in</Button>
             <Button v-if="reserva.status === 'CRIADA'" variant="destructive" @click="cancelarReserva(reserva)">Cancelar</Button>
           </div>
         </div>
