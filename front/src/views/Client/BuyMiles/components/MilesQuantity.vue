@@ -75,12 +75,12 @@ const totalPrice = computed(() => milesStore.totalPrice)
           </div>
           <div class="flex justify-between">
             <span class="font-medium">Preço por milha:</span>
-            <span>R{{ pricePerMile }}</span>
+            <span>{{ pricePerMile.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) }}</span>
           </div>
           <Separator />
           <div class="flex justify-between font-bold">
             <span>Total:</span>
-            <span>R${{ totalPrice }},00</span>
+            <span>{{ totalPrice.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) }}</span>
           </div>
         </CardContent>
       </Card>

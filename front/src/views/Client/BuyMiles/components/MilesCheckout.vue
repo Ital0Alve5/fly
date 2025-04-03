@@ -10,6 +10,7 @@ import { useMilesStore } from '@/stores/miles'
 import { registerExtract, type ExtractItem } from '@/mock/extract'
 import { useAuthStore } from '@/stores/auth'
 import router from '@/router'
+import { getTodayDate } from '@/utils/date/getTodayDate'
 
 const authStore = useAuthStore()
 
@@ -54,11 +55,12 @@ const formatExpiryDate = (e: Event) => {
 }
 
 const onSubmit = handleSubmit(async (values) => {
+
   const newExtract: ExtractItem = {
     userId: authStore.user?.userId || 0,
-    date: new Date().toLocaleDateString('pt-BR'),
+    date: getTodayDate(),
     reservationCode: null,
-    value: totalPrice.value.toString(),
+    value: totalPrice.value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
     miles: currentCheckoutMiles.value,
     description: 'COMPRA DE MILHAS',
     type: 'ENTRADA',
@@ -150,7 +152,7 @@ const onSubmit = handleSubmit(async (values) => {
             </FormField>
           </div>
 
-          <Button type="submit" class="w-full mt-6"> Pagar R${{ totalPrice }},00 </Button>
+          <Button type="submit" class="w-full mt-6"> Pagar {{ totalPrice.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) }}</Button>
         </div>
       </form>
     </div>
