@@ -59,14 +59,28 @@ const columns: ColumnDef<ExtractItem>[] = [
     },
     cell: ({ row }) => h('div', row.getValue('date')),
     sortingFn: (rowA, rowB, columnId) => {
-      const dateA = rowA.getValue(columnId) as string
-      const dateB = rowB.getValue(columnId) as string
+      const dateTimeA = rowA.getValue(columnId) as string
+      const dateTimeB = rowB.getValue(columnId) as string
+
+      const [dateA, timeA] = dateTimeA.split(' ')
+      const [dateB, timeB] = dateTimeB.split(' ')
 
       const [dayA, monthA, yearA] = dateA.split('/').map(Number)
       const [dayB, monthB, yearB] = dateB.split('/').map(Number)
 
-      const parsedDateA = new Date(yearA, monthA - 1, dayA)
-      const parsedDateB = new Date(yearB, monthB - 1, dayB)
+      let hoursA = 0, minutesA = 0, secondsA = 0
+      let hoursB = 0, minutesB = 0, secondsB = 0
+      
+      if (timeA) {
+        [hoursA, minutesA, secondsA] = timeA.split(':').map(Number)
+      }
+      
+      if (timeB) {
+        [hoursB, minutesB, secondsB] = timeB.split(':').map(Number)
+      }
+
+      const parsedDateA = new Date(yearA, monthA - 1, dayA, hoursA, minutesA, secondsA)
+      const parsedDateB = new Date(yearB, monthB - 1, dayB, hoursB, minutesB, secondsB)
 
       return parsedDateA.getTime() - parsedDateB.getTime()
     },
