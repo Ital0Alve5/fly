@@ -29,7 +29,7 @@ watch(openDialog, (newVal) => {
   emit('update:open', newVal)
 })
 
-const fazerCheckin = (reserva: Reserve) => {
+const checkin = (reserva: Reserve) => {
   reserva.status = 'CHECK-IN'
   openDialog.value = false
   toast({
@@ -40,7 +40,7 @@ const fazerCheckin = (reserva: Reserve) => {
   })
 }
 
-const cancelarReserva = (reserva: Reserve) => { 
+const toCancel = (reserva: Reserve) => { 
   reserva.status = 'CANCELADA'
   openDialog.value = false
   toast({
@@ -53,9 +53,9 @@ const cancelarReserva = (reserva: Reserve) => {
 
 const isWithin48Hours = (reserva: Reserve): boolean => {
   const now = new Date()
-  const dataReserva = new Date(reserva.dataHora)
-  const diferencaHoras = (dataReserva.getTime() - now.getTime()) / (1000 * 60 * 60)
-  return diferencaHoras <= 48 && diferencaHoras > 0
+  const reserveDate = new Date(reserva.dataHora)
+  const timeDifference = (reserveDate.getTime() - now.getTime()) / (1000 * 60 * 60)
+  return timeDifference <= 48 && timeDifference > 0
 }
 
 const checkReserveCode = async () => {
@@ -92,8 +92,8 @@ const checkReserveCode = async () => {
             </ul>
           </section>
           <div class="mt-4 flex justify-center gap-4">
-            <Button v-if="reserva.status === 'CRIADA' && isWithin48Hours(reserva)" @click="fazerCheckin(reserva)">Check-in</Button>
-            <Button v-if="reserva.status === 'CRIADA'" variant="destructive" @click="cancelarReserva(reserva)">Cancelar</Button>
+            <Button v-if="reserva.status === 'CRIADA' && isWithin48Hours(reserva)" @click="checkin(reserva)">Check-in</Button>
+            <Button v-if="reserva.status === 'CRIADA'" variant="destructive" @click="toCancel(reserva)">Cancelar</Button>
           </div>
         </div>
       </div>

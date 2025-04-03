@@ -39,13 +39,34 @@ const formatDateTime = (dateTimeString: string) => {
       <CardContent>
         <section>
           <ul class="space-y-2">
-            <li class="flex gap-2"><b>Data:</b><p>{{ formatDateTime(reservation.dataHora).date }} às {{ formatDateTime(reservation.dataHora).time }}</p></li>
-            <li class="flex gap-2"><b>Código:</b><p>{{ reservation.codigo }}</p></li>
-            <li class="flex gap-2"><b>Origem:</b><p>{{ reservation.origem }}</p></li>
-            <li class="flex gap-2"><b>Destino:</b><p>{{ reservation.destino }}</p></li>
-            <li class="flex gap-2"><b>Valor:</b><p>{{ reservation.valor }}</p></li>
-            <li class="flex gap-2"><b>Milhas gastas:</b><p>{{ reservation.milhas }}</p></li>
-            <li class="flex gap-2"><b>Estado da reserva:</b><p>{{ reservation.status }}</p></li>
+            <li class="flex gap-2">
+              <b>Data:</b>
+              <p>{{ formatDateTime(reservation.dataHora).date }} às {{ formatDateTime(reservation.dataHora).time }}</p>
+            </li>
+            <li class="flex gap-2">
+              <b>Código:</b>
+              <p>{{ reservation.codigo }}</p>
+            </li>
+            <li class="flex gap-2">
+              <b>Origem:</b>
+              <p>{{ reservation.origem }}</p>
+            </li>
+            <li class="flex gap-2">
+              <b>Destino:</b>
+              <p>{{ reservation.destino }}</p>
+            </li>
+            <li class="flex gap-2">
+              <b>Valor:</b>
+              <p>{{ reservation.valor }}</p>
+            </li>
+            <li class="flex gap-2">
+              <b>Milhas gastas:</b>
+              <p>{{ reservation.milhas }}</p>
+            </li>
+            <li class="flex gap-2">
+              <b>Estado da reserva:</b>
+              <p>{{ reservation.status }}</p>
+            </li>
           </ul>
         </section>
       </CardContent>
