@@ -40,9 +40,16 @@ const confirmCancellation = () => {
   <div class="flex flex-col justify-center h-screen">
     <nav class="p-1 shadow-md mt-6">
       <div class="container mx-auto flex justify-between items-center">
-        <span class="text-lg">
-          Saldo de Milhas: <strong>{{ milesStore.miles }}</strong>
-        </span>
+        <span class="text-lg"
+          >Saldo de Milhas: <strong>{{ milesStore.totalMiles }}</strong></span
+        >
+      </div>
+      <div class="container mx-auto mt-4 flex justify-around">
+        <Button @click="comprarMilhas">Comprar Milhas</Button>
+        <Button @click="consultarExtrato">Consultar Extrato de Milhas</Button>
+        <Button @click="efetuarReserva">Efetuar Reserva</Button>
+        <Button @click="consultarReserva">Consultar Reserva</Button>
+        <Button @click="fazerCheckin">Fazer Check-in</Button>
       </div>
     </nav>
 

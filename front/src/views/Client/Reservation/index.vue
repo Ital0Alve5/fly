@@ -10,7 +10,7 @@ const goBack = () => {
 }
 
 const reservation = ref({
-  date: '05/03/2025',
+  date: '05/03/2025 14:20:45',
   time: '14:30',
   code: 'ABC123',
   origin: 'Curitiba',

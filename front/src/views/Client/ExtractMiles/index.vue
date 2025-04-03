@@ -59,14 +59,28 @@ const columns: ColumnDef<ExtractItem>[] = [
     },
     cell: ({ row }) => h('div', row.getValue('date')),
     sortingFn: (rowA, rowB, columnId) => {
-      const dateA = rowA.getValue(columnId) as string
-      const dateB = rowB.getValue(columnId) as string
+      const dateTimeA = rowA.getValue(columnId) as string
+      const dateTimeB = rowB.getValue(columnId) as string
+
+      const [dateA, timeA] = dateTimeA.split(' ')
+      const [dateB, timeB] = dateTimeB.split(' ')
 
       const [dayA, monthA, yearA] = dateA.split('/').map(Number)
       const [dayB, monthB, yearB] = dateB.split('/').map(Number)
 
-      const parsedDateA = new Date(yearA, monthA - 1, dayA)
-      const parsedDateB = new Date(yearB, monthB - 1, dayB)
+      let hoursA = 0, minutesA = 0, secondsA = 0
+      let hoursB = 0, minutesB = 0, secondsB = 0
+      
+      if (timeA) {
+        [hoursA, minutesA, secondsA] = timeA.split(':').map(Number)
+      }
+      
+      if (timeB) {
+        [hoursB, minutesB, secondsB] = timeB.split(':').map(Number)
+      }
+
+      const parsedDateA = new Date(yearA, monthA - 1, dayA, hoursA, minutesA, secondsA)
+      const parsedDateB = new Date(yearB, monthB - 1, dayB, hoursB, minutesB, secondsB)
 
       return parsedDateA.getTime() - parsedDateB.getTime()
     },
@@ -132,33 +146,43 @@ const columnVisibility = ref<VisibilityState>({})
 const rowSelection = ref({})
 const expanded = ref<ExpandedState>({})
 
-const table = useVueTable({
-  data: data,
-  columns,
-  getCoreRowModel: getCoreRowModel(),
-  getPaginationRowModel: getPaginationRowModel(),
-  getSortedRowModel: getSortedRowModel(),
-  getFilteredRowModel: getFilteredRowModel(),
-  getExpandedRowModel: getExpandedRowModel(),
-  onColumnFiltersChange: (updaterOrValue) => valueUpdater(updaterOrValue, columnFilters),
-  onColumnVisibilityChange: (updaterOrValue) => valueUpdater(updaterOrValue, columnVisibility),
-  onRowSelectionChange: (updaterOrValue) => valueUpdater(updaterOrValue, rowSelection),
-  onExpandedChange: (updaterOrValue) => valueUpdater(updaterOrValue, expanded),
-  state: {
-    get columnFilters() {
-      return columnFilters.value
+const table = computed(() =>
+  useVueTable({
+    data: data.value,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    getExpandedRowModel: getExpandedRowModel(),
+    onColumnFiltersChange: (updaterOrValue) => valueUpdater(updaterOrValue, columnFilters),
+    onColumnVisibilityChange: (updaterOrValue) => valueUpdater(updaterOrValue, columnVisibility),
+    onRowSelectionChange: (updaterOrValue) => valueUpdater(updaterOrValue, rowSelection),
+    onExpandedChange: (updaterOrValue) => valueUpdater(updaterOrValue, expanded),
+    initialState: {
+      sorting: [
+        {
+          id: 'date',
+          desc: true,
+        },
+      ],
     },
-    get columnVisibility() {
-      return columnVisibility.value
+    state: {
+      get columnFilters() {
+        return columnFilters.value
+      },
+      get columnVisibility() {
+        return columnVisibility.value
+      },
+      get rowSelection() {
+        return rowSelection.value
+      },
+      get expanded() {
+        return expanded.value
+      },
     },
-    get rowSelection() {
-      return rowSelection.value
-    },
-    get expanded() {
-      return expanded.value
-    },
-  },
-})
+  })
+)
 </script>
 
 <template>

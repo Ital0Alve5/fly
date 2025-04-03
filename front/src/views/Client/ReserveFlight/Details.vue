@@ -48,7 +48,7 @@ const valueToPay = computed(() => {
 function handleReserveFlight(value: boolean) {
   if (value) return
 
-  milesStore.setMiles(milesStore.miles - miles.value)
+  milesStore.setTotalMiles(milesStore.totalMiles - miles.value)
 
   booking.push({
     id: booking[booking.length - 1].id + 1,
@@ -62,7 +62,7 @@ function handleReserveFlight(value: boolean) {
     userId: authStore.user?.userId as number,
     date: getTodayDate(),
     reservationCode: generatedCode.value,
-    value: `R$${valueToPay.value},00`,
+    value: valueToPay.value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
     miles: miles.value,
     description: `${flight.value?.originAirport}->${flight.value?.destinationAirport}`,
     type: 'SAÍDA',
@@ -87,7 +87,7 @@ function handleReserveFlight(value: boolean) {
 
     <div class="min-h-screen flex flex-col items-center justify-center p-20">
       <strong class="w-full max-w-[1000px] text-left mb-4 text-xl">
-        Suas milhas restantes: {{ milesStore.miles - miles }}
+        Suas milhas restantes: {{ milesStore.totalMiles - miles }}
       </strong>
 
       <ResizablePanelGroup
@@ -106,7 +106,7 @@ function handleReserveFlight(value: boolean) {
 
         <ResizablePanel :default-size="40" class="bg-black">
           <div class="h-full flex flex-col p-6 gap-4">
-            <NumberField id="miles" v-model="miles" :min="0" :max="milesStore.miles">
+            <NumberField id="miles" v-model="miles" :min="0" :max="milesStore.totalMiles">
               <label>Milhas a usar</label>
               <NumberFieldContent>
                 <NumberFieldDecrement />
@@ -116,7 +116,7 @@ function handleReserveFlight(value: boolean) {
             </NumberField>
 
             <p class="text-xl">
-              Valor a pagar: <b>R${{ valueToPay }},00</b>
+              Valor a pagar: <b>{{ valueToPay.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) }}</b>
             </p>
 
             <DialogTrigger as-child>
