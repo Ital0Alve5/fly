@@ -12,11 +12,10 @@ import {
 } from '@/components/ui/table';
 import { useMilesStore } from '@/stores/miles';
 import CancelDialog from '../CancelFlight/index.vue';
-import bookingData from '@/mock/booking';
+import { useReserveStore } from '@/stores/booking'
 
+const reserveStore = useReserveStore()
 const milesStore = useMilesStore();
-
-const bookings = ref(bookingData);
 
 const viewReservation = (id: number) => {
   console.log('View reservation', id);
@@ -32,17 +31,9 @@ const openCancelDialog = (id: number) => {
 
 const confirmCancellation = () => {
   if (selectedReservation.value !== null) {
-    const reservation = bookings.value.find(r => r.id === selectedReservation.value);
-    if (reservation) {
-      reservation.status = 'CANCELADA';
-      console.log(`Reservation ID ${reservation.id} status updated to: ${reservation.status}`);
-    } else {
-      console.log(`Reservation with ID ${selectedReservation.value} not found.`);
-    }
-  } else {
-    console.log('No reservation selected for cancellation.');
+    reserveStore.cancelReservation(selectedReservation.value)
   }
-};
+}
 </script>
 
 <template>
@@ -72,7 +63,7 @@ const confirmCancellation = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              <TableRow v-for="reservation in bookings" :key="reservation.id">
+              <TableRow v-for="reservation in reserveStore.reserves" :key="reservation.id">
                 <TableCell class="text-center px-6 py-4 text-lg">{{ reservation.dataHora }}</TableCell>
                 <TableCell class="text-center px-6 py-4 text-lg">{{ reservation.origem }}</TableCell>
                 <TableCell class="text-center px-6 py-4 text-lg">{{ reservation.destino }}</TableCell>
