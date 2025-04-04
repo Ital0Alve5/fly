@@ -57,7 +57,7 @@ const totalPrice = computed(() => milesStore.totalPrice)
         <Label>Milhas</Label>
         <NumberFieldContent>
           <NumberFieldDecrement />
-          <NumberFieldInput/>
+          <NumberFieldInput />
           <NumberFieldIncrement />
         </NumberFieldContent>
       </NumberField>
@@ -75,12 +75,16 @@ const totalPrice = computed(() => milesStore.totalPrice)
           </div>
           <div class="flex justify-between">
             <span class="font-medium">Preço por milha:</span>
-            <span>{{ pricePerMile.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) }}</span>
+            <span>{{
+              pricePerMile.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+            }}</span>
           </div>
           <Separator />
           <div class="flex justify-between font-bold">
             <span>Total:</span>
-            <span>{{ totalPrice.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) }}</span>
+            <span>{{
+              totalPrice.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+            }}</span>
           </div>
         </CardContent>
       </Card>

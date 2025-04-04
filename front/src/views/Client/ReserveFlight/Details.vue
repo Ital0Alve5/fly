@@ -23,7 +23,7 @@ import { useMilesStore } from '@/stores/miles'
 import FlightDetails from './components/FlightDetails.vue'
 import { getFlightByCode, type Flight } from '@/mock/flight'
 import { generateUniqueCode } from '@/utils/generateRandomCode'
-import booking from '@/mock/booking'
+import { booking } from '@/mock/booking'
 import { getCurrentDateTime } from '@/utils/date/getCurrentDateTime'
 import { registerExtract } from '@/mock/extract'
 import { useAuthStore } from '@/stores/auth'
@@ -50,8 +50,8 @@ function handleReserveFlight(value: boolean) {
 
   milesStore.setTotalMiles(milesStore.totalMiles - miles.value)
 
-  booking.push({
-    id: booking[booking.length - 1].id + 1,
+  booking.value.push({
+    id: booking.value[booking.value.length - 1].id + 1,
     status: 'CRIADA',
     dataHora: getCurrentDateTime(),
     origem: flight.value?.originAirport ?? '',
@@ -116,7 +116,10 @@ function handleReserveFlight(value: boolean) {
             </NumberField>
 
             <p class="text-xl">
-              Valor a pagar: <b>{{ valueToPay.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) }}</b>
+              Valor a pagar:
+              <b>{{
+                valueToPay.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+              }}</b>
             </p>
 
             <DialogTrigger as-child>

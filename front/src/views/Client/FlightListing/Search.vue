@@ -51,7 +51,12 @@ async function handleSearch(originAipoirt: string, destinationAirpoirt: string) 
       </div>
       <SearchFlightForm :loading @on-search="handleSearch" />
     </section>
-    <FlightCardsGrid :fetched-flights="fetchedFlights" :loading :flights="flightsList" v-slot="{ flight }">
+    <FlightCardsGrid
+      :fetched-flights="fetchedFlights"
+      :loading
+      :flights="flightsList"
+      v-slot="{ flight }"
+    >
       <FlightCard :flight="flight" />
     </FlightCardsGrid>
   </main>
