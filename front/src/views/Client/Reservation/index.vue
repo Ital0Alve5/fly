@@ -10,10 +10,10 @@ const route = useRoute()
 const reservation = ref<Reserve | null>(null)
 
 onMounted(() => {
-  const foundReservation = booking.value.find(res => 
-    res.code.toLowerCase() === (route.params.code as string).toLowerCase()
+  const foundReservation = booking.value.find(
+    (res) => res.code.toLowerCase() === (route.params.code as string).toLowerCase(),
   )
-  
+
   if (foundReservation) {
     reservation.value = foundReservation
   }
@@ -50,7 +50,11 @@ onMounted(() => {
             </li>
             <li class="flex gap-2">
               <b>Valor:</b>
-              <p>{{ reservation.price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) }}</p>
+              <p>
+                {{
+                  reservation.price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+                }}
+              </p>
             </li>
             <li class="flex gap-2">
               <b>Milhas gastas:</b>

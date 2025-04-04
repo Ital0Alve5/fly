@@ -1,8 +1,14 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import { searchReserves } from '@/mock/booking'
 import type { Reserve } from '@/types/Reserve'
 import { Button } from '@/components/ui/button'
@@ -22,9 +28,14 @@ const reserveCode = ref('')
 const reserveFound = ref<Reserve[]>([])
 
 const openDialog = ref(props.open)
-watch(() => props.open, (newVal) => {
-  openDialog.value = newVal
-})
+
+watch(
+  () => props.open,
+  (newVal) => {
+    openDialog.value = newVal
+  },
+)
+
 watch(openDialog, (newVal) => {
   emit('update:open', newVal)
 
@@ -45,7 +56,7 @@ const checkin = (reserva: Reserve) => {
   })
 }
 
-const toCancel = (reserva: Reserve) => { 
+const toCancel = (reserva: Reserve) => {
   reserva.status = 'CANCELADA'
   openDialog.value = false
   toast({
@@ -66,7 +77,7 @@ const isWithin48Hours = (reserva: Reserve): boolean => {
 const checkReserveCode = async () => {
   if (reserveCode.value.trim()) {
     reserveFound.value = await searchReserves(reserveCode.value)
-    
+
     if (reserveFound.value.length === 0) {
       toast({
         title: 'Reserva não encontrada',
@@ -91,7 +102,9 @@ const checkReserveCode = async () => {
     <DialogContent>
       <DialogHeader>
         <DialogTitle>Consultar Reserva</DialogTitle>
-        <DialogDescription>Escreva o código que recebeu para pesquisar sua reserva.</DialogDescription>
+        <DialogDescription
+          >Escreva o código que recebeu para pesquisar sua reserva.</DialogDescription
+        >
       </DialogHeader>
       <Label for="reserveCode" class="flex gap-4">Código da Reserva</Label>
       <div class="flex items-center space-x-2">
@@ -102,18 +115,52 @@ const checkReserveCode = async () => {
         <div v-for="reserva in reserveFound" :key="reserva.id">
           <section>
             <ul class="space-y-2">
-              <li class="flex gap-2"><b>Data:</b> <p>{{ reserva.dateTimeF }}</p></li>
-              <li class="flex gap-2"><b>Código:</b> <p>{{ reserva.code }}</p></li>
-              <li class="flex gap-2"><b>Origem:</b> <p>{{ reserva.origin }}</p></li>
-              <li class="flex gap-2"><b>Destino:</b> <p>{{ reserva.destination }}</p></li>
-              <li class="flex gap-2"><b>Valor:</b> <p>{{ reserva.price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) }}</p></li>
-              <li class="flex gap-2"><b>Milhas gastas:</b> <p>{{ reserva.miles }}</p></li>
-              <li class="flex gap-2"><b>Estado da reserva:</b> <p>{{ reserva.status }}</p></li>
+              <li class="flex gap-2">
+                <b>Data:</b>
+                <p>{{ reserva.dateTimeF }}</p>
+              </li>
+              <li class="flex gap-2">
+                <b>Código:</b>
+                <p>{{ reserva.code }}</p>
+              </li>
+              <li class="flex gap-2">
+                <b>Origem:</b>
+                <p>{{ reserva.origin }}</p>
+              </li>
+              <li class="flex gap-2">
+                <b>Destino:</b>
+                <p>{{ reserva.destination }}</p>
+              </li>
+              <li class="flex gap-2">
+                <b>Valor:</b>
+                <p>
+                  {{
+                    reserva.price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+                  }}
+                </p>
+              </li>
+              <li class="flex gap-2">
+                <b>Milhas gastas:</b>
+                <p>{{ reserva.miles }}</p>
+              </li>
+              <li class="flex gap-2">
+                <b>Estado da reserva:</b>
+                <p>{{ reserva.status }}</p>
+              </li>
             </ul>
           </section>
           <div class="mt-4 flex justify-center gap-4">
-            <Button v-if="reserva.status === 'CRIADA' && isWithin48Hours(reserva)" @click="checkin(reserva)">Check-in</Button>
-            <Button v-if="reserva.status === 'CRIADA'" variant="destructive" @click="toCancel(reserva)">Cancelar</Button>
+            <Button
+              v-if="reserva.status === 'CRIADA' && isWithin48Hours(reserva)"
+              @click="checkin(reserva)"
+              >Check-in</Button
+            >
+            <Button
+              v-if="reserva.status === 'CRIADA'"
+              variant="destructive"
+              @click="toCancel(reserva)"
+              >Cancelar</Button
+            >
           </div>
         </div>
       </div>

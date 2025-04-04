@@ -2,13 +2,11 @@
 import router from '@/router'
 import { useAuthStore } from '@/stores/auth'
 import { LogOut } from 'lucide-vue-next'
-import SearchDialog from '../../views/Client/SearchFlight/search.vue'
-import { ref } from 'vue'
 
 type NavigationItem = {
-  label: string;
-  link?: string;
-  action?: string;
+  label: string
+  link?: string
+  action?: string
 }
 
 const clientNavigationLinks: NavigationItem[] = [
@@ -28,10 +26,6 @@ const clientNavigationLinks: NavigationItem[] = [
     label: 'Extrato de milhas',
     link: '/extrato-milhas',
   },
-  {
-    label: 'Consultar Reserva',
-    action: 'openSearchDialog'
-  }
 ]
 
 const managerNavigationLinks: NavigationItem[] = [
@@ -42,15 +36,10 @@ const managerNavigationLinks: NavigationItem[] = [
 ]
 
 const authStore = useAuthStore()
-const isSearchDialogOpen = ref(false)
 
 function handleLogout() {
   router.replace('/')
   authStore.logout()
-}
-
-function openSearchDialog() {
-  isSearchDialogOpen.value = true
 }
 </script>
 
@@ -63,25 +52,16 @@ function openSearchDialog() {
           : clientNavigationLinks"
         :key="navigation.link || navigation.label"
       >
-        <RouterLink 
+        <RouterLink
           v-if="navigation.link"
-          :to="navigation.link" 
+          :to="navigation.link"
           activeClass="border-b border-b-active-link-border"
         >
           {{ navigation.label }}
         </RouterLink>
-        <a 
-          v-else-if="navigation.action"
-          class="cursor-pointer"
-          @click="openSearchDialog"
-        >
-          {{ navigation.label }}
-        </a>
       </li>
     </ul>
     <p class="ml-auto font-semibold">Olá, {{ authStore.user?.name.split(' ')[0] }}!</p>
     <LogOut @click="handleLogout" class="ml-6 cursor-pointer" />
   </header>
-
-  <SearchDialog v-model:open="isSearchDialogOpen" />
 </template>
