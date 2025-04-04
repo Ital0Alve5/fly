@@ -1,15 +1,16 @@
 <template>
   <Dialog v-model:open="isVisible">
     <DialogContent class="sm:max-w-md">
-      <DialogHeader  class="gap-4">
+      <DialogHeader>
         <DialogTitle>Confirmar Cancelamento</DialogTitle>
-        <DialogDescription  class="gap-100">
+        <br>
+        <DialogDescription>
           Tem certeza de que deseja cancelar esta reserva? Esta ação não pode ser desfeita.
         </DialogDescription>
       </DialogHeader>
       <div class="flex justify-end space-x-2">
         <Button @click="confirmCancel" variant="destructive">Confirmar</Button>
-        <Button @click="closeDialog">Voltar</Button>
+        <Button @click="closeDialog">Cancelar</Button>
       </div>
     </DialogContent>
   </Dialog>

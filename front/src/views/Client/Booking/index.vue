@@ -12,10 +12,11 @@ import {
 } from '@/components/ui/table';
 import { useMilesStore } from '@/stores/miles';
 import CancelDialog from '../CancelFlight/index.vue';
-import { useReserveStore } from '@/stores/booking'
+import bookingData from '@/mock/booking';
 
-const reserveStore = useReserveStore()
 const milesStore = useMilesStore();
+
+const bookings = ref(bookingData);
 
 const viewReservation = (id: number) => {
   console.log('View reservation', id);
@@ -31,9 +32,14 @@ const openCancelDialog = (id: number) => {
 
 const confirmCancellation = () => {
   if (selectedReservation.value !== null) {
-    reserveStore.cancelReservation(selectedReservation.value)
-  }
-}
+    const reservation = bookings.value.find(r => r.id === selectedReservation.value);
+    if (reservation) {
+      reservation.status = 'CANCELADA';
+    } else {
+      console.log(`Reserva com ID ${selectedReservation.value} não encontrada.`);
+    }
+  } 
+};
 </script>
 
 <template>
@@ -63,7 +69,7 @@ const confirmCancellation = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              <TableRow v-for="reservation in reserveStore.reserves" :key="reservation.id">
+              <TableRow v-for="reservation in bookings" :key="reservation.id">
                 <TableCell class="text-center px-6 py-4 text-lg">{{ reservation.dataHora }}</TableCell>
                 <TableCell class="text-center px-6 py-4 text-lg">{{ reservation.origem }}</TableCell>
                 <TableCell class="text-center px-6 py-4 text-lg">{{ reservation.destino }}</TableCell>
