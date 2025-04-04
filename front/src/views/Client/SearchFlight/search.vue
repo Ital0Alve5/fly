@@ -106,7 +106,7 @@ const checkReserveCode = async () => {
               <li class="flex gap-2"><b>Código:</b> <p>{{ reserva.code }}</p></li>
               <li class="flex gap-2"><b>Origem:</b> <p>{{ reserva.origin }}</p></li>
               <li class="flex gap-2"><b>Destino:</b> <p>{{ reserva.destination }}</p></li>
-              <li class="flex gap-2"><b>Valor:</b> <p>{{ reserva.price }}</p></li>
+              <li class="flex gap-2"><b>Valor:</b> <p>{{ reserva.price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) }}</p></li>
               <li class="flex gap-2"><b>Milhas gastas:</b> <p>{{ reserva.miles }}</p></li>
               <li class="flex gap-2"><b>Estado da reserva:</b> <p>{{ reserva.status }}</p></li>
             </ul>
