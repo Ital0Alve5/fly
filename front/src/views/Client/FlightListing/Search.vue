@@ -12,6 +12,7 @@ const globalStore = useGlobalStore()
 
 const flightsList = ref<Flight[]>([])
 const loading = ref(false)
+const fetchedFlights = ref(false)
 
 async function handleSearch(originAipoirt: string, destinationAirpoirt: string) {
   try {
@@ -23,6 +24,7 @@ async function handleSearch(originAipoirt: string, destinationAirpoirt: string) 
 
     const flights = await searchFlights(originAipoirt, destinationAirpoirt)
     flightsList.value = flights
+    fetchedFlights.value = true
   } catch (error) {
     console.log(error)
     globalStore.setNotification({
@@ -49,7 +51,12 @@ async function handleSearch(originAipoirt: string, destinationAirpoirt: string) 
       </div>
       <SearchFlightForm :loading @on-search="handleSearch" />
     </section>
-    <FlightCardsGrid :loading :flights="flightsList" v-slot="{ flight }">
+    <FlightCardsGrid
+      :fetched-flights="fetchedFlights"
+      :loading
+      :flights="flightsList"
+      v-slot="{ flight }"
+    >
       <FlightCard :flight="flight" />
     </FlightCardsGrid>
   </main>

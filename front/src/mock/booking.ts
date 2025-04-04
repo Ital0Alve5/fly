@@ -13,3 +13,14 @@ export async function searchReserves(code: string): Promise<Reserve[]> {
 
   return booking.filter(reserve => reserve.code.toUpperCase() === searchCode)
 }
+
+export async function cancelReservation(reservationid: number) {
+  if (reservationid) {
+    const reservation = booking.find((r) => r.id === reservationid)
+    if (reservation) {
+      reservation.status = 'CANCELADA'
+    } else {
+      console.log(`Reserva com ID ${reservationid} não encontrada.`)
+    }
+  }
+}

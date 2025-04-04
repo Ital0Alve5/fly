@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { ref } from 'vue'
 import { Label } from '@/components/ui/label'
 import {
   NumberField,
@@ -17,15 +16,19 @@ import { useMilesStore } from '@/stores/miles'
 const authStore = useAuthStore()
 const milesStore = useMilesStore()
 
-const user = ref({
+const user = computed(() => ({
   firstName: authStore.user?.name.split(' ')[0],
-  miles: milesStore.miles,
+}))
+const currentCheckoutMiles = computed({
+  get: () => milesStore.currentCheckoutMiles,
+  set: (value: number) => milesStore.setCurrentCheckoutMiles(value),
 })
-
-const miles = computed({
-  get: () => milesStore.miles,
-  set: (value: number) => milesStore.setMiles(value),
+const totalMiles = computed({
+  get: () => milesStore.totalMiles,
+  set: (value: number) => milesStore.setTotalMiles(value),
 })
+const pricePerMile = computed(() => milesStore.pricePerMile)
+const totalPrice = computed(() => milesStore.totalPrice)
 </script>
 
 <template>
@@ -38,7 +41,7 @@ const miles = computed({
       <ul class="space-y-4">
         <li>
           <span class="font-medium w-32 shrink-0">Minhas milhas:</span>
-          <span class="pl-2">{{ user.miles }}</span>
+          <span class="pl-2">{{ totalMiles }}</span>
         </li>
       </ul>
     </div>
@@ -50,7 +53,7 @@ const miles = computed({
     </div>
 
     <div class="px-6 pb-6">
-      <NumberField id="miles" v-model="miles" :min="0">
+      <NumberField id="miles" v-model="currentCheckoutMiles" :min="0">
         <Label>Milhas</Label>
         <NumberFieldContent>
           <NumberFieldDecrement />
@@ -68,16 +71,20 @@ const miles = computed({
         <CardContent class="space-y-4">
           <div class="flex justify-between">
             <span class="font-medium">Milhas:</span>
-            <span>{{ miles }}</span>
+            <span>{{ currentCheckoutMiles }}</span>
           </div>
           <div class="flex justify-between">
             <span class="font-medium">Preço por milha:</span>
-            <span>R$5,00</span>
+            <span>{{
+              pricePerMile.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+            }}</span>
           </div>
           <Separator />
           <div class="flex justify-between font-bold">
             <span>Total:</span>
-            <span>R${{ miles * 5 }},00</span>
+            <span>{{
+              totalPrice.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+            }}</span>
           </div>
         </CardContent>
       </Card>
