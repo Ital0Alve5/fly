@@ -26,6 +26,6 @@ export const useMilesStore = defineStore('miles', () => {
     pricePerMile,
     totalPrice,
     setTotalMiles,
-    setCurrentCheckoutMiles
+    setCurrentCheckoutMiles,
   }
 })

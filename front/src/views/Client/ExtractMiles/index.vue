@@ -68,15 +68,19 @@ const columns: ColumnDef<ExtractItem>[] = [
       const [dayA, monthA, yearA] = dateA.split('/').map(Number)
       const [dayB, monthB, yearB] = dateB.split('/').map(Number)
 
-      let hoursA = 0, minutesA = 0, secondsA = 0
-      let hoursB = 0, minutesB = 0, secondsB = 0
-      
+      let hoursA = 0,
+        minutesA = 0,
+        secondsA = 0
+      let hoursB = 0,
+        minutesB = 0,
+        secondsB = 0
+
       if (timeA) {
-        [hoursA, minutesA, secondsA] = timeA.split(':').map(Number)
+        ;[hoursA, minutesA, secondsA] = timeA.split(':').map(Number)
       }
-      
+
       if (timeB) {
-        [hoursB, minutesB, secondsB] = timeB.split(':').map(Number)
+        ;[hoursB, minutesB, secondsB] = timeB.split(':').map(Number)
       }
 
       const parsedDateA = new Date(yearA, monthA - 1, dayA, hoursA, minutesA, secondsA)
@@ -181,7 +185,7 @@ const table = computed(() =>
         return expanded.value
       },
     },
-  })
+  }),
 )
 </script>
 

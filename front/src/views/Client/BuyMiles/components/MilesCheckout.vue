@@ -20,11 +20,11 @@ const milesStore = useMilesStore()
 const { handleSubmit, cardNumber, cardName, expiryDate, cvv, resetForm } = useCheckoutForm()
 const currentCheckoutMiles = computed({
   get: () => milesStore.currentCheckoutMiles,
-  set: (value) => milesStore.setCurrentCheckoutMiles(value)
+  set: (value) => milesStore.setCurrentCheckoutMiles(value),
 })
 const totalMiles = computed({
   get: () => milesStore.totalMiles,
-  set: (value) => milesStore.setTotalMiles(value)
+  set: (value) => milesStore.setTotalMiles(value),
 })
 const totalPrice = computed(() => milesStore.totalPrice)
 
@@ -55,7 +55,6 @@ const formatExpiryDate = (e: Event) => {
 }
 
 const onSubmit = handleSubmit(async (values) => {
-
   const newExtract: ExtractItem = {
     userId: authStore.user?.userId || 0,
     date: getTodayDate(),
@@ -152,7 +151,10 @@ const onSubmit = handleSubmit(async (values) => {
             </FormField>
           </div>
 
-          <Button type="submit" class="w-full mt-6"> Pagar {{ totalPrice.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) }}</Button>
+          <Button type="submit" class="w-full mt-6">
+            Pagar
+            {{ totalPrice.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) }}</Button
+          >
         </div>
       </form>
     </div>

@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { ref } from 'vue'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
 import {
   Table,
   TableHead,
@@ -9,40 +9,28 @@ import {
   TableHeader,
   TableBody,
   TableCell,
-} from '@/components/ui/table';
-import { useMilesStore } from '@/stores/miles';
-import CancelDialog from '../CancelFlight/index.vue';
-import bookingData from '@/mock/booking';
+} from '@/components/ui/table'
+import { useMilesStore } from '@/stores/miles'
+import CancelFlightDialog from './components/CancelFlightDialog.vue'
+import { booking } from '@/mock/booking'
 
-const milesStore = useMilesStore();
-
-const bookings = ref(bookingData);
+const milesStore = useMilesStore()
 
 const viewReservation = (id: number) => {
-  console.log('View reservation', id);
-};
+  console.log('View reservation', id)
+}
 
-const cancelDialogRef = ref<InstanceType<typeof CancelDialog> | null>(null);
-const selectedReservation = ref<number | null>(null);
+const selectedReservationId = ref<number | null>(null)
+const isCancelDialogOpen = ref(false)
 
-const openCancelDialog = (id: number) => {
-  selectedReservation.value = id;
-  cancelDialogRef.value?.openDialog();
-};
-
-const confirmCancellation = () => {
-  if (selectedReservation.value !== null) {
-    const reservation = bookings.value.find(r => r.id === selectedReservation.value);
-    if (reservation) {
-      reservation.status = 'CANCELADA';
-    } else {
-      console.log(`Reserva com ID ${selectedReservation.value} não encontrada.`);
-    }
-  } 
-};
+function handleCancelFlight(selectedReservation: number) {
+  isCancelDialogOpen.value = true
+  selectedReservationId.value = selectedReservation
+}
 </script>
 
 <template>
+  <CancelFlightDialog v-model="isCancelDialogOpen" :selectedReservationId="selectedReservationId" />
   <div class="flex flex-col justify-center h-screen">
     <nav class="p-1 shadow-md mt-6">
       <div class="container mx-auto flex justify-between items-center">
@@ -68,10 +56,16 @@ const confirmCancellation = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              <TableRow v-for="reservation in bookings" :key="reservation.id">
-                <TableCell class="text-center px-6 py-4 text-lg">{{ reservation.dataHora }}</TableCell>
-                <TableCell class="text-center px-6 py-4 text-lg">{{ reservation.origem }}</TableCell>
-                <TableCell class="text-center px-6 py-4 text-lg">{{ reservation.destino }}</TableCell>
+              <TableRow v-for="reservation in booking" :key="reservation.id">
+                <TableCell class="text-center px-6 py-4 text-lg">{{
+                  reservation.dataHora
+                }}</TableCell>
+                <TableCell class="text-center px-6 py-4 text-lg">{{
+                  reservation.origem
+                }}</TableCell>
+                <TableCell class="text-center px-6 py-4 text-lg">{{
+                  reservation.destino
+                }}</TableCell>
                 <TableCell class="text-center px-6 py-4 text-lg">
                   <span
                     :class="{
@@ -85,16 +79,16 @@ const confirmCancellation = () => {
                 </TableCell>
                 <TableCell class="text-center">
                   <Button
-                    v-if="reservation.status === 'CRIADA'|| reservation.status === 'CHECK-IN'"
+                    v-if="reservation.status === 'CRIADA' || reservation.status === 'CHECK-IN'"
                     class="mr-2"
                     @click="viewReservation(reservation.id)"
                   >
                     Ver Reserva
                   </Button>
                   <Button
-                    v-if="reservation.status === 'CRIADA'|| reservation.status === 'CHECK-IN'"
+                    v-if="reservation.status === 'CRIADA' || reservation.status === 'CHECK-IN'"
                     variant="destructive"
-                    @click="openCancelDialog(reservation.id)"
+                    @click="handleCancelFlight(reservation.id)"
                   >
                     Cancelar
                   </Button>
@@ -105,10 +99,5 @@ const confirmCancellation = () => {
         </CardContent>
       </Card>
     </div>
-
-    <CancelDialog
-      ref="cancelDialogRef"
-      @confirm="confirmCancellation"
-    />
   </div>
 </template>

@@ -8,7 +8,6 @@ export type Flight = {
   price: number
 }
 
-
 export const flights = [
   {
     originAirport: 'GRU',
@@ -133,10 +132,7 @@ export function getFlightByCode(code: string): Flight | undefined {
   return flights.find((f) => f.code === code)
 }
 
-export async function searchFlights(
-  origin: string,
-  destination: string,
-): Promise<Flight[]> {
+export async function searchFlights(origin: string, destination: string): Promise<Flight[]> {
   const searchOrigin = origin.toLowerCase().trim()
   const searchDestination = destination.toLowerCase().trim()
 
@@ -154,7 +150,6 @@ export async function searchFlights(
     const flightOriginAirport = flight.originAirport.toLowerCase()
     const flightDestinationCity = flight.destination.toLowerCase()
     const flightDestinationAirport = flight.destinationAirport.toLowerCase()
-
 
     const matchesOrigin =
       !searchOrigin ||
