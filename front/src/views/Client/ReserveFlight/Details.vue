@@ -53,12 +53,13 @@ function handleReserveFlight(value: boolean) {
   booking.push({
     id: booking[booking.length - 1].id + 1,
     status: 'CRIADA',
-    dataHora: getCurrentDateTime(),
-    origem: flight.value?.originAirport ?? '',
-    destino: flight.value?.destinationAirport ?? '',
-    codigo: generatedCode.value,
-    valor: `R$${valueToPay.value},00`,
-    milhas: miles.value,
+    dateTimeR: getCurrentDateTime(),
+    dateTimeF: flight.value?.destination ?? '',
+    origin: flight.value?.originAirport ?? '',
+    destination: flight.value?.destinationAirport ?? '',
+    code: generatedCode.value,
+    price: valueToPay.value,
+    miles: miles.value,
   })
 
   registerExtract({

@@ -27,6 +27,11 @@ watch(() => props.open, (newVal) => {
 })
 watch(openDialog, (newVal) => {
   emit('update:open', newVal)
+
+  if (!newVal) {
+    reserveCode.value = ''
+    reserveFound.value = []
+  }
 })
 
 const checkin = (reserva: Reserve) => {
@@ -53,7 +58,7 @@ const toCancel = (reserva: Reserve) => {
 
 const isWithin48Hours = (reserva: Reserve): boolean => {
   const now = new Date()
-  const reserveDate = new Date(reserva.dataHora)
+  const reserveDate = new Date(reserva.dateTimeF)
   const timeDifference = (reserveDate.getTime() - now.getTime()) / (1000 * 60 * 60)
   return timeDifference <= 48 && timeDifference > 0
 }
@@ -61,7 +66,22 @@ const isWithin48Hours = (reserva: Reserve): boolean => {
 const checkReserveCode = async () => {
   if (reserveCode.value.trim()) {
     reserveFound.value = await searchReserves(reserveCode.value)
-    console.log('Reserva encontrada:', reserveFound.value)
+    
+    if (reserveFound.value.length === 0) {
+      toast({
+        title: 'Reserva não encontrada',
+        description: 'Nenhuma reserva foi encontrada com este código.',
+        variant: 'default',
+        duration: 2000,
+      })
+    }
+  } else {
+    toast({
+      title: 'Código inválido',
+      description: 'Por favor, insira um código de reserva válido.',
+      variant: 'default',
+      duration: 2000,
+    })
   }
 }
 </script>
@@ -82,12 +102,12 @@ const checkReserveCode = async () => {
         <div v-for="reserva in reserveFound" :key="reserva.id">
           <section>
             <ul class="space-y-2">
-              <li class="flex gap-2"><b>Data:</b> <p>{{ reserva.dataHora }}</p></li>
-              <li class="flex gap-2"><b>Código:</b> <p>{{ reserva.codigo }}</p></li>
-              <li class="flex gap-2"><b>Origem:</b> <p>{{ reserva.origem }}</p></li>
-              <li class="flex gap-2"><b>Destino:</b> <p>{{ reserva.destino }}</p></li>
-              <li class="flex gap-2"><b>Valor:</b> <p>{{ reserva.valor }}</p></li>
-              <li class="flex gap-2"><b>Milhas gastas:</b> <p>{{ reserva.milhas }}</p></li>
+              <li class="flex gap-2"><b>Data:</b> <p>{{ reserva.dateTimeF }}</p></li>
+              <li class="flex gap-2"><b>Código:</b> <p>{{ reserva.code }}</p></li>
+              <li class="flex gap-2"><b>Origem:</b> <p>{{ reserva.origin }}</p></li>
+              <li class="flex gap-2"><b>Destino:</b> <p>{{ reserva.destination }}</p></li>
+              <li class="flex gap-2"><b>Valor:</b> <p>{{ reserva.price }}</p></li>
+              <li class="flex gap-2"><b>Milhas gastas:</b> <p>{{ reserva.miles }}</p></li>
               <li class="flex gap-2"><b>Estado da reserva:</b> <p>{{ reserva.status }}</p></li>
             </ul>
           </section>

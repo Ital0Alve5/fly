@@ -25,7 +25,7 @@ const fazerCheckin = () => {}
 const verReserva = (id: number) => {
 const reserva = booking.find(r => r.id === id)
   if (reserva) {
-    router.push({ name: 'reserva', params: { code: reserva.codigo } })
+    router.push({ name: 'reserva', params: { code: reserva.code } })
   }
 }
 const cancelarReserva = (id: number) => {
@@ -68,9 +68,9 @@ const cancelarReserva = (id: number) => {
             </TableHeader>
             <TableBody>
               <TableRow v-for="reserva in booking" :key="reserva.id">
-                <TableCell class="text-center px-6 py-4 text-lg">{{ reserva.dataHora }}</TableCell>
-                <TableCell class="text-center px-6 py-4 text-lg">{{ reserva.origem }}</TableCell>
-                <TableCell class="text-center px-6 py-4 text-lg">{{ reserva.destino }}</TableCell>
+                <TableCell class="text-center px-6 py-4 text-lg">{{ reserva.dateTimeR }}</TableCell>
+                <TableCell class="text-center px-6 py-4 text-lg">{{ reserva.origin }}</TableCell>
+                <TableCell class="text-center px-6 py-4 text-lg">{{ reserva.destination }}</TableCell>
                 <TableCell class="text-center px-6 py-4 text-lg">
                   <span
                     :class="{

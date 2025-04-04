@@ -4,27 +4,20 @@ import { ref, onMounted } from 'vue'
 import booking from '@/mock/booking'
 import type { Reserve } from '@/types/Reserve'
 import { useRoute } from 'vue-router'
+import formatDateTime from '@/utils/date/formatDateTime'
 
 const route = useRoute()
 const reservation = ref<Reserve | null>(null)
 
 onMounted(() => {
   const foundReservation = booking.find(res => 
-    res.codigo.toLowerCase() === (route.params.code as string).toLowerCase()
+    res.code.toLowerCase() === (route.params.code as string).toLowerCase()
   )
   
   if (foundReservation) {
     reservation.value = foundReservation
   }
 })
-
-const formatDateTime = (dateTimeString: string) => {
-  const date = new Date(dateTimeString)
-  return {
-    date: date.toLocaleDateString('pt-BR'),
-    time: date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
-  }
-}
 </script>
 
 <template>
@@ -32,7 +25,7 @@ const formatDateTime = (dateTimeString: string) => {
     <Card v-if="reservation" class="w-full max-w-md">
       <CardHeader>
         <CardTitle>
-          Reserva do voo de {{ reservation.origem }} à {{ reservation.destino }}
+          Reserva do voo de {{ reservation.origin }} à {{ reservation.destination }}
         </CardTitle>
         <CardDescription>Informações de sua reserva:</CardDescription>
       </CardHeader>
@@ -41,27 +34,27 @@ const formatDateTime = (dateTimeString: string) => {
           <ul class="space-y-2">
             <li class="flex gap-2">
               <b>Data:</b>
-              <p>{{ formatDateTime(reservation.dataHora).date }} às {{ formatDateTime(reservation.dataHora).time }}</p>
+              <p>{{ formatDateTime(reservation.dateTimeF) }}</p>
             </li>
             <li class="flex gap-2">
               <b>Código:</b>
-              <p>{{ reservation.codigo }}</p>
+              <p>{{ reservation.code }}</p>
             </li>
             <li class="flex gap-2">
               <b>Origem:</b>
-              <p>{{ reservation.origem }}</p>
+              <p>{{ reservation.origin }}</p>
             </li>
             <li class="flex gap-2">
               <b>Destino:</b>
-              <p>{{ reservation.destino }}</p>
+              <p>{{ reservation.destination }}</p>
             </li>
             <li class="flex gap-2">
               <b>Valor:</b>
-              <p>{{ reservation.valor }}</p>
+              <p>{{ reservation.price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) }}</p>
             </li>
             <li class="flex gap-2">
               <b>Milhas gastas:</b>
-              <p>{{ reservation.milhas }}</p>
+              <p>{{ reservation.miles }}</p>
             </li>
             <li class="flex gap-2">
               <b>Estado da reserva:</b>
