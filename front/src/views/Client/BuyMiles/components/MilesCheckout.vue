@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 import { Button } from '@/components/ui/button'
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
@@ -10,6 +10,7 @@ import { useMilesStore } from '@/stores/miles'
 import { registerExtract, type ExtractItem } from '@/mock/extract'
 import { useAuthStore } from '@/stores/auth'
 import router from '@/router'
+import { getTodayDate } from '@/utils/date/getTodayDate'
 
 const authStore = useAuthStore()
 
@@ -17,7 +18,15 @@ const { toast } = useToast()
 const milesStore = useMilesStore()
 
 const { handleSubmit, cardNumber, cardName, expiryDate, cvv, resetForm } = useCheckoutForm()
-const milesQuantity = ref(milesStore.miles)
+const currentCheckoutMiles = computed({
+  get: () => milesStore.currentCheckoutMiles,
+  set: (value) => milesStore.setCurrentCheckoutMiles(value)
+})
+const totalMiles = computed({
+  get: () => milesStore.totalMiles,
+  set: (value) => milesStore.setTotalMiles(value)
+})
+const totalPrice = computed(() => milesStore.totalPrice)
 
 const formatCardNumber = (e: Event) => {
   const target = e.target as HTMLInputElement
@@ -46,19 +55,20 @@ const formatExpiryDate = (e: Event) => {
 }
 
 const onSubmit = handleSubmit(async (values) => {
+
   const newExtract: ExtractItem = {
     userId: authStore.user?.userId || 0,
-    date: new Date().toLocaleDateString('pt-BR'),
+    date: getTodayDate(),
     reservationCode: null,
-    value: totalPrice.value.toString(),
-    miles: milesQuantity.value,
+    value: totalPrice.value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
+    miles: currentCheckoutMiles.value,
     description: 'COMPRA DE MILHAS',
     type: 'ENTRADA',
   }
 
   registerExtract(newExtract)
-
-  milesStore.setMiles(milesStore.miles + milesQuantity.value)
+  milesStore.setTotalMiles(totalMiles.value + currentCheckoutMiles.value)
+  milesStore.setCurrentCheckoutMiles(10)
 
   console.log('Informações de pagamento:', values)
 
@@ -72,8 +82,6 @@ const onSubmit = handleSubmit(async (values) => {
   resetForm()
   router.push('/reservas')
 })
-
-const totalPrice = computed(() => milesStore.totalPrice)
 </script>
 
 <template>
@@ -144,7 +152,7 @@ const totalPrice = computed(() => milesStore.totalPrice)
             </FormField>
           </div>
 
-          <Button type="submit" class="w-full mt-6"> Pagar R${{ totalPrice }},00 </Button>
+          <Button type="submit" class="w-full mt-6"> Pagar {{ totalPrice.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) }}</Button>
         </div>
       </form>
     </div>

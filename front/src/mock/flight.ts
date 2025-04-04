@@ -8,6 +8,7 @@ export type Flight = {
   price: number
 }
 
+
 export const flights = [
   {
     originAirport: 'GRU',
@@ -72,6 +73,60 @@ export const flights = [
     destination: 'Nova York',
     price: 1980,
   },
+  {
+    originAirport: 'CDG',
+    destinationAirport: 'LAX',
+    dateTime: '2025-04-08T14:00:00',
+    code: 'VWX111',
+    origin: 'Paris',
+    destination: 'Los Angeles',
+    price: 2600,
+  },
+  {
+    originAirport: 'LHR',
+    destinationAirport: 'CDG',
+    dateTime: '2025-04-09T10:00:00',
+    code: 'YZA222',
+    origin: 'Londres',
+    destination: 'Paris',
+    price: 1300,
+  },
+  {
+    originAirport: 'JFK',
+    destinationAirport: 'MEX',
+    dateTime: '2025-04-10T09:30:00',
+    code: 'BCD333',
+    origin: 'Nova York',
+    destination: 'Cidade do México',
+    price: 500,
+  },
+  {
+    originAirport: 'MAD',
+    destinationAirport: 'JFK',
+    dateTime: '2025-04-11T16:00:00',
+    code: 'EFG444',
+    origin: 'Madrid',
+    destination: 'Nova York',
+    price: 1900,
+  },
+  {
+    originAirport: 'NRT',
+    destinationAirport: 'CDG',
+    dateTime: '2025-04-12T20:00:00',
+    code: 'HIJ555',
+    origin: 'Tóquio',
+    destination: 'Paris',
+    price: 3300,
+  },
+  {
+    originAirport: 'FRA',
+    destinationAirport: 'GRU',
+    dateTime: '2025-04-13T11:00:00',
+    code: 'KLM666',
+    origin: 'Frankfurt',
+    destination: 'São Paulo',
+    price: 2100,
+  },
 ]
 
 export function getFlightByCode(code: string): Flight | undefined {
@@ -79,21 +134,37 @@ export function getFlightByCode(code: string): Flight | undefined {
 }
 
 export async function searchFlights(
-  originAirport: string,
-  destinationAirport: string,
+  origin: string,
+  destination: string,
 ): Promise<Flight[]> {
-  const searchOrigin = originAirport.toLowerCase().trim()
-  const searchDestination = destinationAirport.toLowerCase().trim()
+  const searchOrigin = origin.toLowerCase().trim()
+  const searchDestination = destination.toLowerCase().trim()
 
-  // Sleep de 2 segundos para simular chamada a API
+  // Simula chamada à API com um delay de 2 segundos
   await new Promise((resolve) => setTimeout(() => resolve(undefined), 2000))
 
-  return flights.filter((flight) => {
-    const flightOrigin = flight.originAirport.toLowerCase()
-    const flightDestination = flight.destinationAirport.toLowerCase()
+  const now = new Date()
 
-    const matchesOrigin = !searchOrigin || flightOrigin.includes(searchOrigin)
-    const matchesDestination = !searchDestination || flightDestination.includes(searchDestination)
+  return flights.filter((flight) => {
+    const flightDate = new Date(flight.dateTime)
+
+    if (flightDate <= now) return false
+
+    const flightOriginCity = flight.origin.toLowerCase()
+    const flightOriginAirport = flight.originAirport.toLowerCase()
+    const flightDestinationCity = flight.destination.toLowerCase()
+    const flightDestinationAirport = flight.destinationAirport.toLowerCase()
+
+
+    const matchesOrigin =
+      !searchOrigin ||
+      flightOriginCity.includes(searchOrigin) ||
+      flightOriginAirport.includes(searchOrigin)
+
+    const matchesDestination =
+      !searchDestination ||
+      flightDestinationCity.includes(searchDestination) ||
+      flightDestinationAirport.includes(searchDestination)
 
     return matchesOrigin && matchesDestination
   })

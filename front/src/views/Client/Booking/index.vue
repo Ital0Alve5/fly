@@ -46,9 +46,9 @@ const confirmCancellation = () => {
   <div class="flex flex-col justify-center h-screen">
     <nav class="p-1 shadow-md mt-6">
       <div class="container mx-auto flex justify-between items-center">
-        <span class="text-lg">
-          Saldo de Milhas: <strong>{{ milesStore.miles }}</strong>
-        </span>
+        <span class="text-lg"
+          >Saldo de Milhas: <strong>{{ milesStore.totalMiles }}</strong></span
+        >
       </div>
     </nav>
 
