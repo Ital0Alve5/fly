@@ -10,7 +10,7 @@
       </DialogHeader>
       <div class="flex justify-end space-x-2">
         <Button @click="confirmCancel" variant="destructive">Confirmar</Button>
-        <Button @click="closeDialog">Cancelar</Button>
+        <Button @click="closeDialog">Voltar</Button>
       </div>
     </DialogContent>
   </Dialog>
