@@ -10,33 +10,45 @@ import {
   TableBody,
   TableCell,
 } from '@/components/ui/table'
+import { useRouter } from 'vue-router'
 import { useMilesStore } from '@/stores/miles'
 import CancelFlightDialog from './components/CancelFlightDialog.vue'
-import { booking } from '@/mock/booking'
+import booking from '@/mock/booking'
+import CheckReservationDialog from './components/CheckReservationDialog.vue'
 
+const router = useRouter()
 const milesStore = useMilesStore()
 
 const viewReservation = (id: number) => {
-  console.log('View reservation', id)
+  const reserva = booking.value.find((r) => r.id === id)
+  if (reserva) {
+    router.push({ name: 'reserva', params: { code: reserva.code } })
+  }
 }
-
 const selectedReservationId = ref<number | null>(null)
 const isCancelDialogOpen = ref(false)
+const isCheckReservationDialogOpen = ref(false)
 
 function handleCancelFlight(selectedReservation: number) {
   isCancelDialogOpen.value = true
   selectedReservationId.value = selectedReservation
 }
+
+function openCheckReservationDialog() {
+  isCheckReservationDialogOpen.value = true
+}
 </script>
 
 <template>
   <CancelFlightDialog v-model="isCancelDialogOpen" :selectedReservationId="selectedReservationId" />
+  <CheckReservationDialog v-model:open="isCheckReservationDialogOpen" />
   <div class="flex flex-col justify-center h-screen">
     <nav class="p-1 shadow-md mt-6">
       <div class="container mx-auto flex justify-between items-center">
-        <span class="text-lg"
-          >Saldo de Milhas: <strong>{{ milesStore.totalMiles }}</strong></span
-        >
+        <span class="text-lg">
+          Saldo de Milhas: <strong>{{ milesStore.totalMiles }}</strong>
+        </span>
+        <Button @click="openCheckReservationDialog">Consultar reserva</Button>
       </div>
     </nav>
     <div class="max-h-[500px] overflow-y-auto">
@@ -58,13 +70,13 @@ function handleCancelFlight(selectedReservation: number) {
             <TableBody>
               <TableRow v-for="reservation in booking" :key="reservation.id">
                 <TableCell class="text-center px-6 py-4 text-lg">{{
-                  reservation.dataHora
+                  reservation.dateTimeR
                 }}</TableCell>
                 <TableCell class="text-center px-6 py-4 text-lg">{{
-                  reservation.origem
+                  reservation.origin
                 }}</TableCell>
                 <TableCell class="text-center px-6 py-4 text-lg">{{
-                  reservation.destino
+                  reservation.destination
                 }}</TableCell>
                 <TableCell class="text-center px-6 py-4 text-lg">
                   <span
@@ -82,16 +94,14 @@ function handleCancelFlight(selectedReservation: number) {
                     v-if="reservation.status === 'CRIADA' || reservation.status === 'CHECK-IN'"
                     class="mr-2"
                     @click="viewReservation(reservation.id)"
+                    >Ver Reserva</Button
                   >
-                    Ver Reserva
-                  </Button>
                   <Button
                     v-if="reservation.status === 'CRIADA' || reservation.status === 'CHECK-IN'"
                     variant="destructive"
                     @click="handleCancelFlight(reservation.id)"
+                    >Cancelar</Button
                   >
-                    Cancelar
-                  </Button>
                 </TableCell>
               </TableRow>
             </TableBody>

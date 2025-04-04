@@ -3,7 +3,13 @@ import router from '@/router'
 import { useAuthStore } from '@/stores/auth'
 import { LogOut } from 'lucide-vue-next'
 
-const clientNavigationLinks = [
+type NavigationItem = {
+  label: string
+  link?: string
+  action?: string
+}
+
+const clientNavigationLinks: NavigationItem[] = [
   {
     label: 'Reservas',
     link: '/reservas',
@@ -22,7 +28,7 @@ const clientNavigationLinks = [
   },
 ]
 
-const managerNavigationLinks = [
+const managerNavigationLinks: NavigationItem[] = [
   {
     label: 'coisa de adm',
     link: '/admTeste',
@@ -36,6 +42,7 @@ function handleLogout() {
   authStore.logout()
 }
 </script>
+
 <template>
   <header class="flex justify-end p-4 rounded-xl fixed w-full">
     <ul class="ml-auto flex gap-4">
@@ -43,10 +50,14 @@ function handleLogout() {
         v-for="navigation in authStore.user?.isManager
           ? managerNavigationLinks
           : clientNavigationLinks"
-        :key="navigation.link"
+        :key="navigation.link || navigation.label"
       >
-        <RouterLink :to="navigation.link" activeClass="border-b border-b-active-link-border"
-          >{{ navigation.label }}
+        <RouterLink
+          v-if="navigation.link"
+          :to="navigation.link"
+          activeClass="border-b border-b-active-link-border"
+        >
+          {{ navigation.label }}
         </RouterLink>
       </li>
     </ul>

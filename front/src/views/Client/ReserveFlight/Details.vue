@@ -23,7 +23,7 @@ import { useMilesStore } from '@/stores/miles'
 import FlightDetails from './components/FlightDetails.vue'
 import { getFlightByCode, type Flight } from '@/mock/flight'
 import { generateUniqueCode } from '@/utils/generateRandomCode'
-import { booking } from '@/mock/booking'
+import booking from '@/mock/booking'
 import { getCurrentDateTime } from '@/utils/date/getCurrentDateTime'
 import { registerExtract } from '@/mock/extract'
 import { useAuthStore } from '@/stores/auth'
@@ -53,9 +53,13 @@ function handleReserveFlight(value: boolean) {
   booking.value.push({
     id: booking.value[booking.value.length - 1].id + 1,
     status: 'CRIADA',
-    dataHora: getCurrentDateTime(),
-    origem: flight.value?.originAirport ?? '',
-    destino: flight.value?.destinationAirport ?? '',
+    dateTimeR: getCurrentDateTime(),
+    dateTimeF: flight.value?.destination ?? '',
+    origin: flight.value?.originAirport ?? '',
+    destination: flight.value?.destinationAirport ?? '',
+    code: generatedCode.value,
+    price: valueToPay.value,
+    miles: miles.value,
   })
 
   registerExtract({

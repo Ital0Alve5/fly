@@ -1,37 +1,32 @@
 <script setup lang="ts">
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, onMounted } from 'vue'
+import booking from '@/mock/booking'
+import type { Reserve } from '@/types/Reserve'
+import { useRoute } from 'vue-router'
+import formatDateTime from '@/utils/date/formatDateTime'
 
-const router = useRouter()
+const route = useRoute()
+const reservation = ref<Reserve | null>(null)
 
-const goBack = () => {
-  router.push('/reservas')
-}
+onMounted(() => {
+  const foundReservation = booking.value.find(
+    (res) => res.code.toLowerCase() === (route.params.code as string).toLowerCase(),
+  )
 
-const reservation = ref({
-  date: '05/03/2025 14:20:45',
-  time: '14:30',
-  code: 'ABC123',
-  origin: 'Curitiba',
-  destination: 'Havana',
-  originAirport: 'CWB',
-  destinationAirport: 'CUB',
-  price: 'R$ 450,00',
-  milesSpent: 15000,
-  status: 'Confirmado',
+  if (foundReservation) {
+    reservation.value = foundReservation
+  }
 })
 </script>
 
 <template>
   <div class="flex items-center justify-center min-h-screen">
-    <button @click="goBack" class="absolute top-16 left-6 text-white px-4 py-2">← Voltar</button>
-    <Card class="w-full max-w-md">
+    <Card v-if="reservation" class="w-full max-w-md">
       <CardHeader>
-        <CardTitle
-          >Reserva do voo de {{ reservation.originAirport }} à
-          {{ reservation.destinationAirport }}</CardTitle
-        >
+        <CardTitle>
+          Reserva do voo de {{ reservation.origin }} à {{ reservation.destination }}
+        </CardTitle>
         <CardDescription>Informações de sua reserva:</CardDescription>
       </CardHeader>
       <CardContent>
@@ -39,7 +34,7 @@ const reservation = ref({
           <ul class="space-y-2">
             <li class="flex gap-2">
               <b>Data:</b>
-              <p>{{ reservation.date }} às {{ reservation.time }}</p>
+              <p>{{ formatDateTime(reservation.dateTimeF) }}</p>
             </li>
             <li class="flex gap-2">
               <b>Código:</b>
@@ -53,13 +48,17 @@ const reservation = ref({
               <b>Destino:</b>
               <p>{{ reservation.destination }}</p>
             </li>
-            <li class="flex gDateap-2">
+            <li class="flex gap-2">
               <b>Valor:</b>
-              <p>{{ reservation.price }}</p>
+              <p>
+                {{
+                  reservation.price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+                }}
+              </p>
             </li>
             <li class="flex gap-2">
               <b>Milhas gastas:</b>
-              <p>{{ reservation.milesSpent }}</p>
+              <p>{{ reservation.miles }}</p>
             </li>
             <li class="flex gap-2">
               <b>Estado da reserva:</b>
@@ -69,5 +68,11 @@ const reservation = ref({
         </section>
       </CardContent>
     </Card>
+
+    <div v-else class="text-center p-8">
+      <h2 class="text-2xl font-bold mb-4">Reserva não encontrada</h2>
+      <p class="text-lg">O código da reserva "{{ route.params.code }}" não foi localizado.</p>
+      <p class="text-muted-foreground mt-2">Verifique o código e tente novamente.</p>
+    </div>
   </div>
 </template>

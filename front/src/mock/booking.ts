@@ -2,14 +2,50 @@ import type { Reserve } from '@/types/Reserve'
 import { ref, type Ref } from 'vue'
 
 const booking: Ref<Reserve[]> = ref([
-  { id: 1, status: 'CRIADA', dataHora: '2025-03-25 14:00', origem: 'GRU', destino: 'JFK' },
-  { id: 2, status: 'REALIZADA', dataHora: '2025-03-20 08:30', origem: 'GIG', destino: 'MIA' },
-  { id: 3, status: 'CANCELADA', dataHora: '2025-03-15 16:45', origem: 'BSB', destino: 'LIS' },
-  { id: 4, status: 'CHECK-IN', dataHora: '2025-03-15 16:45', origem: 'BSB', destino: 'LIS' },
-  { id: 5, status: 'CRIADA', dataHora: '2025-03-15 16:45', origem: 'BSB', destino: 'LIS' },
+  {
+    id: 1,
+    status: 'CRIADA',
+    dateTimeR: '2025-04-3 14:00',
+    dateTimeF: '2025-04-5 14:00',
+    origin: 'GRU',
+    destination: 'JFK',
+    code: 'HGP123',
+    price: 250.0,
+    miles: 12,
+  },
+  {
+    id: 2,
+    status: 'REALIZADA',
+    dateTimeR: '2025-03-20 08:30',
+    dateTimeF: '2025-04-5 14:00',
+    origin: 'GIG',
+    destination: 'MIA',
+    code: 'HGP456',
+    price: 200.0,
+    miles: 2,
+  },
+  {
+    id: 3,
+    status: 'CANCELADA',
+    dateTimeR: '2025-03-15 16:45',
+    dateTimeF: '2025-04-5 14:00',
+    origin: 'BSB',
+    destination: 'LIS',
+    code: 'MNB123',
+    price: 50.0,
+    miles: 16,
+  },
 ])
 
-function cancelReservation(reservationid: number) {
+export default booking
+
+export async function searchReserves(code: string): Promise<Reserve[]> {
+  const searchCode = code.trim().toUpperCase()
+
+  return booking.value.filter((reserve) => reserve.code.toUpperCase() === searchCode)
+}
+
+export async function cancelReservation(reservationid: number) {
   if (reservationid) {
     const reservation = booking.value.find((r) => r.id === reservationid)
     if (reservation) {
@@ -19,5 +55,3 @@ function cancelReservation(reservationid: number) {
     }
   }
 }
-
-export { booking, cancelReservation }
