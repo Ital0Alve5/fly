@@ -10,7 +10,7 @@ const route = useRoute()
 const reservation = ref<Reserve | null>(null)
 
 onMounted(() => {
-  const foundReservation = booking.find(res => 
+  const foundReservation = booking.value.find(res => 
     res.code.toLowerCase() === (route.params.code as string).toLowerCase()
   )
   

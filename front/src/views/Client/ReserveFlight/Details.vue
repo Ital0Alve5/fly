@@ -50,8 +50,8 @@ function handleReserveFlight(value: boolean) {
 
   milesStore.setTotalMiles(milesStore.totalMiles - miles.value)
 
-  booking.push({
-    id: booking[booking.length - 1].id + 1,
+  booking.value.push({
+    id: booking.value[booking.value.length - 1].id + 1,
     status: 'CRIADA',
     dateTimeR: getCurrentDateTime(),
     dateTimeF: flight.value?.destination ?? '',
