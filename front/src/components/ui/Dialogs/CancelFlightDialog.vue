@@ -20,10 +20,14 @@ const handleConfirmCancelation = () => {
   cancelReservation(props.selectedReservationId as number)
   emit('update:modelValue', false)
 }
+
+const handleOpenChange = (open: boolean) => {
+  emit('update:modelValue', open)
+}
 </script>
 
 <template>
-  <Dialog :open="props.modelValue">
+  <Dialog :open="props.modelValue" @update:open="handleOpenChange">
     <DialogContent class="sm:max-w-md">
       <DialogHeader>
         <DialogTitle>Confirmar Cancelamento</DialogTitle>
