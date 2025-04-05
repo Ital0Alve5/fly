@@ -6,9 +6,10 @@ export type Flight = {
   origin: string
   destination: string
   price: number
+  status: 'CONFIRMADO' | 'CANCELADO' | 'REALIZADO'
 }
 
-export const flights = [
+export const flights: Flight[] = [
   {
     originAirport: 'GRU',
     destinationAirport: 'JFK',
@@ -17,6 +18,7 @@ export const flights = [
     origin: 'São Paulo',
     destination: 'Nova York',
     price: 2000,
+    status: 'REALIZADO'
   },
   {
     originAirport: 'GRU',
@@ -26,6 +28,7 @@ export const flights = [
     origin: 'São Paulo',
     destination: 'Paris',
     price: 3450,
+    status: 'CONFIRMADO'
   },
   {
     originAirport: 'LAX',
@@ -35,6 +38,7 @@ export const flights = [
     origin: 'Los Angeles',
     destination: 'Nova York',
     price: 500,
+    status: 'CONFIRMADO'
   },
   {
     originAirport: 'LAX',
@@ -44,6 +48,7 @@ export const flights = [
     origin: 'Los Angeles',
     destination: 'Londres',
     price: 1400,
+    status: 'CONFIRMADO'
   },
   {
     originAirport: 'CDG',
@@ -53,6 +58,7 @@ export const flights = [
     origin: 'Paris',
     destination: 'São Paulo',
     price: 2300,
+    status: 'CONFIRMADO'
   },
   {
     originAirport: 'JFK',
@@ -62,6 +68,7 @@ export const flights = [
     origin: 'Nova York',
     destination: 'Los Angeles',
     price: 380,
+    status: 'CONFIRMADO'
   },
   {
     originAirport: 'GRU',
@@ -71,6 +78,7 @@ export const flights = [
     origin: 'São Paulo',
     destination: 'Nova York',
     price: 1980,
+    status: 'CONFIRMADO'
   },
   {
     originAirport: 'CDG',
@@ -80,6 +88,7 @@ export const flights = [
     origin: 'Paris',
     destination: 'Los Angeles',
     price: 2600,
+    status: 'CONFIRMADO'
   },
   {
     originAirport: 'LHR',
@@ -89,6 +98,7 @@ export const flights = [
     origin: 'Londres',
     destination: 'Paris',
     price: 1300,
+    status: 'CONFIRMADO'
   },
   {
     originAirport: 'JFK',
@@ -98,6 +108,7 @@ export const flights = [
     origin: 'Nova York',
     destination: 'Cidade do México',
     price: 500,
+    status: 'CONFIRMADO'
   },
   {
     originAirport: 'MAD',
@@ -107,6 +118,7 @@ export const flights = [
     origin: 'Madrid',
     destination: 'Nova York',
     price: 1900,
+    status: 'CONFIRMADO'
   },
   {
     originAirport: 'NRT',
@@ -116,6 +128,7 @@ export const flights = [
     origin: 'Tóquio',
     destination: 'Paris',
     price: 3300,
+    status: 'CONFIRMADO'
   },
   {
     originAirport: 'FRA',
@@ -125,6 +138,7 @@ export const flights = [
     origin: 'Frankfurt',
     destination: 'São Paulo',
     price: 2100,
+    status: 'CONFIRMADO'
   },
   {
     originAirport: 'GRU',
@@ -134,6 +148,7 @@ export const flights = [
     origin: 'São Paulo',
     destination: 'Miami',
     price: 1900,
+    status: 'CONFIRMADO'
   },
   {
     originAirport: 'LAX',
@@ -143,6 +158,7 @@ export const flights = [
     origin: 'Los Angeles',
     destination: 'São Paulo',
     price: 1700,
+    status: 'CONFIRMADO'
   },
   {
     originAirport: 'JFK',
@@ -152,6 +168,7 @@ export const flights = [
     origin: 'Nova York',
     destination: 'São Paulo',
     price: 2200,
+    status: 'CONFIRMADO'
   },
   {
     originAirport: 'CDG',
@@ -161,6 +178,7 @@ export const flights = [
     origin: 'Paris',
     destination: 'Madrid',
     price: 880,
+    status: 'CONFIRMADO'
   },
 ]
 
@@ -180,7 +198,7 @@ export async function searchFlights(origin: string, destination: string): Promis
   return flights.filter((flight) => {
     const flightDate = new Date(flight.dateTime)
 
-    if (flightDate <= now) return false
+    if (flightDate <= now && flight.status !== 'REALIZADO') return false
 
     const flightOriginCity = flight.origin.toLowerCase()
     const flightOriginAirport = flight.originAirport.toLowerCase()
@@ -222,7 +240,7 @@ export function getFlightsInNext48Hours(): Flight[] {
 
   const filtered = flights.filter((flight) => {
     const flightDate = parseDateTime(flight.dateTime)
-    return flightDate > now && flightDate <= in48h
+    return flightDate > now && flightDate <= in48h && flight.status !== 'CANCELADO'
   })
 
   return sortFlightsByDateTime(filtered)
