@@ -8,6 +8,9 @@ import {
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { cancelReservation } from '@/mock/booking'
+import { useToast } from '@/components/ui/toast'
+
+const { toast } = useToast()
 
 const props = defineProps<{
   modelValue: boolean
@@ -19,6 +22,12 @@ const emit = defineEmits(['update:modelValue'])
 const handleConfirmCancelation = () => {
   cancelReservation(props.selectedReservationId as number)
   emit('update:modelValue', false)
+  toast({
+    title: 'Status atualizado',
+    description: `O status foi alterado para CANCELADA.`,
+    variant: 'default',
+    duration: 2000,
+  })
 }
 </script>
 

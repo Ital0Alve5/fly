@@ -84,6 +84,7 @@ function openCheckReservationDialog() {
                       'text-green-500': reservation.status === 'REALIZADA',
                       'text-blue-500': reservation.status === 'CRIADA',
                       'text-red-500': reservation.status === 'CANCELADA',
+                      'text-purple-500': reservation.status === 'CHECK-IN',
                     }"
                   >
                     {{ reservation.status }}
