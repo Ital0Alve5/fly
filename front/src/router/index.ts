@@ -8,7 +8,7 @@ import Details from '@/views/Client/ReserveFlight/Details.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import ExtractMiles from '@/views/Client/ExtractMiles/index.vue'
-import NextFlightListing from '@/views/Manager/NextFlightListing.vue'
+import NextFlightListing from '@/views/Manager/Booking/NextFlightListing.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),

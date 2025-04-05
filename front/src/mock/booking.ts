@@ -55,3 +55,17 @@ export async function cancelReservation(reservationid: number) {
     }
   }
 }
+
+export function getReservationByCode(code: string): Reserve | undefined {
+  const searchCode = code.trim().toUpperCase()
+  return booking.value.find((reserve) => reserve.code.toUpperCase() === searchCode)
+}
+
+export function updateReservationStatus(code: string, newStatus: Reserve['status']): void {
+  const reservation = getReservationByCode(code)
+  if (reservation) {
+    reservation.status = newStatus
+  } else {
+    console.warn(`Reserva com código ${code} não encontrada para atualizar status.`)
+  }
+}
