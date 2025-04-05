@@ -22,6 +22,7 @@ import { getFlightsInNext48Hours } from '@/mock/flight'
           <TableHead> Data/hora </TableHead>
           <TableHead>Origem</TableHead>
           <TableHead>Destino</TableHead>
+          <TableHead>Status</TableHead>
           <TableHead></TableHead>
         </TableRow>
       </TableHeader>
@@ -32,6 +33,7 @@ import { getFlightsInNext48Hours } from '@/mock/flight'
           </TableCell>
           <TableCell> {{ flight.destinationAirport }} </TableCell>
           <TableCell>{{ flight.originAirport }}</TableCell>
+          <TableCell>{{ flight.status }}</TableCell>
           <TableCell class="w-[200px]"
             ><Button class="bg-green bg-green-500">Confirmar embarque</Button></TableCell
           >
