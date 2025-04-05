@@ -6,7 +6,7 @@ const booking: Ref<Reserve[]> = ref([
     id: 1,
     status: 'CRIADA',
     dateTimeR: '2025-04-3 14:00',
-    dateTimeF: '2025-04-5 14:00',
+    dateTimeF: '2025-04-6 14:00',
     origin: 'GRU',
     destination: 'JFK',
     code: 'HGP123',
