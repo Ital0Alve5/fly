@@ -30,8 +30,8 @@ const clientNavigationLinks: NavigationItem[] = [
 
 const managerNavigationLinks: NavigationItem[] = [
   {
-    label: 'coisa de adm',
-    link: '/admTeste',
+    label: 'Voos',
+    link: '/adm/voos',
   },
 ]
 

@@ -1,7 +1,6 @@
 import Auth from '@/views/Auth/index.vue'
 import Booking from '@/views/Client/Booking/index.vue'
 import Reservation from '@/views/Client/Reservation/index.vue'
-import Adm from '@/views/Manager/PaginaAdmTeste.vue'
 import Search from '@/views/Client/FlightListing/Search.vue'
 import BuyMiles from '@/views/Client/BuyMiles/index.vue'
 import Details from '@/views/Client/ReserveFlight/Details.vue'
@@ -9,6 +8,7 @@ import Details from '@/views/Client/ReserveFlight/Details.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import ExtractMiles from '@/views/Client/ExtractMiles/index.vue'
+import NextFlightListing from '@/views/Manager/NextFlightListing.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -43,12 +43,6 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
-      path: '/admTeste',
-      name: 'admTeste',
-      component: Adm,
-      meta: { requiresAuth: true, isManager: true },
-    },
-    {
       path: '/comprar-milhas',
       name: 'comprarMilhas',
       component: BuyMiles,
@@ -59,6 +53,17 @@ const router = createRouter({
       name: 'extratoDeMilhas',
       component: ExtractMiles,
       meta: { requiresAuth: true },
+    },
+    {
+      path: '/adm',
+      meta: { requiresAuth: true, isManager: true },
+      children: [
+        {
+          path: 'voos',
+          name: 'admVoos',
+          component: NextFlightListing,
+        },
+      ],
     },
   ],
 })

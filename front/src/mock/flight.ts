@@ -12,7 +12,7 @@ export const flights = [
   {
     originAirport: 'GRU',
     destinationAirport: 'JFK',
-    dateTime: '2025-04-01T10:30:00',
+    dateTime: '01/04/25 10:30',
     code: 'ABC123',
     origin: 'São Paulo',
     destination: 'Nova York',
@@ -21,7 +21,7 @@ export const flights = [
   {
     originAirport: 'GRU',
     destinationAirport: 'CDG',
-    dateTime: '2025-04-02T09:00:00',
+    dateTime: '02/04/25 09:00',
     code: 'DEF456',
     origin: 'São Paulo',
     destination: 'Paris',
@@ -30,7 +30,7 @@ export const flights = [
   {
     originAirport: 'LAX',
     destinationAirport: 'JFK',
-    dateTime: '2025-04-03T12:00:00',
+    dateTime: '03/04/25 12:00',
     code: 'GHI789',
     origin: 'Los Angeles',
     destination: 'Nova York',
@@ -39,7 +39,7 @@ export const flights = [
   {
     originAirport: 'LAX',
     destinationAirport: 'LHR',
-    dateTime: '2025-04-04T11:00:00',
+    dateTime: '04/04/25 11:00',
     code: 'JKL012',
     origin: 'Los Angeles',
     destination: 'Londres',
@@ -48,7 +48,7 @@ export const flights = [
   {
     originAirport: 'CDG',
     destinationAirport: 'GRU',
-    dateTime: '2025-04-05T18:00:00',
+    dateTime: '05/04/25 18:00',
     code: 'MNO345',
     origin: 'Paris',
     destination: 'São Paulo',
@@ -57,7 +57,7 @@ export const flights = [
   {
     originAirport: 'JFK',
     destinationAirport: 'LAX',
-    dateTime: '2025-04-06T15:00:00',
+    dateTime: '06/04/25 15:00',
     code: 'PQR678',
     origin: 'Nova York',
     destination: 'Los Angeles',
@@ -66,7 +66,7 @@ export const flights = [
   {
     originAirport: 'GRU',
     destinationAirport: 'JFK',
-    dateTime: '2025-04-07T07:30:00',
+    dateTime: '07/04/25 07:30',
     code: 'STU901',
     origin: 'São Paulo',
     destination: 'Nova York',
@@ -75,7 +75,7 @@ export const flights = [
   {
     originAirport: 'CDG',
     destinationAirport: 'LAX',
-    dateTime: '2025-04-08T14:00:00',
+    dateTime: '08/04/25 14:00',
     code: 'VWX111',
     origin: 'Paris',
     destination: 'Los Angeles',
@@ -84,7 +84,7 @@ export const flights = [
   {
     originAirport: 'LHR',
     destinationAirport: 'CDG',
-    dateTime: '2025-04-09T10:00:00',
+    dateTime: '09/04/25 10:00',
     code: 'YZA222',
     origin: 'Londres',
     destination: 'Paris',
@@ -93,7 +93,7 @@ export const flights = [
   {
     originAirport: 'JFK',
     destinationAirport: 'MEX',
-    dateTime: '2025-04-10T09:30:00',
+    dateTime: '10/04/25 09:30',
     code: 'BCD333',
     origin: 'Nova York',
     destination: 'Cidade do México',
@@ -102,7 +102,7 @@ export const flights = [
   {
     originAirport: 'MAD',
     destinationAirport: 'JFK',
-    dateTime: '2025-04-11T16:00:00',
+    dateTime: '11/04/25 16:00',
     code: 'EFG444',
     origin: 'Madrid',
     destination: 'Nova York',
@@ -111,7 +111,7 @@ export const flights = [
   {
     originAirport: 'NRT',
     destinationAirport: 'CDG',
-    dateTime: '2025-04-12T20:00:00',
+    dateTime: '12/04/25 20:00',
     code: 'HIJ555',
     origin: 'Tóquio',
     destination: 'Paris',
@@ -120,11 +120,47 @@ export const flights = [
   {
     originAirport: 'FRA',
     destinationAirport: 'GRU',
-    dateTime: '2025-04-13T11:00:00',
+    dateTime: '13/04/25 11:00',
     code: 'KLM666',
     origin: 'Frankfurt',
     destination: 'São Paulo',
     price: 2100,
+  },
+  {
+    originAirport: 'GRU',
+    destinationAirport: 'MIA',
+    dateTime: '04/04/25 20:30',
+    code: 'NEW101',
+    origin: 'São Paulo',
+    destination: 'Miami',
+    price: 1900,
+  },
+  {
+    originAirport: 'LAX',
+    destinationAirport: 'GRU',
+    dateTime: '03/04/25 23:00',
+    code: 'NEW102',
+    origin: 'Los Angeles',
+    destination: 'São Paulo',
+    price: 1700,
+  },
+  {
+    originAirport: 'JFK',
+    destinationAirport: 'GRU',
+    dateTime: '02/04/25 15:00',
+    code: 'NEW103',
+    origin: 'Nova York',
+    destination: 'São Paulo',
+    price: 2200,
+  },
+  {
+    originAirport: 'CDG',
+    destinationAirport: 'MAD',
+    dateTime: '04/04/25 06:15',
+    code: 'NEW104',
+    origin: 'Paris',
+    destination: 'Madrid',
+    price: 880,
   },
 ]
 
@@ -165,4 +201,31 @@ export async function searchFlights(origin: string, destination: string): Promis
   })
 }
 
-export default { flights, searchFlights }
+function parseDateTime(dateTime: string): Date {
+  const [datePart, timePart] = dateTime.split(' ')
+  const [day, month, year] = datePart.split('/').map(Number)
+  const [hours, minutes] = timePart.split(':').map(Number)
+  return new Date(2000 + year, month - 1, day, hours, minutes)
+}
+
+function sortFlightsByDateTime(flights: Flight[]): Flight[] {
+  return [...flights].sort((a, b) => {
+    const dateA = parseDateTime(a.dateTime).getTime()
+    const dateB = parseDateTime(b.dateTime).getTime()
+    return dateA - dateB
+  })
+}
+
+export function getFlightsInNext48Hours(): Flight[] {
+  const now = new Date()
+  const in48h = new Date(now.getTime() + 48 * 60 * 60 * 1000)
+
+  const filtered = flights.filter((flight) => {
+    const flightDate = parseDateTime(flight.dateTime)
+    return flightDate > now && flightDate <= in48h
+  })
+
+  return sortFlightsByDateTime(filtered)
+}
+
+export default { flights, searchFlights, getFlightsInNext48Hours }
