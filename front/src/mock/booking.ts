@@ -20,7 +20,7 @@ const booking: Ref<Reserve[]> = ref([
     dateTimeF: '2025-04-5 14:00',
     origin: 'GIG',
     destination: 'MIA',
-    code: 'HGP456',
+    code: 'STU901',
     price: 200.0,
     miles: 2,
   },
@@ -31,7 +31,7 @@ const booking: Ref<Reserve[]> = ref([
     dateTimeF: '2025-04-5 14:00',
     origin: 'BSB',
     destination: 'LIS',
-    code: 'MNB123',
+    code: 'MNO345',
     price: 50.0,
     miles: 16,
   },
@@ -53,5 +53,15 @@ export async function cancelReservation(reservationid: number) {
     } else {
       console.log(`Reserva com ID ${reservationid} não encontrada.`)
     }
+  }
+}
+
+export async function cancelReservationByFlightCode(flightCode: string) {
+  if (flightCode) {
+    booking.value.forEach((reservation) => {
+      if (reservation.code === flightCode) {
+        reservation.status = 'CANCELADO VOO'
+      }
+    })
   }
 }

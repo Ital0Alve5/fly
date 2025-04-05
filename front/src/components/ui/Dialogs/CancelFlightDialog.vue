@@ -7,18 +7,40 @@ import {
   DialogDescription,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import { cancelReservation } from '@/mock/booking'
+import { cancelReservation, cancelReservationByFlightCode } from '@/mock/booking'
+import { cancelFlight } from '@/mock/flight';
+import { useToast } from '@/components/ui/toast'
 
 const props = defineProps<{
   modelValue: boolean
   selectedReservationId: number | null
+  confirmationHandler: string
+  selectedFlightCode: string
 }>()
 
 const emit = defineEmits(['update:modelValue'])
+const { toast } = useToast()
 
 const handleConfirmCancelation = () => {
-  cancelReservation(props.selectedReservationId as number)
-  emit('update:modelValue', false)
+  switch(props.confirmationHandler) {
+    case 'clientBooking':
+      cancelReservation(props.selectedReservationId as number)
+      emit('update:modelValue', false)
+      break
+    case 'managerFlight':
+      cancelFlight(props.selectedFlightCode)
+      cancelReservationByFlightCode(props.selectedFlightCode)
+      toast({
+        title: 'Voo cancelado com sucesso',
+        description: 'Todas as reservas foram canceladas com sucesso.',
+        variant: 'default',
+        duration: 1000,
+      })
+      emit('update:modelValue', false)
+      break
+    default:
+  }
+  
 }
 
 const handleOpenChange = (open: boolean) => {
