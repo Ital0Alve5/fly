@@ -246,4 +246,13 @@ export function getFlightsInNext48Hours(): Flight[] {
   return sortFlightsByDateTime(filtered)
 }
 
-export default { flights, searchFlights, getFlightsInNext48Hours }
+export function cancelFlight(code: string): boolean {
+  const flight = flights.find((flight) => flight.code === code)
+  if (flight) {
+    flight.status = 'CANCELADO'
+    return true
+  }
+  return false
+}
+
+export default { flights, searchFlights, getFlightsInNext48Hours, cancelFlight }
