@@ -26,6 +26,10 @@ const clientNavigationLinks: NavigationItem[] = [
     label: 'Extrato de milhas',
     link: '/extrato-milhas',
   },
+  {
+    label: 'Fazer Check-in',
+    link: '/fazer-check-in'
+  }
 ]
 
 const managerNavigationLinks: NavigationItem[] = [

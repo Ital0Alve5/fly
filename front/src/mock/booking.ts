@@ -5,8 +5,8 @@ const booking: Ref<Reserve[]> = ref([
   {
     id: 1,
     status: 'CRIADA',
-    dateTimeR: '2025-04-3 14:00',
-    dateTimeF: '2025-04-5 14:00',
+    dateTimeR: '03/04/25 14:00',
+    dateTimeF: '06/04/25 14:00',
     origin: 'GRU',
     destination: 'JFK',
     code: 'HGP123',
@@ -16,8 +16,8 @@ const booking: Ref<Reserve[]> = ref([
   {
     id: 2,
     status: 'REALIZADA',
-    dateTimeR: '2025-03-20 08:30',
-    dateTimeF: '2025-04-5 14:00',
+    dateTimeR: '20/03/25 08:30',
+    dateTimeF: '05/04/25 14:00',
     origin: 'GIG',
     destination: 'MIA',
     code: 'HGP456',
@@ -27,8 +27,8 @@ const booking: Ref<Reserve[]> = ref([
   {
     id: 3,
     status: 'CANCELADA',
-    dateTimeR: '2025-03-15 16:45',
-    dateTimeF: '2025-04-5 14:00',
+    dateTimeR: '15/03/25 16:45',
+    dateTimeF: '05/04/25 14:00',
     origin: 'BSB',
     destination: 'LIS',
     code: 'MNB123',
