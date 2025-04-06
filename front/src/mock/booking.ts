@@ -65,3 +65,16 @@ export async function cancelReservationByFlightCode(flightCode: string) {
     })
   }
 }
+
+export async function updateReservationStatus(
+  reservationId: number, 
+  newStatus: Reserve['status']
+): Promise<void> {
+  const reservation = booking.value.find(r => r.id === reservationId)
+  if (reservation) {
+    reservation.status = newStatus
+  } else {
+    console.error(`Reserva com ID ${reservationId} não encontrada`)
+    throw new Error(`Reserva com ID ${reservationId} não encontrada`)
+  }
+}

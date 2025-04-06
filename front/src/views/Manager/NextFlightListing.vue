@@ -12,13 +12,15 @@ import {
 import { Button } from '@/components/ui/button'
 import { getFlightsInNext48Hours } from '@/mock/flight'
 import CancelFlightDialog from '@/components/ui/Dialogs/CancelFlightDialog.vue'
+import PerformFlightDialog from '@/components/ui/Dialogs/PerformFlightDialog.vue'
 
 const isCancelDialogOpen = ref(false)
+const isPerformDialogOpen = ref(false)
 const selectedFlight = ref<string>('')
 const flights = ref(getFlightsInNext48Hours())
 
-watch(isCancelDialogOpen, (newVal) => {
-  if (!newVal) {
+watch([isCancelDialogOpen, isPerformDialogOpen], ([newCancelVal, newPerformVal]) => {
+  if (!newCancelVal || !newPerformVal) {
     flights.value = getFlightsInNext48Hours()
   }
 })
@@ -27,11 +29,18 @@ function handleCancelFlight(selectedFlightCode: string) {
   selectedFlight.value = selectedFlightCode
   isCancelDialogOpen.value = true
 }
+
+function handlePerformFlight(selectedFlightCode: string) {
+  selectedFlight.value = selectedFlightCode
+  isPerformDialogOpen.value = true
+}
+
 </script>
 
 <template>
   <div>
     <CancelFlightDialog v-model="isCancelDialogOpen" :selectedFlightCode="selectedFlight" :confirmation-handler="'managerFlight'" />
+    <PerformFlightDialog v-model="isPerformDialogOpen" :selectedFlightCode="selectedFlight" />
     <div class="min-h-screen flex flex-col justify-center items-center">
       <Table>
         <TableCaption>Voos das próximas 48h.</TableCaption>
@@ -61,7 +70,12 @@ function handleCancelFlight(selectedFlightCode: string) {
               </Button>
             </TableCell>
             <TableCell class="w-[150px]">
-              <Button>Realizar voo</Button>
+              <Button 
+                v-if="flight.status === 'CONFIRMADO'" 
+                @click="handlePerformFlight(flight.code)"
+              >
+                Realizar Voo
+              </Button>
             </TableCell>
           </TableRow>
         </TableBody>
