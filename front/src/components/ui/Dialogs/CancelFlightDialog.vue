@@ -54,8 +54,11 @@ const handleOpenChange = (open: boolean) => {
       <DialogHeader>
         <DialogTitle>Confirmar Cancelamento</DialogTitle>
         <br />
-        <DialogDescription>
+        <DialogDescription v-if="props.confirmationHandler === 'clientBooking'">
           Tem certeza de que deseja cancelar esta reserva? Esta ação não pode ser desfeita.
+        </DialogDescription>
+        <DialogDescription v-if="props.confirmationHandler === 'managerFlight'">
+          Tem certeza de que deseja cancelar este voo? Esta ação não pode ser desfeita.
         </DialogDescription>
       </DialogHeader>
       <div class="flex justify-end space-x-2">
