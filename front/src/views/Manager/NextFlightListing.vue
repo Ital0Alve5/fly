@@ -12,7 +12,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { getFlightsInNext48Hours } from '@/mock/flight'
 import CancelFlightDialog from '@/components/ui/Dialogs/CancelFlightDialog.vue'
-import PerformFlightDialog from '@/components/ui/Dialogs/PerformFlightDialog.vue'
+import PerformFlightDialog from '@/views/Manager/components/PerformFlightDialog.vue'
 
 const isCancelDialogOpen = ref(false)
 const isPerformDialogOpen = ref(false)
