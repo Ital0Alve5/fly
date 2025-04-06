@@ -1,3 +1,6 @@
+import { formatFromDate } from '@/utils/date/formatFromDate'
+import { loadCityByAirpoirt } from './airpoirts'
+
 export type Flight = {
   originAirport: string
   destinationAirport: string
@@ -157,7 +160,7 @@ export const flights = [
     originAirport: 'CDG',
     destinationAirport: 'MAD',
     dateTime: '04/04/25 06:15',
-    code: 'NEW104',
+    code: 'TADS1000',
     origin: 'Paris',
     destination: 'Madrid',
     price: 880,
@@ -222,10 +225,44 @@ export function getFlightsInNext48Hours(): Flight[] {
 
   const filtered = flights.filter((flight) => {
     const flightDate = parseDateTime(flight.dateTime)
+    console.log(flight.code, flightDate, flightDate > now, flightDate <= in48h)
     return flightDate > now && flightDate <= in48h
   })
 
   return sortFlightsByDateTime(filtered)
 }
 
-export default { flights, searchFlights, getFlightsInNext48Hours }
+type RegisterFlightFormType = {
+  code: string
+  originAirport: string
+  destinationAirport: string
+  date: Date
+  price: number
+  seatsNumber: number
+}
+
+export async function registerFlight(data: RegisterFlightFormType) {
+  const codeExists = flights.find((flight) => flight.code === data.code)
+
+  if (codeExists) {
+    throw new Error('Código já cadastrado.')
+  }
+
+  // Simula chamada à API com um delay de 2 segundos
+  await new Promise((resolve) => setTimeout(() => resolve(undefined), 2000))
+
+  const origin = loadCityByAirpoirt(data.originAirport)
+  const destination = loadCityByAirpoirt(data.destinationAirport)
+
+  flights.push({
+    originAirport: data.originAirport,
+    destinationAirport: data.destinationAirport,
+    price: data.price,
+    code: data.code,
+    dateTime: formatFromDate(data.date),
+    origin,
+    destination,
+  })
+}
+
+export default { flights, searchFlights, getFlightsInNext48Hours, registerFlight }
