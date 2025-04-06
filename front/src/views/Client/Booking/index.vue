@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/table'
 import { useRouter } from 'vue-router'
 import { useMilesStore } from '@/stores/miles'
-import CancelFlightDialog from './components/CancelFlightDialog.vue'
+import CancelFlightDialog from '@/components/ui/Dialogs/CancelFlightDialog.vue'
 import booking from '@/mock/booking'
 import CheckReservationDialog from './components/CheckReservationDialog.vue'
 
@@ -40,74 +40,76 @@ function openCheckReservationDialog() {
 </script>
 
 <template>
-  <CancelFlightDialog v-model="isCancelDialogOpen" :selectedReservationId="selectedReservationId" />
-  <CheckReservationDialog v-model:open="isCheckReservationDialogOpen" />
-  <div class="flex flex-col justify-center h-screen">
-    <nav class="p-1 shadow-md mt-6">
-      <div class="container mx-auto flex justify-between items-center">
-        <span class="text-lg">
-          Saldo de Milhas: <strong>{{ milesStore.totalMiles }}</strong>
-        </span>
-        <Button @click="openCheckReservationDialog">Consultar reserva</Button>
+  <div>
+    <CancelFlightDialog v-model="isCancelDialogOpen" :selectedReservationId="selectedReservationId" :confirmation-handler="'clientBooking'" />
+    <CheckReservationDialog v-model:open="isCheckReservationDialogOpen" />
+    <div class="flex flex-col justify-center h-screen">
+      <nav class="p-1 shadow-md mt-6">
+        <div class="container mx-auto flex justify-between items-center">
+          <span class="text-lg">
+            Saldo de Milhas: <strong>{{ milesStore.totalMiles }}</strong>
+          </span>
+          <Button @click="openCheckReservationDialog">Consultar reserva</Button>
+        </div>
+      </nav>
+      <div class="max-h-[500px] overflow-y-auto">
+        <Card>
+          <CardHeader>
+            <CardTitle class="text-2xl">Minhas Reservas e Voos</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Table class="w-full table-auto border-separate border-spacing-2">
+              <TableHeader>
+                <TableRow>
+                  <TableHead class="text-center px-6 py-3 text-lg">Data/Hora</TableHead>
+                  <TableHead class="text-center px-6 py-3 text-lg">Aeroporto Origem</TableHead>
+                  <TableHead class="text-center px-6 py-3 text-lg">Aeroporto Destino</TableHead>
+                  <TableHead class="text-center px-6 py-3 text-lg">Status</TableHead>
+                  <TableHead class="text-center px-6 py-3 text-lg">Ações</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                <TableRow v-for="reservation in booking" :key="reservation.id">
+                  <TableCell class="text-center px-6 py-4 text-lg">{{
+                    reservation.dateTimeR
+                  }}</TableCell>
+                  <TableCell class="text-center px-6 py-4 text-lg">{{
+                    reservation.origin
+                  }}</TableCell>
+                  <TableCell class="text-center px-6 py-4 text-lg">{{
+                    reservation.destination
+                  }}</TableCell>
+                  <TableCell class="text-center px-6 py-4 text-lg">
+                    <span
+                      :class="{
+                        'text-green-500': reservation.status === 'REALIZADA',
+                        'text-blue-500': reservation.status === 'CRIADA',
+                        'text-red-500': reservation.status === 'CANCELADA',
+                      }"
+                    >
+                      {{ reservation.status }}
+                    </span>
+                  </TableCell>
+                  <TableCell class="text-center">
+                    <Button
+                      v-if="reservation.status === 'CRIADA' || reservation.status === 'CHECK-IN'"
+                      class="mr-2"
+                      @click="viewReservation(reservation.id)"
+                      >Ver Reserva</Button
+                    >
+                    <Button
+                      v-if="reservation.status === 'CRIADA' || reservation.status === 'CHECK-IN'"
+                      variant="destructive"
+                      @click="handleCancelFlight(reservation.id)"
+                      >Cancelar</Button
+                    >
+                  </TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
       </div>
-    </nav>
-    <div class="max-h-[500px] overflow-y-auto">
-      <Card>
-        <CardHeader>
-          <CardTitle class="text-2xl">Minhas Reservas e Voos</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Table class="w-full table-auto border-separate border-spacing-2">
-            <TableHeader>
-              <TableRow>
-                <TableHead class="text-center px-6 py-3 text-lg">Data/Hora</TableHead>
-                <TableHead class="text-center px-6 py-3 text-lg">Aeroporto Origem</TableHead>
-                <TableHead class="text-center px-6 py-3 text-lg">Aeroporto Destino</TableHead>
-                <TableHead class="text-center px-6 py-3 text-lg">Status</TableHead>
-                <TableHead class="text-center px-6 py-3 text-lg">Ações</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              <TableRow v-for="reservation in booking" :key="reservation.id">
-                <TableCell class="text-center px-6 py-4 text-lg">{{
-                  reservation.dateTimeR
-                }}</TableCell>
-                <TableCell class="text-center px-6 py-4 text-lg">{{
-                  reservation.origin
-                }}</TableCell>
-                <TableCell class="text-center px-6 py-4 text-lg">{{
-                  reservation.destination
-                }}</TableCell>
-                <TableCell class="text-center px-6 py-4 text-lg">
-                  <span
-                    :class="{
-                      'text-green-500': reservation.status === 'REALIZADA',
-                      'text-blue-500': reservation.status === 'CRIADA',
-                      'text-red-500': reservation.status === 'CANCELADA',
-                    }"
-                  >
-                    {{ reservation.status }}
-                  </span>
-                </TableCell>
-                <TableCell class="text-center">
-                  <Button
-                    v-if="reservation.status === 'CRIADA' || reservation.status === 'CHECK-IN'"
-                    class="mr-2"
-                    @click="viewReservation(reservation.id)"
-                    >Ver Reserva</Button
-                  >
-                  <Button
-                    v-if="reservation.status === 'CRIADA' || reservation.status === 'CHECK-IN'"
-                    variant="destructive"
-                    @click="handleCancelFlight(reservation.id)"
-                    >Cancelar</Button
-                  >
-                </TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
     </div>
   </div>
 </template>
