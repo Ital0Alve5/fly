@@ -225,7 +225,6 @@ export function getFlightsInNext48Hours(): Flight[] {
 
   const filtered = flights.filter((flight) => {
     const flightDate = parseDateTime(flight.dateTime)
-    console.log(flight.code, flightDate, flightDate > now, flightDate <= in48h)
     return flightDate > now && flightDate <= in48h
   })
 
