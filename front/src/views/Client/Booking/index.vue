@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/table'
 import { useRouter } from 'vue-router'
 import { useMilesStore } from '@/stores/miles'
-import CancelFlightDialog from '@/components/ui/Dialogs/CancelFlightDialog.vue'
+import CancelFlightDialog from '@/components/dialogs/CancelFlightDialog.vue'
 import booking from '@/mock/booking'
 import CheckReservationDialog from './components/CheckReservationDialog.vue'
 

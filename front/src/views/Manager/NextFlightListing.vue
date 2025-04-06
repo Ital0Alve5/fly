@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
 import { getFlightsInNext48Hours } from '@/mock/flight'
-import CancelFlightDialog from '@/components/ui/Dialogs/CancelFlightDialog.vue'
+import CancelFlightDialog from '@/components/dialogs/CancelFlightDialog.vue'
 
 const isCancelDialogOpen = ref(false)
 const selectedFlight = ref<string>('')

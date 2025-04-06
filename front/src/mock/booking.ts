@@ -57,11 +57,9 @@ export async function cancelReservation(reservationid: number) {
 }
 
 export async function cancelReservationByFlightCode(flightCode: string) {
-  if (flightCode) {
-    booking.value.forEach((reservation) => {
-      if (reservation.code === flightCode) {
-        reservation.status = 'CANCELADO VOO'
-      }
-    })
-  }
+  booking.value.forEach((reservation) => {
+    if (reservation.code === flightCode) {
+      reservation.status = 'CANCELADO VOO'
+    }
+  })
 }

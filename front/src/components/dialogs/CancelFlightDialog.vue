@@ -13,7 +13,7 @@ import { useToast } from '@/components/ui/toast'
 
 const props = defineProps<{
   modelValue: boolean
-  selectedReservationId: number | null
+  selectedReservationId?: number
   confirmationHandler: string
   selectedFlightCode: string
 }>()
