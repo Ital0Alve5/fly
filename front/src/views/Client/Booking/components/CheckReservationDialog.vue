@@ -13,6 +13,7 @@ import { searchReserves } from '@/mock/booking'
 import type { Reserve } from '@/types/Reserve'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/components/ui/toast'
+import formatDateTime from '@/utils/date/formatDateTime'
 
 const { toast } = useToast()
 
@@ -117,7 +118,7 @@ const checkReserveCode = async () => {
             <ul class="space-y-2">
               <li class="flex gap-2">
                 <b>Data:</b>
-                <p>{{ reserva.dateTimeF }}</p>
+                <p>{{ formatDateTime(reserva.dateTimeF) }}</p>
               </li>
               <li class="flex gap-2">
                 <b>Código:</b>

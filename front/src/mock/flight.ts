@@ -12,7 +12,7 @@ export const flights = [
   {
     originAirport: 'GRU',
     destinationAirport: 'JFK',
-    dateTime: '2025-04-01T10:30:00',
+    dateTime: '2025-04-07T10:30:00',
     code: 'ABC123',
     origin: 'São Paulo',
     destination: 'Nova York',

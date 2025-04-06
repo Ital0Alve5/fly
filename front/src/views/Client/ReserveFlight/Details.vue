@@ -54,7 +54,7 @@ function handleReserveFlight(value: boolean) {
     id: booking.value[booking.value.length - 1].id + 1,
     status: 'CRIADA',
     dateTimeR: getCurrentDateTime(),
-    dateTimeF: flight.value?.destination ?? '',
+    dateTimeF: flight.value?.dateTime ?? '',
     origin: flight.value?.originAirport ?? '',
     destination: flight.value?.destinationAirport ?? '',
     code: generatedCode.value,

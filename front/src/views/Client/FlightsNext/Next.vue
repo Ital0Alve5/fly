@@ -7,6 +7,7 @@ import booking from '@/mock/booking'
 import type { Reserve } from '@/types/Reserve'
 import { useToast } from '@/components/ui/toast'
 import CancelFlightDialog from '@/views/Client/Booking/components/CancelFlightDialog.vue'
+import formatDateTime from '@/utils/date/formatDateTime'
 
 const { toast } = useToast()
 
@@ -64,7 +65,7 @@ function handleCancelFlight(selectedReservation: number) {
                 <template v-for="reserve in booking" :key="reserve.id">
                   <TableRow v-if="shouldShowReservation(reserve)">
                     <TableCell class="text-center px-6 py-4 text-lg">{{
-                        reserve.dateTimeF
+                        formatDateTime(reserve.dateTimeF)
                     }}</TableCell>
                     <TableCell class="text-center px-6 py-4 text-lg">{{
                         reserve.origin

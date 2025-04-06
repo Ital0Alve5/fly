@@ -15,6 +15,7 @@ import { useMilesStore } from '@/stores/miles'
 import CancelFlightDialog from './components/CancelFlightDialog.vue'
 import booking from '@/mock/booking'
 import CheckReservationDialog from './components/CheckReservationDialog.vue'
+import formatDateTime from '@/utils/date/formatDateTime'
 
 const router = useRouter()
 const milesStore = useMilesStore()
@@ -70,7 +71,7 @@ function openCheckReservationDialog() {
             <TableBody>
               <TableRow v-for="reservation in booking" :key="reservation.id">
                 <TableCell class="text-center px-6 py-4 text-lg">{{
-                  reservation.dateTimeR
+                  formatDateTime(reservation.dateTimeR)
                 }}</TableCell>
                 <TableCell class="text-center px-6 py-4 text-lg">{{
                   reservation.origin
