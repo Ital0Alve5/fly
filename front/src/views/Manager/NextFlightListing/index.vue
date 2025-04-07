@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref } from 'vue'
 import {
   Table,
   TableBody,
@@ -21,20 +21,18 @@ const selectedFlight = ref<string>('')
 const flights = ref(getFlightsInNext48Hours())
 const { toast } = useToast()
 
-watch(isCancelDialogOpen, (newVal) => {
-  if (!newVal) {
-    flights.value = getFlightsInNext48Hours()
-  }
-})
-
 function handleCancelFlightDialog(selectedFlightCode: string) {
   selectedFlight.value = selectedFlightCode
   isCancelDialogOpen.value = true
 }
 
 function handelCancelFlight() {
+  console.log(selectedFlight.value)
   cancelFlight(selectedFlight.value)
   cancelReservationByFlightCode(selectedFlight.value)
+  flights.value = getFlightsInNext48Hours()
+  isCancelDialogOpen.value = false
+
   toast({
     title: 'Voo cancelado com sucesso',
     description: 'Todas as reservas deste voo foram canceladas.',
