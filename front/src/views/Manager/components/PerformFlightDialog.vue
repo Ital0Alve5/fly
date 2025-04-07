@@ -30,14 +30,15 @@ const handleConfirmPerformance = async () => {
     performFlight(props.selectedFlightCode)
 
     const reservations = await searchReserves(props.selectedFlightCode)
-    
-    await Promise.all(reservations.map(reserve => {
 
-      const newStatus: Reserve['status'] = 
-        reserve.status === 'EMBARCADA' ? 'REALIZADA' : 'NÃO REALIZADA'
-      
-      return updateReservationStatus(reserve.id, newStatus)
-    }))
+    await Promise.all(
+      reservations.map((reserve) => {
+        const newStatus: Reserve['status'] =
+          reserve.status === 'EMBARCADA' ? 'REALIZADA' : 'NÃO REALIZADA'
+
+        return updateReservationStatus(reserve.id, newStatus)
+      }),
+    )
 
     toast({
       title: 'Operação concluída com sucesso',
@@ -72,7 +73,9 @@ const handleOpenChange = (open: boolean) => {
         <DialogDescription>
           Esta ação irá:
           <ul class="list-disc pl-5 mt-2 space-y-1">
-            <li>Marcar o voo <strong>{{ selectedFlightCode }}</strong> como REALIZADO.</li>
+            <li>
+              Marcar o voo <strong>{{ selectedFlightCode }}</strong> como REALIZADO.
+            </li>
             <li>Atualizar todas as reservas associadas.</li>
           </ul>
         </DialogDescription>

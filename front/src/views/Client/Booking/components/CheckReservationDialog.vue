@@ -69,7 +69,10 @@ const toCancel = (reserva: Reserve) => {
 
 const isWithin48Hours = (reserva: Reserve): boolean => {
   const now = new Date()
-  const reserveDate = new Date(reserva.dateTimeF)
+  const [datePart, timePart] = reserva.dateTimeF.split(' ')
+  const [day, month, year] = datePart.split('/').map(Number)
+  const [hours, minutes] = timePart.split(':').map(Number)
+  const reserveDate = new Date(2000 + year, month - 1, day, hours, minutes)
   const timeDifference = (reserveDate.getTime() - now.getTime()) / (1000 * 60 * 60)
   return timeDifference <= 48 && timeDifference > 0
 }

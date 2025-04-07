@@ -18,7 +18,7 @@ export const flights: Flight[] = [
     origin: 'São Paulo',
     destination: 'Nova York',
     price: 2000,
-    status: 'REALIZADO'
+    status: 'REALIZADO',
   },
   {
     originAirport: 'GRU',
@@ -28,7 +28,7 @@ export const flights: Flight[] = [
     origin: 'São Paulo',
     destination: 'Paris',
     price: 3450,
-    status: 'CONFIRMADO'
+    status: 'CONFIRMADO',
   },
   {
     originAirport: 'LAX',
@@ -38,7 +38,7 @@ export const flights: Flight[] = [
     origin: 'Los Angeles',
     destination: 'Nova York',
     price: 500,
-    status: 'CONFIRMADO'
+    status: 'CONFIRMADO',
   },
   {
     originAirport: 'LAX',
@@ -48,7 +48,7 @@ export const flights: Flight[] = [
     origin: 'Los Angeles',
     destination: 'Londres',
     price: 1400,
-    status: 'CONFIRMADO'
+    status: 'CONFIRMADO',
   },
   {
     originAirport: 'CDG',
@@ -58,7 +58,7 @@ export const flights: Flight[] = [
     origin: 'Paris',
     destination: 'São Paulo',
     price: 2300,
-    status: 'CONFIRMADO'
+    status: 'CONFIRMADO',
   },
   {
     originAirport: 'JFK',
@@ -68,7 +68,7 @@ export const flights: Flight[] = [
     origin: 'Nova York',
     destination: 'Los Angeles',
     price: 380,
-    status: 'CONFIRMADO'
+    status: 'CONFIRMADO',
   },
   {
     originAirport: 'GRU',
@@ -78,7 +78,7 @@ export const flights: Flight[] = [
     origin: 'São Paulo',
     destination: 'Nova York',
     price: 1980,
-    status: 'CONFIRMADO'
+    status: 'CONFIRMADO',
   },
   {
     originAirport: 'CDG',
@@ -88,7 +88,7 @@ export const flights: Flight[] = [
     origin: 'Paris',
     destination: 'Los Angeles',
     price: 2600,
-    status: 'CONFIRMADO'
+    status: 'CONFIRMADO',
   },
   {
     originAirport: 'LHR',
@@ -98,7 +98,7 @@ export const flights: Flight[] = [
     origin: 'Londres',
     destination: 'Paris',
     price: 1300,
-    status: 'CONFIRMADO'
+    status: 'CONFIRMADO',
   },
   {
     originAirport: 'JFK',
@@ -108,7 +108,7 @@ export const flights: Flight[] = [
     origin: 'Nova York',
     destination: 'Cidade do México',
     price: 500,
-    status: 'CONFIRMADO'
+    status: 'CONFIRMADO',
   },
   {
     originAirport: 'MAD',
@@ -118,7 +118,7 @@ export const flights: Flight[] = [
     origin: 'Madrid',
     destination: 'Nova York',
     price: 1900,
-    status: 'CONFIRMADO'
+    status: 'CONFIRMADO',
   },
   {
     originAirport: 'NRT',
@@ -128,7 +128,7 @@ export const flights: Flight[] = [
     origin: 'Tóquio',
     destination: 'Paris',
     price: 3300,
-    status: 'CONFIRMADO'
+    status: 'CONFIRMADO',
   },
   {
     originAirport: 'FRA',
@@ -138,7 +138,7 @@ export const flights: Flight[] = [
     origin: 'Frankfurt',
     destination: 'São Paulo',
     price: 2100,
-    status: 'CONFIRMADO'
+    status: 'CONFIRMADO',
   },
   {
     originAirport: 'GRU',
@@ -148,7 +148,7 @@ export const flights: Flight[] = [
     origin: 'São Paulo',
     destination: 'Miami',
     price: 1900,
-    status: 'CONFIRMADO'
+    status: 'CONFIRMADO',
   },
   {
     originAirport: 'LAX',
@@ -158,7 +158,7 @@ export const flights: Flight[] = [
     origin: 'Los Angeles',
     destination: 'São Paulo',
     price: 1700,
-    status: 'CONFIRMADO'
+    status: 'CONFIRMADO',
   },
   {
     originAirport: 'JFK',
@@ -168,7 +168,7 @@ export const flights: Flight[] = [
     origin: 'Nova York',
     destination: 'São Paulo',
     price: 2200,
-    status: 'CONFIRMADO'
+    status: 'CONFIRMADO',
   },
   {
     originAirport: 'CDG',
@@ -178,7 +178,7 @@ export const flights: Flight[] = [
     origin: 'Paris',
     destination: 'Madrid',
     price: 880,
-    status: 'CONFIRMADO'
+    status: 'CONFIRMADO',
   },
 ]
 
@@ -255,10 +255,10 @@ export function cancelFlight(code: string): boolean {
   return false
 }
 export function performFlight(flightCode: string) {
-  const flight = flights.find(f => f.code === flightCode)
+  const flight = flights.find((f) => f.code === flightCode)
   if (flight) {
     flight.status = 'REALIZADO'
   }
 }
 
-export default { flights, searchFlights, getFlightsInNext48Hours, cancelFlight, performFlight}
+export default { flights, searchFlights, getFlightsInNext48Hours, cancelFlight, performFlight }

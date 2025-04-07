@@ -12,8 +12,8 @@ import {
 } from '@/components/ui/table'
 import { useRouter } from 'vue-router'
 import { useMilesStore } from '@/stores/miles'
-import CancelFlightDialog from '@/components/ui/Dialogs/CancelFlightDialog.vue'
-import booking from '@/mock/booking'
+import CancelReservationDialog from '@/components/dialogs/CancelReservationDialog.vue'
+import { booking } from '@/mock/booking'
 import CheckReservationDialog from './components/CheckReservationDialog.vue'
 
 const router = useRouter()
@@ -41,7 +41,10 @@ function openCheckReservationDialog() {
 
 <template>
   <div>
-    <CancelFlightDialog v-model="isCancelDialogOpen" :selectedReservationId="selectedReservationId" :confirmation-handler="'clientBooking'" />
+    <CancelReservationDialog
+      :reservation-id="selectedReservationId as number"
+      v-model="isCancelDialogOpen"
+    />
     <CheckReservationDialog v-model:open="isCheckReservationDialogOpen" />
     <div class="flex flex-col justify-center h-screen">
       <nav class="p-1 shadow-md mt-6">
@@ -85,6 +88,7 @@ function openCheckReservationDialog() {
                         'text-green-500': reservation.status === 'REALIZADA',
                         'text-blue-500': reservation.status === 'CRIADA',
                         'text-red-500': reservation.status === 'CANCELADA',
+                        'text-purple-500': reservation.status === 'CHECK-IN',
                       }"
                     >
                       {{ reservation.status }}
