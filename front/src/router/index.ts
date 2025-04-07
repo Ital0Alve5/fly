@@ -4,6 +4,7 @@ import Reservation from '@/views/Client/Reservation/index.vue'
 import Search from '@/views/Client/FlightListing/Search.vue'
 import BuyMiles from '@/views/Client/BuyMiles/index.vue'
 import Details from '@/views/Client/ReserveFlight/Details.vue'
+import Next from '@/views/Client/FlightsNext/Next.vue'
 
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
@@ -52,6 +53,12 @@ const router = createRouter({
       path: '/extrato-milhas',
       name: 'extratoDeMilhas',
       component: ExtractMiles,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/fazer-check-in',
+      name: 'fazerCheckin',
+      component: Next,
       meta: { requiresAuth: true },
     },
     {
