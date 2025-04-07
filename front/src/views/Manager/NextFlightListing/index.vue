@@ -9,13 +9,17 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { useToast } from '@/components/ui/toast'
 import { Button } from '@/components/ui/button'
-import { getFlightsInNext48Hours } from '@/mock/flight'
-import CancelFlightDialog from '@/components/dialogs/CancelFlightDialog.vue'
+import { getFlightsInNext48Hours, cancelFlight } from '@/mock/flight'
+import { cancelReservationByFlightCode } from '@/mock/booking'
+
+import CancelFlightDialog from './components/CancelFlightDialog.vue'
 
 const isCancelDialogOpen = ref(false)
 const selectedFlight = ref<string>('')
 const flights = ref(getFlightsInNext48Hours())
+const { toast } = useToast()
 
 watch(isCancelDialogOpen, (newVal) => {
   if (!newVal) {
@@ -23,19 +27,26 @@ watch(isCancelDialogOpen, (newVal) => {
   }
 })
 
-function handleCancelFlight(selectedFlightCode: string) {
+function handleCancelFlightDialog(selectedFlightCode: string) {
   selectedFlight.value = selectedFlightCode
   isCancelDialogOpen.value = true
+}
+
+function handelCancelFlight() {
+  cancelFlight(selectedFlight.value)
+  cancelReservationByFlightCode(selectedFlight.value)
+  toast({
+    title: 'Voo cancelado com sucesso',
+    description: 'Todas as reservas deste voo foram canceladas.',
+    variant: 'default',
+    duration: 1000,
+  })
 }
 </script>
 
 <template>
   <div>
-    <CancelFlightDialog
-      v-model="isCancelDialogOpen"
-      :selectedFlightCode="selectedFlight"
-      :confirmation-handler="'managerFlight'"
-    />
+    <CancelFlightDialog v-model="isCancelDialogOpen" @confirm="handelCancelFlight" />
     <div class="min-h-screen flex flex-col justify-center items-center">
       <Table>
         <TableCaption>Voos das próximas 48h.</TableCaption>
@@ -63,7 +74,7 @@ function handleCancelFlight(selectedFlightCode: string) {
               <Button
                 v-if="flight.status === 'CONFIRMADO'"
                 variant="destructive"
-                @click="handleCancelFlight(flight.code)"
+                @click="handleCancelFlightDialog(flight.code)"
               >
                 Cancelar voo
               </Button>
