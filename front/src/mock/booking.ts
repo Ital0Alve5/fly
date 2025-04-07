@@ -84,3 +84,16 @@ export function getCheckInFlightsInNext48Hrs(): Reserve[] {
     ['CRIADA', 'CHECK-IN'].includes(reserve.status.toUpperCase()),
   )
 }
+
+export async function updateReservationStatus(
+  reservationId: number,
+  newStatus: Reserve['status'],
+): Promise<void> {
+  const reservation = booking.value.find((r) => r.id === reservationId)
+  if (reservation) {
+    reservation.status = newStatus
+  } else {
+    console.error(`Reserva com ID ${reservationId} não encontrada`)
+    throw new Error(`Reserva com ID ${reservationId} não encontrada`)
+  }
+}

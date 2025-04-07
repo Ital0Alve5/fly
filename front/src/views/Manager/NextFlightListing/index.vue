@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import {
   Table,
   TableBody,
@@ -11,19 +11,32 @@ import {
 } from '@/components/ui/table'
 import { useToast } from '@/components/ui/toast'
 import { Button } from '@/components/ui/button'
+import PerformFlightDialog from '@/views/Manager/components/PerformFlightDialog.vue'
 import { getFlightsInNext48Hours, cancelFlight } from '@/mock/flight'
 import { cancelReservationByFlightCode } from '@/mock/booking'
 
 import CancelFlightDialog from './components/CancelFlightDialog.vue'
 
 const isCancelDialogOpen = ref(false)
+const isPerformDialogOpen = ref(false)
 const selectedFlight = ref<string>('')
 const flights = ref(getFlightsInNext48Hours())
 const { toast } = useToast()
 
+watch([isCancelDialogOpen, isPerformDialogOpen], ([newCancelVal, newPerformVal]) => {
+  if (!newCancelVal || !newPerformVal) {
+    flights.value = getFlightsInNext48Hours()
+  }
+})
+
 function handleCancelFlightDialog(selectedFlightCode: string) {
   selectedFlight.value = selectedFlightCode
   isCancelDialogOpen.value = true
+}
+
+function handlePerformFlight(selectedFlightCode: string) {
+  selectedFlight.value = selectedFlightCode
+  isPerformDialogOpen.value = true
 }
 
 function handelCancelFlight() {
@@ -43,6 +56,7 @@ function handelCancelFlight() {
 
 <template>
   <div>
+    <PerformFlightDialog v-model="isPerformDialogOpen" :selectedFlightCode="selectedFlight" />
     <CancelFlightDialog v-model="isCancelDialogOpen" @confirm="handelCancelFlight" />
     <div class="min-h-screen flex flex-col justify-center items-center">
       <Table>
@@ -77,7 +91,12 @@ function handelCancelFlight() {
               </Button>
             </TableCell>
             <TableCell class="w-[150px]">
-              <Button>Realizar voo</Button>
+              <Button
+                v-if="flight.status === 'CONFIRMADO'"
+                @click="handlePerformFlight(flight.code)"
+              >
+                Realizar Voo
+              </Button>
             </TableCell>
           </TableRow>
         </TableBody>

@@ -254,5 +254,11 @@ export function cancelFlight(code: string): boolean {
   }
   return false
 }
+export function performFlight(flightCode: string) {
+  const flight = flights.find((f) => f.code === flightCode)
+  if (flight) {
+    flight.status = 'REALIZADO'
+  }
+}
 
-export default { flights, searchFlights, getFlightsInNext48Hours, cancelFlight }
+export default { flights, searchFlights, getFlightsInNext48Hours, cancelFlight, performFlight }
