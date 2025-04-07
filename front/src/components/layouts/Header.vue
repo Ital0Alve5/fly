@@ -28,8 +28,8 @@ const clientNavigationLinks: NavigationItem[] = [
   },
   {
     label: 'Fazer Check-in',
-    link: '/fazer-check-in'
-  }
+    link: '/fazer-check-in',
+  },
 ]
 
 const managerNavigationLinks: NavigationItem[] = [
