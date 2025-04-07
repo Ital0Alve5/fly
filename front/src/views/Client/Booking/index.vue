@@ -13,7 +13,7 @@ import {
 import { useRouter } from 'vue-router'
 import { useMilesStore } from '@/stores/miles'
 import CancelReservationDialog from '@/components/dialogs/CancelReservationDialog.vue'
-import booking from '@/mock/booking'
+import { booking } from '@/mock/booking'
 import CheckReservationDialog from './components/CheckReservationDialog.vue'
 
 const router = useRouter()

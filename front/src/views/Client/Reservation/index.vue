@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { ref, onMounted } from 'vue'
-import booking from '@/mock/booking'
+import { booking } from '@/mock/booking'
 import type { Reserve } from '@/types/Reserve'
 import { useRoute } from 'vue-router'
 

@@ -1,12 +1,12 @@
 import type { Reserve } from '@/types/Reserve'
 import { ref, type Ref } from 'vue'
 
-const booking: Ref<Reserve[]> = ref([
+export const booking: Ref<Reserve[]> = ref([
   {
     id: 1,
     status: 'CRIADA',
     dateTimeR: '03/04/25 14:00',
-    dateTimeF: '06/04/25 14:00',
+    dateTimeF: '08/04/25 14:00',
     origin: 'GRU',
     destination: 'JFK',
     code: 'HGP123',
@@ -37,8 +37,6 @@ const booking: Ref<Reserve[]> = ref([
   },
 ])
 
-export default booking
-
 export async function searchReserves(code: string): Promise<Reserve[]> {
   const searchCode = code.trim().toUpperCase()
 
@@ -62,4 +60,27 @@ export async function cancelReservationByFlightCode(flightCode: string) {
       reservation.status = 'CANCELADO VOO'
     }
   })
+}
+
+function getFlightsInNext48hrs(): Reserve[] {
+  const now = new Date()
+  const nowTime = now.getTime()
+  const limitTime = nowTime + 48 * 60 * 60 * 1000
+
+  return booking.value.filter((reserve) => {
+    const [datePart, timePart] = reserve.dateTimeF.split(' ')
+    const [day, month, year] = datePart.split('/').map(Number)
+    const [hour, minute] = timePart.split(':').map(Number)
+
+    const flightDate = new Date(2000 + year, month - 1, day, hour, minute)
+    const flightTime = flightDate.getTime()
+
+    return flightTime > nowTime && flightTime <= limitTime
+  })
+}
+
+export function getCheckInFlightsInNext48Hrs(): Reserve[] {
+  return getFlightsInNext48hrs().filter((reserve) =>
+    ['CRIADA', 'CHECK-IN'].includes(reserve.status.toUpperCase()),
+  )
 }

@@ -10,7 +10,7 @@ import {
   TableBody,
   TableCell,
 } from '@/components/ui/table'
-import booking from '@/mock/booking'
+import { getCheckInFlightsInNext48Hrs } from '@/mock/booking'
 import type { Reserve } from '@/types/Reserve'
 import { useToast } from '@/components/ui/toast'
 import CancelReservationDialog from '@/components/dialogs/CancelReservationDialog.vue'
@@ -27,20 +27,6 @@ const checkin = (reserve: Reserve) => {
   })
 }
 
-const isWithin48Hours = (reserva: Reserve): boolean => {
-  const now = new Date()
-  const [datePart, timePart] = reserva.dateTimeF.split(' ')
-  const [day, month, year] = datePart.split('/').map(Number)
-  const [hours, minutes] = timePart.split(':').map(Number)
-  const reserveDate = new Date(2000 + year, month - 1, day, hours, minutes)
-  const timeDifference = (reserveDate.getTime() - now.getTime()) / (1000 * 60 * 60)
-  return timeDifference <= 48 && timeDifference > 0
-}
-
-const shouldShowReservation = (reserve: Reserve): boolean => {
-  return (reserve.status === 'CRIADA' || reserve.status === 'CHECK-IN') && isWithin48Hours(reserve)
-}
-
 const selectedReservationId = ref<number | null>(null)
 const isCancelDialogOpen = ref(false)
 
@@ -51,10 +37,7 @@ function handleCancelFlight(selectedReservation: number) {
 </script>
 
 <template>
-  <CancelReservationDialog
-    :reservation-id="selectedReservationId as number"
-    v-model="isCancelDialogOpen"
-  />
+  <CancelReservationDialog :reservation-id="selectedReservationId" v-model="isCancelDialogOpen" />
   <div class="flex flex-col justify-center h-screen">
     <div class="max-h-[500px] overflow-y-auto">
       <Card>
@@ -73,8 +56,8 @@ function handleCancelFlight(selectedReservation: number) {
               </TableRow>
             </TableHeader>
             <TableBody>
-              <template v-for="reserve in booking" :key="reserve.id">
-                <TableRow v-if="shouldShowReservation(reserve)">
+              <template v-for="reserve in getCheckInFlightsInNext48Hrs()" :key="reserve.id">
+                <TableRow>
                   <TableCell class="text-center px-6 py-4 text-lg">{{
                     reserve.dateTimeF
                   }}</TableCell>
