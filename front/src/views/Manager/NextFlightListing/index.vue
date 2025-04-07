@@ -27,7 +27,6 @@ function handleCancelFlightDialog(selectedFlightCode: string) {
 }
 
 function handelCancelFlight() {
-  console.log(selectedFlight.value)
   cancelFlight(selectedFlight.value)
   cancelReservationByFlightCode(selectedFlight.value)
   flights.value = getFlightsInNext48Hours()

@@ -12,15 +12,12 @@ import {
 } from '@/components/ui/table'
 import { useRouter } from 'vue-router'
 import { useMilesStore } from '@/stores/miles'
-import CancelReservationDialog from './components/CancelReservationDialog.vue'
+import CancelReservationDialog from '@/components/dialogs/CancelReservationDialog.vue'
 import booking from '@/mock/booking'
-import { cancelReservation } from '@/mock/booking'
 import CheckReservationDialog from './components/CheckReservationDialog.vue'
-import { useToast } from '@/components/ui/toast'
 
 const router = useRouter()
 const milesStore = useMilesStore()
-const { toast } = useToast()
 
 const viewReservation = (id: number) => {
   const reserva = booking.value.find((r) => r.id === id)
@@ -40,25 +37,13 @@ function handleCancelFlight(selectedReservation: number) {
 function openCheckReservationDialog() {
   isCheckReservationDialogOpen.value = true
 }
-
-function handleCancelReservation() {
-  cancelReservation(selectedReservationId.value as number)
-  isCancelDialogOpen.value = false
-  toast({
-    title: 'Reserva cancelada com sucesso',
-    description: 'Sua reserva foi cancelada!',
-    variant: 'default',
-    duration: 1000,
-  })
-}
 </script>
 
 <template>
   <div>
     <CancelReservationDialog
-      @confirm="handleCancelReservation"
+      :reservation-id="selectedReservationId as number"
       v-model="isCancelDialogOpen"
-      :selectedReservationId="selectedReservationId"
     />
     <CheckReservationDialog v-model:open="isCheckReservationDialogOpen" />
     <div class="flex flex-col justify-center h-screen">

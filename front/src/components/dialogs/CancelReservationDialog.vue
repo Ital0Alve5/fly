@@ -7,15 +7,32 @@ import {
   DialogDescription,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
+import { cancelReservation } from '@/mock/booking'
+import { useToast } from '@/components/ui/toast'
 
 const props = defineProps<{
   modelValue: boolean
+  reservationId: number
 }>()
 
-const emit = defineEmits(['update:modelValue', 'confirm'])
+const { toast } = useToast()
+
+const emit = defineEmits(['update:modelValue'])
 
 const handleOpenChange = (open: boolean) => {
   emit('update:modelValue', open)
+}
+
+function handleCancelReservation() {
+  cancelReservation(props.reservationId)
+  emit('update:modelValue', false)
+
+  toast({
+    title: 'Reserva cancelada com sucesso',
+    description: 'Sua reserva foi cancelada!',
+    variant: 'default',
+    duration: 1000,
+  })
 }
 </script>
 
@@ -30,7 +47,7 @@ const handleOpenChange = (open: boolean) => {
         </DialogDescription>
       </DialogHeader>
       <div class="flex justify-end space-x-2">
-        <Button @click="emit('confirm')" variant="destructive">Confirmar</Button>
+        <Button @click="handleCancelReservation" variant="destructive">Confirmar</Button>
         <Button @click="emit('update:modelValue', false)">Voltar</Button>
       </div>
     </DialogContent>

@@ -13,7 +13,7 @@ import {
 import booking from '@/mock/booking'
 import type { Reserve } from '@/types/Reserve'
 import { useToast } from '@/components/ui/toast'
-import CancelFlightDialog from '@/views/Client/Booking/components/CancelFlightDialog.vue'
+import CancelReservationDialog from '@/components/dialogs/CancelReservationDialog.vue'
 
 const { toast } = useToast()
 
@@ -51,7 +51,10 @@ function handleCancelFlight(selectedReservation: number) {
 </script>
 
 <template>
-  <CancelFlightDialog v-model="isCancelDialogOpen" :selectedReservationId="selectedReservationId" />
+  <CancelReservationDialog
+    :reservation-id="selectedReservationId as number"
+    v-model="isCancelDialogOpen"
+  />
   <div class="flex flex-col justify-center h-screen">
     <div class="max-h-[500px] overflow-y-auto">
       <Card>
