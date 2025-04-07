@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { ref, onMounted } from 'vue'
-import booking from '@/mock/booking'
+import { booking } from '@/mock/booking'
 import type { Reserve } from '@/types/Reserve'
 import { useRoute } from 'vue-router'
-import formatDateTime from '@/utils/date/formatDateTime'
 
 const route = useRoute()
 const reservation = ref<Reserve | null>(null)
@@ -34,7 +33,7 @@ onMounted(() => {
           <ul class="space-y-2">
             <li class="flex gap-2">
               <b>Data:</b>
-              <p>{{ formatDateTime(reservation.dateTimeF) }}</p>
+              <p>{{ reservation.dateTimeF }}</p>
             </li>
             <li class="flex gap-2">
               <b>Código:</b>

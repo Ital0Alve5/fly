@@ -32,7 +32,7 @@ defineProps<{
 const emit = defineEmits(['update:modelValue', 'handleFlightRegistered'])
 
 const globalStore = useGlobalStore()
-const { handleSubmit, code, originAirpoirt, destinationAirpoirt, seatsNumber, priceField } =
+const { handleSubmit, code, originAirport, destinationAirport, seatsNumber, priceField, date } =
   useRegisterFlightForm()
 const loading = ref(false)
 
@@ -120,7 +120,7 @@ const onSubmit = handleSubmit(async (data) => {
             <FormControl>
               <Input v-bind="componentField" type="datetime-local" />
             </FormControl>
-            <FormMessage>{{ priceField.errorMessage.value }}</FormMessage>
+            <FormMessage>{{ date.errorMessage.value }}</FormMessage>
           </FormItem>
         </FormField>
 
@@ -144,7 +144,7 @@ const onSubmit = handleSubmit(async (data) => {
                 </SelectContent>
               </Select>
             </FormControl>
-            <FormMessage>{{ originAirpoirt.errorMessage.value }}</FormMessage>
+            <FormMessage>{{ originAirport.errorMessage.value }}</FormMessage>
           </FormItem>
         </FormField>
 
@@ -168,7 +168,7 @@ const onSubmit = handleSubmit(async (data) => {
                 </SelectContent>
               </Select>
             </FormControl>
-            <FormMessage>{{ destinationAirpoirt.errorMessage.value }}</FormMessage>
+            <FormMessage>{{ destinationAirport.errorMessage.value }}</FormMessage>
           </FormItem>
         </FormField>
 
