@@ -18,7 +18,7 @@ export const flights: Flight[] = [
     origin: 'São Paulo',
     destination: 'Nova York',
     price: 2000,
-    status: 'REALIZADO'
+    status: 'REALIZADO',
   },
   {
     originAirport: 'GRU',
@@ -247,3 +247,20 @@ export function getFlightsInNext48Hours(): Flight[] {
 }
 
 export default { flights, searchFlights, getFlightsInNext48Hours }
+
+export function cancelFlight(code: string): boolean {
+  const flight = flights.find((flight) => flight.code === code)
+  if (flight) {
+    flight.status = 'CANCELADO'
+    return true
+  }
+  return false
+}
+export function performFlight(flightCode: string) {
+  const flight = flights.find((f) => f.code === flightCode)
+  if (flight) {
+    flight.status = 'REALIZADO'
+  }
+}
+
+export default { flights, searchFlights, getFlightsInNext48Hours, cancelFlight, performFlight }
