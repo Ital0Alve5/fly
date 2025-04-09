@@ -64,7 +64,7 @@ const handleConfirmBoarding = () => {
           v-model="reservationCode"
           type="text"
           placeholder="Código da reserva"
-          class="w-full px-4 py-2 border rounded"
+          class="w-full px-4 py-2 border rounded text-black"
         />
         <p v-if="errorMessage" class="text-red-600 mt-2 text-sm">{{ errorMessage }}</p>
       </div>
