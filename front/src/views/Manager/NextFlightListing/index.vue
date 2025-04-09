@@ -83,8 +83,8 @@ function handelCancelFlight() {
             <TableCell>
               {{ flight.dateTime }}
             </TableCell>
-            <TableCell> {{ flight.destinationAirport }} </TableCell>
-            <TableCell>{{ flight.originAirport }}</TableCell>
+            <TableCell> {{ flight.originAirport }} </TableCell>
+            <TableCell>{{ flight.destinationAirport }}</TableCell>
             <TableCell>{{ flight.status }}</TableCell>
             <TableCell class="w-[200px]">
               <Button class="bg-green bg-green-500" @click="handleConfirmBoarding(flight.code)"
