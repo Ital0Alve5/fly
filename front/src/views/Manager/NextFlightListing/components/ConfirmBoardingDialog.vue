@@ -91,9 +91,8 @@ const handleOpenChange = (open: boolean) => {
 <template>
   <Dialog :open="modelValue" @update:open="handleOpenChange">
     <DialogContent class="sm:max-w-md">
-      <DialogHeader>
+      <DialogHeader class="flex gap-4">
         <DialogTitle>Confirmar Embarque</DialogTitle>
-        <br />
         <DialogDescription>
           Esta ação irá:
           <ul class="list-disc pl-5 mt-2 space-y-1">
