@@ -15,8 +15,10 @@ import PerformFlightDialog from '@/views/Manager/components/PerformFlightDialog.
 import { getFlightsInNext48Hours, cancelFlight } from '@/mock/flight'
 import { cancelReservationByFlightCode } from '@/mock/booking'
 
+import ConfirmBoardingDialog from '@/views/Manager/NextFlightListing/components/ConfirmBoardingDialog.vue'
 import CancelFlightDialog from './components/CancelFlightDialog.vue'
 
+const isBoardingDialogOpen = ref(false)
 const isCancelDialogOpen = ref(false)
 const isPerformDialogOpen = ref(false)
 const selectedFlight = ref<string>('')
@@ -28,6 +30,11 @@ watch([isCancelDialogOpen, isPerformDialogOpen], ([newCancelVal, newPerformVal])
     flights.value = getFlightsInNext48Hours()
   }
 })
+
+function handleConfirmBoarding(selectedFlightCode: string) {
+  selectedFlight.value = selectedFlightCode
+  isBoardingDialogOpen.value = true
+}
 
 function handleCancelFlightDialog(selectedFlightCode: string) {
   selectedFlight.value = selectedFlightCode
@@ -58,6 +65,7 @@ function handelCancelFlight() {
   <div>
     <PerformFlightDialog v-model="isPerformDialogOpen" :selectedFlightCode="selectedFlight" />
     <CancelFlightDialog v-model="isCancelDialogOpen" @confirm="handelCancelFlight" />
+    <ConfirmBoardingDialog v-model="isBoardingDialogOpen" :selectedFlightCode="selectedFlight" />
     <div class="min-h-screen flex flex-col justify-center items-center">
       <Table>
         <TableCaption>Voos das próximas 48h.</TableCaption>
@@ -79,7 +87,9 @@ function handelCancelFlight() {
             <TableCell>{{ flight.originAirport }}</TableCell>
             <TableCell>{{ flight.status }}</TableCell>
             <TableCell class="w-[200px]">
-              <Button class="bg-green bg-green-500">Confirmar embarque</Button>
+              <Button class="bg-green bg-green-500" @click="handleConfirmBoarding(flight.code)"
+                >Confirmar embarque</Button
+              >
             </TableCell>
             <TableCell class="w-[150px]">
               <Button
