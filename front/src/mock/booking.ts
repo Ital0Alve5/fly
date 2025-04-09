@@ -54,11 +54,6 @@ export async function cancelReservation(reservationid: number) {
   }
 }
 
-export function getReservationByCode(code: string): Reserve | undefined {
-  const searchCode = code.trim().toUpperCase()
-  return booking.value.find((reserve) => reserve.code.toUpperCase() === searchCode)
-}
-
 export function getReservationById(id: number): Reserve | undefined {
   return booking.value.find((reserve) => reserve.id === id)
 }
