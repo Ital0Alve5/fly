@@ -9,6 +9,8 @@ import {
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/components/ui/toast'
+import { Input } from '@/components/ui/input'
+
 import { getReservationById, updateReservationStatus } from '@/mock/booking'
 
 const props = defineProps<{
@@ -105,11 +107,10 @@ const handleOpenChange = (open: boolean) => {
       </DialogHeader>
 
       <div class="my-4">
-        <input
+        <Input
           v-model="reservationId"
           type="text"
           placeholder="ID da reserva"
-          class="w-full px-4 py-2 border rounded text-black"
         />
         <p v-if="errorMessage" class="text-red-600 mt-2 text-sm">{{ errorMessage }}</p>
       </div>
