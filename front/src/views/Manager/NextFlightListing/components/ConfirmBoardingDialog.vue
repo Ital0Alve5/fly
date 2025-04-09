@@ -65,10 +65,14 @@ const handleConfirmBoarding = () => {
   updateReservationStatus(reservation.id, 'EMBARCADA')
   emit('update:modelValue', false)
 }
+
+const handleOpenChange = (open: boolean) => {
+  emit('update:modelValue', open)
+}
 </script>
 
 <template>
-  <Dialog :open="modelValue">
+  <Dialog :open="modelValue" @update:open="handleOpenChange">
     <DialogContent class="sm:max-w-md">
       <DialogHeader>
         <DialogTitle>Confirmar Embarque</DialogTitle>
