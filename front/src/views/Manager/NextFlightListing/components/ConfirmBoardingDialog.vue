@@ -74,9 +74,8 @@ const handleOpenChange = (open: boolean) => {
 <template>
   <Dialog :open="modelValue" @update:open="handleOpenChange">
     <DialogContent class="sm:max-w-md">
-      <DialogHeader>
+      <DialogHeader class="flex gap-4">
         <DialogTitle>Confirmar Embarque</DialogTitle>
-        <br />
         <DialogDescription>
           Digite o <strong>ID</strong> da reserva para confirmar o embarque do cliente.
         </DialogDescription>
