@@ -59,6 +59,10 @@ export function getReservationByCode(code: string): Reserve | undefined {
   return booking.value.find((reserve) => reserve.code.toUpperCase() === searchCode)
 }
 
+export function getReservationById(id: number): Reserve | undefined {
+  return booking.value.find((reserve) => reserve.id === id)
+}
+
 export async function cancelReservationByFlightCode(flightCode: string) {
   booking.value.forEach((reservation) => {
     if (reservation.code === flightCode) {

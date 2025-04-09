@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import {
   Dialog,
   DialogContent,
@@ -9,7 +9,7 @@ import {
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import type { Flight } from '@/mock/flight'
-import { getReservationByCode, updateReservationStatus } from '@/mock/booking'
+import { getReservationById, updateReservationStatus } from '@/mock/booking'
 
 const props = defineProps<{
   modelValue: boolean
@@ -18,13 +18,34 @@ const props = defineProps<{
 
 const emit = defineEmits(['update:modelValue'])
 
-const reservationCode = ref('')
+const reservationId = ref('')
 const errorMessage = ref('')
+
+watch(
+  () => props.modelValue,
+  (isOpen) => {
+    if (!isOpen) {
+      reservationId.value = ''
+      errorMessage.value = ''
+    }
+  },
+)
 
 const handleConfirmBoarding = () => {
   if (!props.flight) return
 
-  const reservation = getReservationByCode(reservationCode.value)
+  if (!reservationId.value.trim()) {
+    errorMessage.value = 'Digite o ID da reserva.'
+    return
+  }
+
+  const idParsed = Number(reservationId.value)
+  if (isNaN(idParsed)) {
+    errorMessage.value = 'ID inválido.'
+    return
+  }
+
+  const reservation = getReservationById(idParsed)
 
   if (!reservation) {
     errorMessage.value = 'Reserva não encontrada.'
@@ -41,10 +62,8 @@ const handleConfirmBoarding = () => {
     return
   }
 
-  updateReservationStatus(reservation.code, 'EMBARCADO')
+  updateReservationStatus(reservation.id, 'EMBARCADA')
   emit('update:modelValue', false)
-  reservationCode.value = ''
-  errorMessage.value = ''
 }
 </script>
 
@@ -55,15 +74,15 @@ const handleConfirmBoarding = () => {
         <DialogTitle>Confirmar Embarque</DialogTitle>
         <br />
         <DialogDescription>
-          Digite o código da reserva para confirmar o embarque do cliente.
+          Digite o <strong>ID</strong> da reserva para confirmar o embarque do cliente.
         </DialogDescription>
       </DialogHeader>
 
       <div class="my-2">
         <input
-          v-model="reservationCode"
-          type="text"
-          placeholder="Código da reserva"
+          v-model="reservationId"
+          type="number"
+          placeholder="ID da reserva"
           class="w-full px-4 py-2 border rounded text-black"
         />
         <p v-if="errorMessage" class="text-red-600 mt-2 text-sm">{{ errorMessage }}</p>

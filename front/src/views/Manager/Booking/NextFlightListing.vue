@@ -18,7 +18,6 @@ import type { Flight } from '@/mock/flight'
 import ConfirmBoardingDialog from '@/views/Manager/Booking/components/ConfirmBoardingDialog.vue'
 
 const selectedFlight = ref<Flight | null>(null)
-
 const isBoardingDialogOpen = ref(false)
 
 function openBoardingDialog(flight: Flight) {
@@ -63,6 +62,7 @@ function openBoardingDialog(flight: Flight) {
 
     <ConfirmBoardingDialog
       v-if="selectedFlight"
+      :key="selectedFlight.code"
       v-model="isBoardingDialogOpen"
       :flight="selectedFlight"
     />
