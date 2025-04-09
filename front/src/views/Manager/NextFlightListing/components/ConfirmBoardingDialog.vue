@@ -97,11 +97,9 @@ const handleOpenChange = (open: boolean) => {
           Esta ação irá:
           <ul class="list-disc pl-5 mt-2 space-y-1">
             <li>
-              Marcar a reserva como <strong>EMBARCADA</strong> se o ID for válido e associado ao voo
-              <strong>{{ selectedFlightCode }}</strong
-              >.
+              Marcar a reserva como <strong>EMBARCADA</strong> se o check-in do voo
+              <strong>{{ selectedFlightCode }}</strong> estiver feito.
             </li>
-            <li>Validar se o status da reserva é CHECK-IN.</li>
           </ul>
         </DialogDescription>
       </DialogHeader>
