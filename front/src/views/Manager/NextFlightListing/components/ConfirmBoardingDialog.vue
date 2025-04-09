@@ -8,15 +8,16 @@ import {
   DialogDescription,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import type { Flight } from '@/mock/flight'
+import { useToast } from '@/components/ui/toast'
 import { getReservationById, updateReservationStatus } from '@/mock/booking'
 
 const props = defineProps<{
   modelValue: boolean
-  flight: Flight | null
+  selectedFlightCode: string
 }>()
 
 const emit = defineEmits(['update:modelValue'])
+const { toast } = useToast()
 
 const reservationId = ref('')
 const errorMessage = ref('')
@@ -31,39 +32,55 @@ watch(
   },
 )
 
-const handleConfirmBoarding = () => {
-  if (!props.flight) return
+const handleConfirmBoarding = async () => {
+  try {
+    if (!props.selectedFlightCode) {
+      throw new Error('Código do voo não informado.')
+    }
 
-  if (!reservationId.value.trim()) {
-    errorMessage.value = 'Digite o ID da reserva.'
-    return
+    if (!reservationId.value.trim()) {
+      throw new Error('Digite o ID da reserva.')
+    }
+
+    const idParsed = Number(reservationId.value)
+    if (isNaN(idParsed)) {
+      throw new Error('ID inválido.')
+    }
+
+    const reservation = getReservationById(idParsed)
+
+    if (!reservation) {
+      throw new Error('Reserva não encontrada.')
+    }
+
+    if (reservation.code !== props.selectedFlightCode) {
+      throw new Error('Esta reserva não pertence a este voo.')
+    }
+
+    if (reservation.status !== 'CHECK-IN') {
+      throw new Error('A reserva não está no estado CHECK-IN.')
+    }
+
+    await updateReservationStatus(reservation.id, 'EMBARCADA')
+
+    toast({
+      title: 'Embarque confirmado',
+      description: `Reserva ${reservation.id} marcada como EMBARCADA.`,
+      variant: 'default',
+      duration: 1000,
+    })
+
+    emit('update:modelValue', false)
+  } catch (error) {
+    errorMessage.value = error instanceof Error ? error.message : 'Erro ao confirmar embarque.'
+
+    toast({
+      title: 'Erro',
+      description: errorMessage.value,
+      variant: 'destructive',
+      duration: 2500,
+    })
   }
-
-  const idParsed = Number(reservationId.value)
-  if (isNaN(idParsed)) {
-    errorMessage.value = 'ID inválido.'
-    return
-  }
-
-  const reservation = getReservationById(idParsed)
-
-  if (!reservation) {
-    errorMessage.value = 'Reserva não encontrada.'
-    return
-  }
-
-  if (reservation.code !== props.flight.code) {
-    errorMessage.value = 'Esta reserva não pertence a este voo.'
-    return
-  }
-
-  if (reservation.status !== 'CHECK-IN') {
-    errorMessage.value = 'A reserva não está no estado CHECK-IN.'
-    return
-  }
-
-  updateReservationStatus(reservation.id, 'EMBARCADA')
-  emit('update:modelValue', false)
 }
 
 const handleOpenChange = (open: boolean) => {
@@ -74,17 +91,26 @@ const handleOpenChange = (open: boolean) => {
 <template>
   <Dialog :open="modelValue" @update:open="handleOpenChange">
     <DialogContent class="sm:max-w-md">
-      <DialogHeader class="flex gap-4">
+      <DialogHeader>
         <DialogTitle>Confirmar Embarque</DialogTitle>
+        <br />
         <DialogDescription>
-          Digite o <strong>ID</strong> da reserva para confirmar o embarque do cliente.
+          Esta ação irá:
+          <ul class="list-disc pl-5 mt-2 space-y-1">
+            <li>
+              Marcar a reserva como <strong>EMBARCADA</strong> se o ID for válido e associado ao voo
+              <strong>{{ selectedFlightCode }}</strong
+              >.
+            </li>
+            <li>Validar se o status da reserva é CHECK-IN.</li>
+          </ul>
         </DialogDescription>
       </DialogHeader>
 
-      <div class="my-2">
+      <div class="my-4">
         <input
           v-model="reservationId"
-          type="number"
+          type="text"
           placeholder="ID da reserva"
           class="w-full px-4 py-2 border rounded text-black"
         />
@@ -92,8 +118,10 @@ const handleOpenChange = (open: boolean) => {
       </div>
 
       <div class="flex justify-end space-x-2">
-        <Button @click="handleConfirmBoarding" class="bg-green-600 text-white">Confirmar</Button>
-        <Button @click="emit('update:modelValue', false)">Voltar</Button>
+        <Button @click="handleConfirmBoarding" class="bg-green-600 hover:bg-green-700">
+          Confirmar Embarque
+        </Button>
+        <Button variant="destructive" @click="emit('update:modelValue', false)">Cancelar</Button>
       </div>
     </DialogContent>
   </Dialog>
