@@ -12,6 +12,7 @@ import {
 import { useToast } from '@/components/ui/toast'
 import { Button } from '@/components/ui/button'
 import PerformFlightDialog from '@/views/Manager/components/PerformFlightDialog.vue'
+import RegisterFlightDialog from './components/RegisterFlightDialog.vue'
 import { getFlightsInNext48Hours, cancelFlight } from '@/mock/flight'
 import { cancelReservationByFlightCode } from '@/mock/booking'
 
@@ -21,6 +22,7 @@ import CancelFlightDialog from './components/CancelFlightDialog.vue'
 const isBoardingDialogOpen = ref(false)
 const isCancelDialogOpen = ref(false)
 const isPerformDialogOpen = ref(false)
+const isRegisterFlightFormOpen = ref(false)
 const selectedFlight = ref<string>('')
 const flights = ref(getFlightsInNext48Hours())
 const { toast } = useToast()
@@ -46,6 +48,10 @@ function handlePerformFlight(selectedFlightCode: string) {
   isPerformDialogOpen.value = true
 }
 
+function handleFlightRegistered() {
+  flights.value = getFlightsInNext48Hours()
+}
+
 function handelCancelFlight() {
   cancelFlight(selectedFlight.value)
   cancelReservationByFlightCode(selectedFlight.value)
@@ -63,10 +69,17 @@ function handelCancelFlight() {
 
 <template>
   <div>
+    <RegisterFlightDialog
+      @handle-flight-registered="handleFlightRegistered"
+      v-model="isRegisterFlightFormOpen"
+    />
     <PerformFlightDialog v-model="isPerformDialogOpen" :selectedFlightCode="selectedFlight" />
     <CancelFlightDialog v-model="isCancelDialogOpen" @confirm="handelCancelFlight" />
     <ConfirmBoardingDialog v-model="isBoardingDialogOpen" :selectedFlightCode="selectedFlight" />
     <div class="min-h-screen flex flex-col justify-center items-center">
+    <div @click="isRegisterFlightFormOpen = true" class="flex justify-end mb-4 pr-8 w-full">
+      <Button>Cadastrar Voo</Button>
+    </div>
       <Table>
         <TableCaption>Voos das próximas 48h.</TableCaption>
         <TableHeader>
