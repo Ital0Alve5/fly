@@ -22,8 +22,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useMilesStore } from '@/stores/miles'
 import FlightDetails from './components/FlightDetails.vue'
 import { getFlightByCode, type Flight } from '@/mock/flight'
-import { generateUniqueCode } from '@/utils/generateRandomCode'
-import { booking } from '@/mock/booking'
+import { createNewReservation } from '@/mock/booking'
 import { registerExtract } from '@/mock/extract'
 import { useAuthStore } from '@/stores/auth'
 import { getTodayDate } from '@/utils/date/getTodayDate'
@@ -37,26 +36,18 @@ const authStore = useAuthStore()
 const code = route.params.code as string
 const flight = ref<Flight | null>(getFlightByCode(code) ?? null)
 const miles = ref(0)
-const generatedCode = ref(generateUniqueCode())
+const generatedCode = ref('')
 
 const valueToPay = computed(() => {
   const discount = miles.value * milesStore.pricePerMile
   return (flight.value?.price ?? discount) - discount
 })
 
-function handleReserveFlight(value: boolean) {
-  if (value) return
-
+async function handleReserveFlight() {
   milesStore.setTotalMiles(milesStore.totalMiles - miles.value)
 
-  booking.value.push({
-    id: booking.value[booking.value.length - 1].id + 1,
-    status: 'CRIADA',
-    dateTimeR: getTodayDate(),
-    dateTimeF: flight.value?.dateTime ?? '',
-    origin: flight.value?.originAirport ?? '',
-    destination: flight.value?.destinationAirport ?? '',
-    code: generatedCode.value,
+  generatedCode.value = await createNewReservation({
+    flight: flight.value,
     price: valueToPay.value,
     miles: miles.value,
   })
@@ -70,12 +61,16 @@ function handleReserveFlight(value: boolean) {
     description: `${flight.value?.originAirport}->${flight.value?.destinationAirport}`,
     type: 'SAÍDA',
   })
-
-  router.push('/reservas')
 }
 </script>
 <template>
-  <Dialog @update:open="handleReserveFlight">
+  <Dialog
+    @update:open="
+      (value) => {
+        if (!value) router.push('/reservas')
+      }
+    "
+  >
     <DialogContent class="sm:max-w-md">
       <DialogHeader>
         <DialogTitle>Código de reserva</DialogTitle>

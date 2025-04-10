@@ -77,9 +77,9 @@ function handelCancelFlight() {
     <CancelFlightDialog v-model="isCancelDialogOpen" @confirm="handelCancelFlight" />
     <ConfirmBoardingDialog v-model="isBoardingDialogOpen" :selectedFlightCode="selectedFlight" />
     <div class="min-h-screen flex flex-col justify-center items-center">
-    <div @click="isRegisterFlightFormOpen = true" class="flex justify-end mb-4 pr-8 w-full">
-      <Button>Cadastrar Voo</Button>
-    </div>
+      <div @click="isRegisterFlightFormOpen = true" class="flex justify-end mb-4 pr-8 w-full">
+        <Button>Cadastrar Voo</Button>
+      </div>
       <Table>
         <TableCaption>Voos das próximas 48h.</TableCaption>
         <TableHeader>

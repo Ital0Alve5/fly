@@ -10,7 +10,7 @@ const reservation = ref<Reserve | null>(null)
 
 onMounted(() => {
   const foundReservation = booking.value.find(
-    (res) => res.code.toLowerCase() === (route.params.code as string).toLowerCase(),
+    (res) => res.reservationCode.toLowerCase() === (route.params.code as string).toLowerCase(),
   )
 
   if (foundReservation) {
@@ -37,7 +37,7 @@ onMounted(() => {
             </li>
             <li class="flex gap-2">
               <b>Código:</b>
-              <p>{{ reservation.code }}</p>
+              <p>{{ reservation.reservationCode }}</p>
             </li>
             <li class="flex gap-2">
               <b>Origem:</b>

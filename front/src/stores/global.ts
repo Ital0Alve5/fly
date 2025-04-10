@@ -6,7 +6,6 @@ export const useGlobalStore = defineStore('global', () => {
   const notification = ref<Notification | null>(null)
 
   function setNotification(data: Notification) {
-    console.log(data)
     notification.value = data
   }
 

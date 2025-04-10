@@ -54,7 +54,7 @@ const formatExpiryDate = (e: Event) => {
   expiryDate.value.value = value
 }
 
-const onSubmit = handleSubmit(async (values) => {
+const onSubmit = handleSubmit(async () => {
   const newExtract: ExtractItem = {
     userId: authStore.user?.userId || 0,
     date: getTodayDate(),
@@ -66,10 +66,9 @@ const onSubmit = handleSubmit(async (values) => {
   }
 
   registerExtract(newExtract)
+
   milesStore.setTotalMiles(totalMiles.value + currentCheckoutMiles.value)
   milesStore.setCurrentCheckoutMiles(10)
-
-  console.log('Informações de pagamento:', values)
 
   toast({
     title: 'Pagamento efetuado com sucesso',

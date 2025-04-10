@@ -13,7 +13,8 @@ export type Reserve = {
   dateTimeF: string // yyyy-mm-dd hh:mm
   origin: string
   destination: string
-  code: string
+  flightCode: string
+  reservationCode: string
   price: number
   miles: number
 }

@@ -22,7 +22,7 @@ const milesStore = useMilesStore()
 const viewReservation = (id: number) => {
   const reserva = booking.value.find((r) => r.id === id)
   if (reserva) {
-    router.push({ name: 'reserva', params: { code: reserva.code } })
+    router.push({ name: 'reserva', params: { code: reserva.reservationCode } })
   }
 }
 const selectedReservationId = ref<number | null>(null)

@@ -124,7 +124,7 @@ const checkReserveCode = async () => {
               </li>
               <li class="flex gap-2">
                 <b>Código:</b>
-                <p>{{ reserva.code }}</p>
+                <p>{{ reserva.reservationCode }}</p>
               </li>
               <li class="flex gap-2">
                 <b>Origem:</b>

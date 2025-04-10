@@ -11,7 +11,8 @@ import { Button } from '@/components/ui/button'
 import { useToast } from '@/components/ui/toast'
 import { Input } from '@/components/ui/input'
 
-import { getReservationById, updateReservationStatus } from '@/mock/booking'
+import { getReservationByCode, updateReservationStatus } from '@/mock/booking'
+import { getFlightByCode } from '@/mock/flight'
 
 const props = defineProps<{
   modelValue: boolean
@@ -21,14 +22,14 @@ const props = defineProps<{
 const emit = defineEmits(['update:modelValue'])
 const { toast } = useToast()
 
-const reservationId = ref('')
+const reservationCode = ref('')
 const errorMessage = ref('')
 
 watch(
   () => props.modelValue,
   (isOpen) => {
     if (!isOpen) {
-      reservationId.value = ''
+      reservationCode.value = ''
       errorMessage.value = ''
     }
   },
@@ -40,22 +41,17 @@ const handleConfirmBoarding = async () => {
       throw new Error('Código do voo não informado.')
     }
 
-    if (!reservationId.value.trim()) {
-      throw new Error('Digite o ID da reserva.')
+    if (!reservationCode.value.trim()) {
+      throw new Error('Digite o código da reserva.')
     }
 
-    const idParsed = Number(reservationId.value)
-    if (isNaN(idParsed)) {
-      throw new Error('ID inválido.')
-    }
-
-    const reservation = getReservationById(idParsed)
+    const reservation = getReservationByCode(reservationCode.value)
 
     if (!reservation) {
       throw new Error('Reserva não encontrada.')
     }
 
-    if (reservation.code !== props.selectedFlightCode) {
+    if (!getFlightByCode(reservation.flightCode)) {
       throw new Error('Esta reserva não pertence a este voo.')
     }
 
@@ -67,7 +63,7 @@ const handleConfirmBoarding = async () => {
 
     toast({
       title: 'Embarque confirmado',
-      description: `Reserva ${reservation.id} marcada como EMBARCADA.`,
+      description: `Reserva ${reservation.reservationCode} marcada como EMBARCADA.`,
       variant: 'default',
       duration: 1000,
     })
@@ -107,7 +103,7 @@ const handleOpenChange = (open: boolean) => {
       </DialogHeader>
 
       <div class="my-4">
-        <Input v-model="reservationId" type="text" placeholder="ID da reserva" />
+        <Input v-model="reservationCode" type="text" placeholder="ID da reserva" />
         <p v-if="errorMessage" class="text-red-600 mt-2 text-sm">{{ errorMessage }}</p>
       </div>
 

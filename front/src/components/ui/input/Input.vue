@@ -2,7 +2,7 @@
 import type { HTMLAttributes } from 'vue'
 import { cn } from '@/lib/utils'
 import { useVModel } from '@vueuse/core'
-import { vMaska } from 'maska/vue';
+import { vMaska } from 'maska/vue'
 
 const props = defineProps<{
   defaultValue?: string | number

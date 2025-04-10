@@ -119,6 +119,42 @@ const ExtractHistory = ref<ExtractItem[]>([
     description: 'COMPRA DE MILHAS',
     type: 'ENTRADA',
   },
+  {
+    userId: 1,
+    date: '10/04/2025 15:00:00',
+    reservationCode: 'NOW001',
+    value: 'R$ 1.800,00',
+    miles: 36000,
+    description: 'GRU->MEX',
+    type: 'SAÍDA',
+  },
+  {
+    userId: 1,
+    date: '11/04/2025 08:45:00',
+    reservationCode: 'NOW002',
+    value: 'R$ 900,00',
+    miles: 18000,
+    description: 'FRA->LHR',
+    type: 'SAÍDA',
+  },
+  {
+    userId: 1,
+    date: '11/04/2025 23:00:00',
+    reservationCode: 'NOW003',
+    value: 'R$ 1.200,00',
+    miles: 24000,
+    description: 'MIA->GRU',
+    type: 'SAÍDA',
+  },
+  {
+    userId: 1,
+    date: '12/04/2025 06:30:00',
+    reservationCode: 'NOW004',
+    value: 'R$ 700,00',
+    miles: 14000,
+    description: 'CDG->FRA',
+    type: 'SAÍDA',
+  },
 ])
 
 export function getExtractByUserId(userId: number): ExtractItem[] {
