@@ -107,11 +107,7 @@ const handleOpenChange = (open: boolean) => {
       </DialogHeader>
 
       <div class="my-4">
-        <Input
-          v-model="reservationId"
-          type="text"
-          placeholder="ID da reserva"
-        />
+        <Input v-model="reservationId" type="text" placeholder="ID da reserva" />
         <p v-if="errorMessage" class="text-red-600 mt-2 text-sm">{{ errorMessage }}</p>
       </div>
 
