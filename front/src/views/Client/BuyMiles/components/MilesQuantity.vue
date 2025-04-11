@@ -8,13 +8,19 @@ import {
   NumberFieldIncrement,
   NumberFieldInput,
 } from '@/components/ui/number-field'
+import { useToast } from '@/components/ui/toast'
+import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { useAuthStore } from '@/stores/auth'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useMilesStore } from '@/stores/miles'
+import { registerExtract, type ExtractItem } from '@/mock/extract'
+import { getTodayDate } from '@/utils/date/getTodayDate'
+import router from '@/router'
 
 const authStore = useAuthStore()
 const milesStore = useMilesStore()
+const { toast } = useToast()
 
 const user = computed(() => ({
   firstName: authStore.user?.name.split(' ')[0],
@@ -29,6 +35,32 @@ const totalMiles = computed({
 })
 const pricePerMile = computed(() => milesStore.pricePerMile)
 const totalPrice = computed(() => milesStore.totalPrice)
+
+const onSubmit = async () => {
+  const newExtract: ExtractItem = {
+    userId: authStore.user?.userId || 0,
+    date: getTodayDate(),
+    reservationCode: null,
+    value: totalPrice.value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
+    miles: currentCheckoutMiles.value,
+    description: 'COMPRA DE MILHAS',
+    type: 'ENTRADA',
+  }
+
+  registerExtract(newExtract)
+
+  milesStore.setTotalMiles(totalMiles.value + currentCheckoutMiles.value)
+  milesStore.setCurrentCheckoutMiles(10)
+
+  toast({
+    title: 'Pagamento efetuado com sucesso',
+    description: 'Suas milhas foram compradas com sucesso!',
+    variant: 'default',
+    duration: 2000,
+  })
+
+  router.push('/reservas')
+}
 </script>
 
 <template>
@@ -89,5 +121,9 @@ const totalPrice = computed(() => milesStore.totalPrice)
         </CardContent>
       </Card>
     </div>
+    <Button @click="onSubmit" class="w-full mt-6">
+      Pagar
+      {{ totalPrice.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) }}</Button
+    >
   </div>
 </template>
