@@ -3,10 +3,12 @@ import { ref, type Ref } from 'vue'
 import type { Flight } from './flight'
 import { getTodayDate } from '@/utils/date/getTodayDate'
 import { generateUniqueCode } from '@/utils/generateRandomCode'
+import { useAuthStore } from '@/stores/auth'
 
 export const booking: Ref<Reserve[]> = ref([
   {
     id: 1,
+    userId: 1,
     status: 'CRIADA',
     dateTimeR: '03/04/25 14:00',
     dateTimeF: '08/04/25 14:00',
@@ -19,6 +21,7 @@ export const booking: Ref<Reserve[]> = ref([
   },
   {
     id: 2,
+    userId: 1,
     status: 'REALIZADA',
     dateTimeR: '20/03/25 08:30',
     dateTimeF: '05/04/25 14:00',
@@ -31,6 +34,7 @@ export const booking: Ref<Reserve[]> = ref([
   },
   {
     id: 3,
+    userId: 1,
     status: 'CANCELADA',
     dateTimeR: '15/03/25 16:45',
     dateTimeF: '05/04/25 14:00',
@@ -43,6 +47,7 @@ export const booking: Ref<Reserve[]> = ref([
   },
   {
     id: 4,
+    userId: 1,
     status: 'REALIZADA',
     dateTimeR: '01/03/25 07:00',
     dateTimeF: '01/03/25 09:15',
@@ -55,6 +60,7 @@ export const booking: Ref<Reserve[]> = ref([
   },
   {
     id: 5,
+    userId: 1,
     status: 'REALIZADA',
     dateTimeR: '20/03/25 08:00',
     dateTimeF: '20/03/25 08:45',
@@ -67,6 +73,7 @@ export const booking: Ref<Reserve[]> = ref([
   },
   {
     id: 6,
+    userId: 1,
     status: 'REALIZADA',
     dateTimeR: '30/03/25 06:00',
     dateTimeF: '30/03/25 07:30',
@@ -79,6 +86,7 @@ export const booking: Ref<Reserve[]> = ref([
   },
   {
     id: 7,
+    userId: 1,
     status: 'REALIZADA',
     dateTimeR: '01/04/25 10:00',
     dateTimeF: '01/04/25 12:00',
@@ -91,6 +99,7 @@ export const booking: Ref<Reserve[]> = ref([
   },
   {
     id: 8,
+    userId: 1,
     status: 'REALIZADA',
     dateTimeR: '23/03/25 16:00',
     dateTimeF: '23/03/25 18:20',
@@ -103,6 +112,7 @@ export const booking: Ref<Reserve[]> = ref([
   },
   {
     id: 9,
+    userId: 1,
     status: 'CRIADA',
     dateTimeR: '10/04/25 12:00',
     dateTimeF: '10/04/25 15:00',
@@ -115,6 +125,7 @@ export const booking: Ref<Reserve[]> = ref([
   },
   {
     id: 10,
+    userId: 1,
     status: 'CRIADA',
     dateTimeR: '11/04/25 06:00',
     dateTimeF: '11/04/25 08:45',
@@ -127,6 +138,7 @@ export const booking: Ref<Reserve[]> = ref([
   },
   {
     id: 11,
+    userId: 1,
     status: 'CRIADA',
     dateTimeR: '11/04/25 20:30',
     dateTimeF: '11/04/25 23:00',
@@ -139,6 +151,7 @@ export const booking: Ref<Reserve[]> = ref([
   },
   {
     id: 12,
+    userId: 1,
     status: 'CRIADA',
     dateTimeR: '12/04/25 04:00',
     dateTimeF: '12/04/25 06:30',
@@ -151,41 +164,56 @@ export const booking: Ref<Reserve[]> = ref([
   },
 ])
 
+export async function getBooking(): Promise<Reserve[]> {
+  const authStore = useAuthStore()
+
+  return new Promise((res) => {
+    res(booking.value.filter((reservation) => reservation.userId === authStore.user?.userId))
+  })
+}
+
 export async function searchReserves(code: string): Promise<Reserve[]> {
   const searchCode = code.trim().toUpperCase()
+  const booking = await getBooking()
 
-  return booking.value.filter((reserve) => reserve.reservationCode.toUpperCase() === searchCode)
+  return booking.filter((reserve) => reserve.reservationCode.toUpperCase() === searchCode)
 }
 
 export async function cancelReservation(reservationid: number) {
-  if (reservationid) {
-    const reservation = booking.value.find((r) => r.id === reservationid)
-    if (reservation) {
-      reservation.status = 'CANCELADA'
-    } else {
-      console.log(`Reserva com ID ${reservationid} não encontrada.`)
-    }
+  if (!reservationid) return
+
+  const reservation = booking.value.find((r) => r.id === reservationid)
+
+  if (reservation) {
+    reservation.status = 'CANCELADA'
+  } else {
+    console.log(`Reserva com ID ${reservationid} não encontrada.`)
   }
 }
 
-export function getReservationByCode(code: string): Reserve | undefined {
-  return booking.value.find((reserve) => reserve.reservationCode === code)
+export async function getReservationByCode(code: string): Promise<Reserve | undefined> {
+  const booking = await getBooking()
+
+  return booking.find((reserve) => reserve.reservationCode === code)
 }
 
 export async function cancelReservationByFlightCode(flightCode: string) {
-  booking.value.forEach((reservation) => {
+  const booking = await getBooking()
+
+  booking.forEach((reservation) => {
     if (reservation.flightCode === flightCode) {
       reservation.status = 'CANCELADO VOO'
     }
   })
 }
 
-function getFlightsInNext48hrs(): Reserve[] {
+async function getFlightsInNext48hrs(): Promise<Reserve[]> {
   const now = new Date()
   const nowTime = now.getTime()
   const limitTime = nowTime + 48 * 60 * 60 * 1000
+  const booking = await getBooking()
 
-  return booking.value.filter((reserve) => {
+  return booking.filter((reserve) => {
     const [datePart, timePart] = reserve.dateTimeF.split(' ')
     const [day, month, year] = datePart.split('/').map(Number)
     const [hour, minute] = timePart.split(':').map(Number)
@@ -197,17 +225,19 @@ function getFlightsInNext48hrs(): Reserve[] {
   })
 }
 
-export function getCheckInFlightsInNext48Hrs(): Reserve[] {
-  return getFlightsInNext48hrs().filter((reserve) =>
-    ['CRIADA', 'CHECK-IN'].includes(reserve.status.toUpperCase()),
-  )
+export async function getCheckInFlightsInNext48Hrs(): Promise<Reserve[]> {
+  const flights = await getFlightsInNext48hrs()
+
+  return flights.filter((reserve) => ['CRIADA', 'CHECK-IN'].includes(reserve.status.toUpperCase()))
 }
 
 export async function updateReservationStatus(
   reservationId: number,
   newStatus: Reserve['status'],
 ): Promise<void> {
-  const reservation = booking.value.find((r) => r.id === reservationId)
+  const booking = await getBooking()
+
+  const reservation = booking.find((r) => r.id === reservationId)
   if (reservation) {
     reservation.status = newStatus
   } else {
@@ -221,11 +251,14 @@ export async function createNewReservation(data: {
   price: number
   miles: number
 }): Promise<string> {
+  const authStore = useAuthStore()
+
   return new Promise((res) => {
     const code = generateUniqueCode()
 
     booking.value.push({
       id: booking.value[booking.value.length - 1].id + 1,
+      userId: authStore.user!.userId,
       status: 'CRIADA',
       dateTimeR: getTodayDate(),
       dateTimeF: data.flight.dateTime ?? '',

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import {
@@ -13,13 +13,19 @@ import {
 import { useRouter } from 'vue-router'
 import { useMilesStore } from '@/stores/miles'
 import CancelReservationDialog from '@/components/dialogs/CancelReservationDialog.vue'
-import { booking } from '@/mock/booking'
+import { getBooking } from '@/mock/booking'
 import CheckReservationDialog from './components/CheckReservationDialog.vue'
+import type { Reserve } from '@/types/Reserve'
 
 const router = useRouter()
 const milesStore = useMilesStore()
+const booking = ref<Reserve[]>([])
 
-const viewReservation = (id: number) => {
+onMounted(async () => {
+  booking.value = await getBooking()
+})
+
+const viewReservation = async (id: number) => {
   const reserva = booking.value.find((r) => r.id === id)
   if (reserva) {
     router.push({ name: 'reserva', params: { code: reserva.reservationCode } })

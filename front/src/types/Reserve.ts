@@ -1,5 +1,6 @@
 export type Reserve = {
   id: number
+  userId: number
   status:
     | 'CRIADA'
     | 'CHECK-IN'
