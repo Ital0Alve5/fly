@@ -26,7 +26,7 @@ export const flights: Flight[] = [
   {
     originAirport: 'GIG',
     destinationAirport: 'MIA',
-    dateTime: '05/04/25 14:00',
+    dateTime: '20/04/25 14:00',
     code: 'STU901',
     origin: 'Rio de Janeiro',
     destination: 'Miami',
@@ -36,7 +36,7 @@ export const flights: Flight[] = [
   {
     originAirport: 'BSB',
     destinationAirport: 'LIS',
-    dateTime: '05/04/25 14:00',
+    dateTime: '22/04/25 14:00',
     code: 'MNO345',
     origin: 'Brasília',
     destination: 'Lisboa',
@@ -46,7 +46,7 @@ export const flights: Flight[] = [
   {
     originAirport: 'GRU',
     destinationAirport: 'SDU',
-    dateTime: '01/03/25 09:15',
+    dateTime: '30/04/25 09:15',
     code: 'FLW316',
     origin: 'São Paulo',
     destination: 'Rio de Janeiro',
@@ -56,7 +56,7 @@ export const flights: Flight[] = [
   {
     originAirport: 'GRU',
     destinationAirport: 'EZE',
-    dateTime: '20/03/25 08:45',
+    dateTime: '02/05/25 08:45',
     code: 'FLK822',
     origin: 'São Paulo',
     destination: 'Buenos Aires',
@@ -66,7 +66,7 @@ export const flights: Flight[] = [
   {
     originAirport: 'BSB',
     destinationAirport: 'CGH',
-    dateTime: '30/03/25 07:30',
+    dateTime: '04/05/25 07:30',
     code: 'FLY156',
     origin: 'Brasília',
     destination: 'São Paulo',
@@ -76,7 +76,7 @@ export const flights: Flight[] = [
   {
     originAirport: 'CWB',
     destinationAirport: 'MAO',
-    dateTime: '01/04/25 12:00',
+    dateTime: '06/05/25 12:00',
     code: 'PGP001',
     origin: 'Curitiba',
     destination: 'Manaus',
@@ -86,7 +86,7 @@ export const flights: Flight[] = [
   {
     originAirport: 'REC',
     destinationAirport: 'FOR',
-    dateTime: '23/03/25 18:20',
+    dateTime: '08/05/25 18:20',
     code: 'FLT413',
     origin: 'Recife',
     destination: 'Fortaleza',
@@ -96,7 +96,7 @@ export const flights: Flight[] = [
   {
     originAirport: 'GRU',
     destinationAirport: 'MEX',
-    dateTime: '10/04/25 15:00',
+    dateTime: '12/04/25 15:00',
     code: 'NOA001',
     origin: 'São Paulo',
     destination: 'Mexico City',

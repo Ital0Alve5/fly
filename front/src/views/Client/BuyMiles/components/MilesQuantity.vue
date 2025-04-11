@@ -22,9 +22,6 @@ const authStore = useAuthStore()
 const milesStore = useMilesStore()
 const { toast } = useToast()
 
-const user = computed(() => ({
-  firstName: authStore.user?.name.split(' ')[0],
-}))
 const currentCheckoutMiles = computed({
   get: () => milesStore.currentCheckoutMiles,
   set: (value: number) => milesStore.setCurrentCheckoutMiles(value),
@@ -65,24 +62,14 @@ const onSubmit = async () => {
 
 <template>
   <div class="h-full w-full flex flex-col border-0 space-y-6">
-    <div class="p-6">
-      <h2 class="text-lg font-semibold text-center">Informações de {{ user.firstName }}</h2>
-    </div>
-
-    <div class="px-6 pb-6">
-      <ul class="space-y-4">
-        <li>
-          <span class="font-medium w-32 shrink-0">Minhas milhas:</span>
-          <span class="pl-2">{{ totalMiles }}</span>
-        </li>
-      </ul>
+    <div class="space-y-4">
+      <span class="font-medium w-32 shrink-0">Minhas milhas:</span>
+      <span class="pl-2">{{ totalMiles }}</span>
     </div>
 
     <Separator />
 
-    <div class="p-6 pt-12">
-      <h2 class="text-lg font-semibold text-center">Selecione a quantidade de milhas</h2>
-    </div>
+    <h2 class="text-lg font-semibold text-center">Selecione a quantidade de milhas</h2>
 
     <div class="px-6 pb-6">
       <NumberField id="miles" v-model="currentCheckoutMiles" :min="0">
