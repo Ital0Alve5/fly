@@ -101,10 +101,7 @@ function openCheckReservationDialog() {
                     </span>
                   </TableCell>
                   <TableCell class="text-center">
-                    <Button
-                      v-if="reservation.status === 'CRIADA' || reservation.status === 'CHECK-IN'"
-                      class="mr-2"
-                      @click="viewReservation(reservation.id)"
+                    <Button class="mr-2" @click="viewReservation(reservation.id)"
                       >Ver Reserva</Button
                     >
                     <Button
