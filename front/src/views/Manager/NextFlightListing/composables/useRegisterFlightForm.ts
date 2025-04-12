@@ -5,7 +5,6 @@ import { toTypedSchema } from '@vee-validate/zod'
 const flightSchema = toTypedSchema(
   z
     .object({
-      code: z.string({ required_error: 'Código do voo é obrigatório' }).min(1, 'Campo obrigatório'),
       originAirport: z
         .string({ required_error: 'O aeroporto de origem é obrigatório' })
         .min(1, 'Campo obrigatório'),
@@ -21,7 +20,7 @@ const flightSchema = toTypedSchema(
       date: z.preprocess(
         (arg) => {
           if (typeof arg === 'string' || arg instanceof Date) {
-            return new Date(arg)
+            return new Date(arg) 
           }
           return arg
         },
@@ -43,7 +42,6 @@ export function useRegisterFlightForm() {
     validationSchema: flightSchema,
   })
 
-  const code = useField<string>('code')
   const originAirport = useField<string>('originAirport')
   const destinationAirport = useField<string>('destinationAirport')
   const priceField = useField<string>('price')
@@ -52,7 +50,6 @@ export function useRegisterFlightForm() {
 
   return {
     handleSubmit,
-    code,
     originAirport,
     destinationAirport,
     priceField,

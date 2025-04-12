@@ -149,9 +149,9 @@ export async function searchFlights(origin: string, destination: string): Promis
   const now = new Date()
 
   return flights.filter((flight) => {
-    const flightDate = new Date(flight.dateTime)
+    const flightDate = parseDateTime(flight.dateTime)
 
-    if (flightDate <= now && flight.status !== 'REALIZADO') return false
+    if (flightDate <= now) return false
 
     const flightOriginCity = flight.origin.toLowerCase()
     const flightOriginAirport = flight.originAirport.toLowerCase()
@@ -209,12 +209,6 @@ type RegisterFlightFormType = {
 }
 
 export async function registerFlight(data: RegisterFlightFormType) {
-  const codeExists = flights.find((flight) => flight.code === data.code)
-
-  if (codeExists) {
-    throw new Error('Código já cadastrado.')
-  }
-
   // Simula chamada à API com um delay de 2 segundos
   await new Promise((resolve) => setTimeout(() => resolve(undefined), 2000))
 

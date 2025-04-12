@@ -15,7 +15,7 @@ const clientNavigationLinks: NavigationItem[] = [
     link: '/reservas',
   },
   {
-    label: 'Fazer reserva',
+    label: 'Efetuar reserva',
     link: '/voos',
   },
   {
@@ -48,7 +48,7 @@ function handleLogout() {
 </script>
 
 <template>
-  <header class="flex justify-end p-4 rounded-xl fixed w-full">
+  <header class="flex justify-end p-4 rounded-xl fixed w-full bg-background shadow-md">
     <ul class="ml-auto flex gap-4">
       <li
         v-for="navigation in authStore.user?.isManager

@@ -9,6 +9,13 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import { useToast } from '@/components/ui/toast'
 import { Button } from '@/components/ui/button'
 import PerformFlightDialog from '@/views/Manager/components/PerformFlightDialog.vue'
@@ -24,6 +31,8 @@ const isCancelDialogOpen = ref(false)
 const isPerformDialogOpen = ref(false)
 const isRegisterFlightFormOpen = ref(false)
 const selectedFlight = ref<string>('')
+const generatedCode = ref('')
+const createdFlight = ref(false)
 const flights = ref(getFlightsInNext48Hours())
 const { toast } = useToast()
 
@@ -48,8 +57,10 @@ function handlePerformFlight(selectedFlightCode: string) {
   isPerformDialogOpen.value = true
 }
 
-function handleFlightRegistered() {
+function handleFlightRegistered(code: string) {
   flights.value = getFlightsInNext48Hours()
+  generatedCode.value = code
+  createdFlight.value = true
 }
 
 function handelCancelFlight() {
@@ -69,6 +80,28 @@ function handelCancelFlight() {
 
 <template>
   <div>
+    <Dialog
+      v-if="createdFlight"
+      :default-open="true"
+      @update:open="
+        (value) => {
+          if (!value) createdFlight = false
+        }
+      "
+    >
+      <DialogContent class="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>Código do voo</DialogTitle>
+          <DialogDescription>Código gerado unicamente para o voo cadastrado</DialogDescription>
+        </DialogHeader>
+        <div class="flex items-center space-x-2">
+          <div class="grid flex-1 gap-2">
+            <div>{{ generatedCode }}</div>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+
     <RegisterFlightDialog
       @handle-flight-registered="handleFlightRegistered"
       v-model="isRegisterFlightFormOpen"
