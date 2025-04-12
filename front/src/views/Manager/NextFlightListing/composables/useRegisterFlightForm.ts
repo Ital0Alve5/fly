@@ -20,7 +20,7 @@ const flightSchema = toTypedSchema(
       date: z.preprocess(
         (arg) => {
           if (typeof arg === 'string' || arg instanceof Date) {
-            return new Date(arg) 
+            return new Date(arg)
           }
           return arg
         },

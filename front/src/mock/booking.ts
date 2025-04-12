@@ -4,6 +4,7 @@ import type { Flight } from './flight'
 import { getTodayDate } from '@/utils/date/getTodayDate'
 import { generateUniqueCode } from '@/utils/generateRandomCode'
 import { useAuthStore } from '@/stores/auth'
+import { useMilesStore } from '@/stores/miles'
 
 export const booking: Ref<Reserve[]> = ref([
   {
@@ -180,12 +181,15 @@ export async function searchReserves(code: string): Promise<Reserve[]> {
 }
 
 export async function cancelReservation(reservationid: number) {
+  const milesStore = useMilesStore()
+
   if (!reservationid) return
 
   const reservation = booking.value.find((r) => r.id === reservationid)
 
   if (reservation) {
     reservation.status = 'CANCELADA'
+    milesStore.setTotalMiles(milesStore.totalMiles + reservation.miles)
   } else {
     console.log(`Reserva com ID ${reservationid} não encontrada.`)
   }
