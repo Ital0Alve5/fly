@@ -5,6 +5,7 @@ import { getTodayDate } from '@/utils/date/getTodayDate'
 import { generateUniqueCode } from '@/utils/generateRandomCode'
 import { useAuthStore } from '@/stores/auth'
 import { useMilesStore } from '@/stores/miles'
+import { registerExtract, type ExtractItem } from './extract'
 
 export const booking: Ref<Reserve[]> = ref([
   {
@@ -78,6 +79,7 @@ export async function searchReservesByFlightCode(code: string): Promise<Reserve[
 
 export async function cancelReservation(reservationid: number) {
   const milesStore = useMilesStore()
+  const authStore = useAuthStore()
 
   if (!reservationid) return
 
@@ -86,6 +88,21 @@ export async function cancelReservation(reservationid: number) {
   if (reservation) {
     reservation.status = 'CANCELADA'
     milesStore.setTotalMiles(milesStore.totalMiles + reservation.miles)
+
+    const newExtract: ExtractItem = {
+      userId: authStore.user?.userId || 0,
+      date: getTodayDate(),
+      reservationCode: null,
+      value: (milesStore.pricePerMile * reservation.miles).toLocaleString('pt-BR', {
+        style: 'currency',
+        currency: 'BRL',
+      }),
+      miles: reservation.miles,
+      description: 'DEVOLUÇÃO DE MILHAS',
+      type: 'ENTRADA',
+    }
+
+    registerExtract(newExtract)
   } else {
     console.log(`Reserva com ID ${reservationid} não encontrada.`)
   }
