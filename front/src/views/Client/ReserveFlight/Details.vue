@@ -85,7 +85,7 @@ async function handleReserveFlight() {
 
     <div class="min-h-screen flex flex-col items-center justify-center p-20">
       <strong class="w-full max-w-[1000px] text-left mb-4 text-xl">
-        Suas milhas restantes: {{ milesStore.totalMiles - miles }}
+        Suas milhas restantes: {{ milesStore.totalMiles }}
       </strong>
 
       <ResizablePanelGroup

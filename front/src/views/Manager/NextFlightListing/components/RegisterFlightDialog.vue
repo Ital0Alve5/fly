@@ -24,6 +24,7 @@ import { useRegisterFlightForm } from '../composables/useRegisterFlightForm'
 import { extractPriceValue } from '@/utils/currency/extractPriceValue'
 import { currencyMask } from '@/utils/currency/inputMask'
 import { registerFlight } from '@/mock/flight'
+import { generateFlightCode } from '@/utils/generateFlightCode'
 
 defineProps<{
   modelValue: boolean
@@ -32,7 +33,7 @@ defineProps<{
 const emit = defineEmits(['update:modelValue', 'handleFlightRegistered'])
 
 const globalStore = useGlobalStore()
-const { handleSubmit, code, originAirport, destinationAirport, seatsNumber, priceField, date } =
+const { handleSubmit, originAirport, destinationAirport, seatsNumber, priceField, date } =
   useRegisterFlightForm()
 const loading = ref(false)
 
@@ -72,8 +73,11 @@ const onSubmit = handleSubmit(async (data) => {
     }
 
     loading.value = true
+
+    const generatedCode = generateFlightCode()
     await registerFlight({
       ...data,
+      code: generatedCode,
       price: price.value,
     })
 
@@ -84,7 +88,7 @@ const onSubmit = handleSubmit(async (data) => {
     })
 
     emit('update:modelValue', false)
-    emit('handleFlightRegistered')
+    emit('handleFlightRegistered', generatedCode)
   } catch (err) {
     globalStore.setNotification({
       title: 'Erro ao cadastrar voo!',
@@ -106,16 +110,6 @@ const onSubmit = handleSubmit(async (data) => {
         <DialogDescription>Insira as informações do voo a ser cadastrado. </DialogDescription>
       </DialogHeader>
       <form @submit.prevent="onSubmit" class="flex flex-col gap-3">
-        <FormField name="code" v-slot="{ componentField }">
-          <FormItem>
-            <FormLabel>Código do Voo</FormLabel>
-            <FormControl>
-              <Input mask="TADS####" v-bind="componentField" type="text" placeholder="TADS0000" />
-            </FormControl>
-            <FormMessage>{{ code.errorMessage.value }}</FormMessage>
-          </FormItem>
-        </FormField>
-
         <FormField name="date" v-slot="{ componentField }">
           <FormItem>
             <FormLabel>Data da viagem</FormLabel>
