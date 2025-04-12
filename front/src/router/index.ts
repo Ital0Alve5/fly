@@ -5,7 +5,7 @@ import Search from '@/views/Client/FlightListing/Search.vue'
 import BuyMiles from '@/views/Client/BuyMiles/index.vue'
 import Details from '@/views/Client/ReserveFlight/Details.vue'
 import Next from '@/views/Client/FlightsNext/Next.vue'
-import EmployersListing from '@/views/Manager/EmployersListing/index.vue'
+import EmployeesListing from '@/views/Manager/EmployeesListing/index.vue'
 
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
@@ -74,7 +74,7 @@ const router = createRouter({
         {
           path: '/todos-funcionarios',
           name: 'todosFuncionarios',
-          component: EmployersListing,
+          component: EmployeesListing,
           meta: { requiresAuth: true },
         },
       ],
