@@ -13,7 +13,7 @@ import {
 import { useRouter } from 'vue-router'
 import { useMilesStore } from '@/stores/miles'
 import CancelReservationDialog from '@/components/dialogs/CancelReservationDialog.vue'
-import { getBooking } from '@/mock/booking'
+import { getBookingByUserId } from '@/mock/booking'
 import CheckReservationDialog from './components/CheckReservationDialog.vue'
 import type { Reserve } from '@/types/Reserve'
 
@@ -22,7 +22,7 @@ const milesStore = useMilesStore()
 const booking = ref<Reserve[]>([])
 
 onMounted(async () => {
-  booking.value = await getBooking()
+  booking.value = await getBookingByUserId()
 })
 
 const viewReservation = async (id: number) => {

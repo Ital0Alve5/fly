@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import {
@@ -29,6 +29,15 @@ const checkin = (reserve: Reserve) => {
 
 const selectedReservationId = ref<number | null>(null)
 const isCancelDialogOpen = ref(false)
+const flights = ref<Reserve[]>([])
+
+onMounted(async () => {
+  setFlights()
+})
+
+async function setFlights() {
+  flights.value = await getCheckInFlightsInNext48Hrs()
+}
 
 function handleCancelFlight(selectedReservation: number) {
   isCancelDialogOpen.value = true
@@ -56,7 +65,7 @@ function handleCancelFlight(selectedReservation: number) {
               </TableRow>
             </TableHeader>
             <TableBody>
-              <template v-for="reserve in getCheckInFlightsInNext48Hrs()" :key="reserve.id">
+              <template v-for="reserve in flights" :key="reserve.id">
                 <TableRow>
                   <TableCell class="text-center px-6 py-4 text-lg">{{
                     reserve.dateTimeF

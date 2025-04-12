@@ -8,7 +8,7 @@ import {
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { performFlight, getFlightByCode } from '@/mock/flight'
-import { searchReserves, updateReservationStatus } from '@/mock/booking'
+import { searchReservesByFlightCode, updateReservationStatus } from '@/mock/booking'
 import { useToast } from '@/components/ui/toast'
 import type { Reserve } from '@/types/Reserve'
 
@@ -29,20 +29,22 @@ const handleConfirmPerformance = async () => {
 
     performFlight(props.selectedFlightCode)
 
-    const reservations = await searchReserves(props.selectedFlightCode)
+    console.log(props.selectedFlightCode)
 
-    await Promise.all(
-      reservations.map((reserve) => {
-        const newStatus: Reserve['status'] =
-          reserve.status === 'EMBARCADA' ? 'REALIZADA' : 'NÃO REALIZADA'
+    const reservations = await searchReservesByFlightCode(props.selectedFlightCode)
 
-        return updateReservationStatus(reserve.id, newStatus)
-      }),
-    )
+    console.log(reservations)
+
+    reservations.forEach(async (reservation) => {
+      const newStatus: Reserve['status'] =
+        reservation.status === 'EMBARCADA' ? 'REALIZADA' : 'NÃO REALIZADA'
+
+      await updateReservationStatus(reservation.reservationCode, newStatus)
+    })
 
     toast({
       title: 'Operação concluída com sucesso',
-      description: `Voo ${flight.code} marcado como realizado. 
+      description: `Voo ${flight.code} marcado como realizado.
                    ${reservations.length} reservas atualizadas.`,
       variant: 'default',
       duration: 1000,
@@ -73,10 +75,7 @@ const handleOpenChange = (open: boolean) => {
         <DialogDescription>
           Esta ação irá:
           <ul class="list-disc pl-5 mt-2 space-y-1">
-            <li>
-              Marcar o voo <strong>{{ selectedFlightCode }}</strong> como REALIZADO.
-            </li>
-            <li>Atualizar todas as reservas associadas.</li>
+            <li>Atualizar o status da reserva aplicada.</li>
           </ul>
         </DialogDescription>
       </DialogHeader>

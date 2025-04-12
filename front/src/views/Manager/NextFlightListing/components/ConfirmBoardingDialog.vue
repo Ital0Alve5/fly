@@ -45,7 +45,7 @@ const handleConfirmBoarding = async () => {
       throw new Error('Digite o código da reserva.')
     }
 
-    const reservation = getReservationByCode(reservationCode.value)
+    const reservation = await getReservationByCode(reservationCode.value)
 
     if (!reservation) {
       throw new Error('Reserva não encontrada.')
@@ -59,7 +59,7 @@ const handleConfirmBoarding = async () => {
       throw new Error('A reserva não está no estado CHECK-IN.')
     }
 
-    await updateReservationStatus(reservation.id, 'EMBARCADA')
+    await updateReservationStatus(reservation.reservationCode, 'EMBARCADA')
 
     toast({
       title: 'Embarque confirmado',
@@ -94,10 +94,7 @@ const handleOpenChange = (open: boolean) => {
         <DialogDescription>
           Esta ação irá:
           <ul class="list-disc pl-5 mt-2 space-y-1">
-            <li>
-              Marcar a reserva como <strong>EMBARCADA</strong> se o check-in do voo
-              <strong>{{ selectedFlightCode }}</strong> estiver feito.
-            </li>
+            <li>Marcar a reserva como <strong>EMBARCADA</strong> se o check-in estiver feito.</li>
           </ul>
         </DialogDescription>
       </DialogHeader>

@@ -133,7 +133,10 @@ function handelCancelFlight() {
             <TableCell>{{ flight.destinationAirport }}</TableCell>
             <TableCell>{{ flight.status }}</TableCell>
             <TableCell class="w-[200px]">
-              <Button class="bg-green bg-green-500" @click="handleConfirmBoarding(flight.code)"
+              <Button
+                v-if="(flight.status !== 'REALIZADO') | 'CANCELADO'"
+                class="bg-green bg-green-500"
+                @click="handleConfirmBoarding(flight.code)"
                 >Confirmar embarque</Button
               >
             </TableCell>
