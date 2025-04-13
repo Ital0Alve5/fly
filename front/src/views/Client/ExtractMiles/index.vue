@@ -28,16 +28,16 @@ import {
 import { ArrowUpDown } from 'lucide-vue-next'
 import { h, ref } from 'vue'
 import { useAuthStore } from '@/stores/auth'
-import { getExtractByUserId, type ExtractItem } from '@/mock/extract'
+import { getExtractByUserCode, type ExtractItem } from '@/mock/extract'
 
 const authtore = useAuthStore()
 
-const userId = computed(() => authtore.user?.userId)
+const userCode = computed(() => authtore.user?.usuario.codigo)
 const data = ref<ExtractItem[]>([])
 
 watchEffect(() => {
-  if (userId.value) {
-    const extractedData = getExtractByUserId(userId.value)
+  if (userCode.value) {
+    const extractedData = getExtractByUserCode(userCode.value)
     data.value = extractedData
   } else {
     data.value = []
@@ -46,7 +46,7 @@ watchEffect(() => {
 
 const columns: ColumnDef<ExtractItem>[] = [
   {
-    accessorKey: 'date',
+    accessorKey: 'data',
     header: ({ column }) => {
       return h(
         Button,
@@ -57,11 +57,10 @@ const columns: ColumnDef<ExtractItem>[] = [
         () => ['Data', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })],
       )
     },
-    cell: ({ row }) => h('div', row.getValue('date')),
+    cell: ({ row }) => h('div', row.getValue('data')),
     sortingFn: (rowA, rowB, columnId) => {
       const dateTimeA = rowA.getValue(columnId) as string
       const dateTimeB = rowB.getValue(columnId) as string
-
       const [dateA, timeA] = dateTimeA.split(' ')
       const [dateB, timeB] = dateTimeB.split(' ')
 
@@ -90,12 +89,12 @@ const columns: ColumnDef<ExtractItem>[] = [
     },
   },
   {
-    accessorKey: 'reservationCode',
+    accessorKey: 'codigo_reserva',
     header: 'Código de reserva',
-    cell: ({ row }) => h('div', row.getValue('reservationCode')),
+    cell: ({ row }) => h('div', row.getValue('codigo_reserva')),
   },
   {
-    accessorKey: 'value',
+    accessorKey: 'valor_reais',
     header: ({ column }) => {
       return h(
         Button,
@@ -106,7 +105,7 @@ const columns: ColumnDef<ExtractItem>[] = [
         () => ['Valor', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })],
       )
     },
-    cell: ({ row }) => h('div', row.getValue('value')),
+    cell: ({ row }) => h('div', row.getValue('valor_reais')),
     sortingFn: (rowA, rowB, columnId) => {
       const extractNumber = (value: string) => {
         const cleaned = value.replace('R$', '').replace(/\./g, '').replace(',', '.')
@@ -120,7 +119,7 @@ const columns: ColumnDef<ExtractItem>[] = [
     },
   },
   {
-    accessorKey: 'miles',
+    accessorKey: 'quantidade_milhas',
     header: ({ column }) => {
       return h(
         Button,
@@ -131,17 +130,17 @@ const columns: ColumnDef<ExtractItem>[] = [
         () => ['Milhas', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })],
       )
     },
-    cell: ({ row }) => h('div', row.getValue('miles')),
+    cell: ({ row }) => h('div', row.getValue('quantidade_milhas')),
   },
   {
-    accessorKey: 'description',
+    accessorKey: 'descricao',
     header: 'Descrição',
-    cell: ({ row }) => h('div', row.getValue('description')),
+    cell: ({ row }) => h('div', row.getValue('descricao')),
   },
   {
-    accessorKey: 'type',
+    accessorKey: 'tipo',
     header: 'Tipo',
-    cell: ({ row }) => h('div', row.getValue('type')),
+    cell: ({ row }) => h('div', row.getValue('tipo')),
   },
 ]
 
@@ -166,7 +165,7 @@ const table = computed(() =>
     initialState: {
       sorting: [
         {
-          id: 'date',
+          id: 'data',
           desc: true,
         },
       ],

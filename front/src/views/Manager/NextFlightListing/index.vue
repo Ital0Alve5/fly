@@ -18,7 +18,7 @@ import {
 } from '@/components/ui/dialog'
 import { useToast } from '@/components/ui/toast'
 import { Button } from '@/components/ui/button'
-import PerformFlightDialog from '@/views/Manager/components/PerformFlightDialog.vue'
+import PerformFlightDialog from './components/PerformFlightDialog.vue'
 import RegisterFlightDialog from './components/RegisterFlightDialog.vue'
 import { getFlightsInNext48Hours, cancelFlight } from '@/mock/flight'
 import { cancelReservationByFlightCode } from '@/mock/booking'
@@ -125,34 +125,34 @@ function handelCancelFlight() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          <TableRow v-for="flight in flights" :key="flight.code">
+          <TableRow v-for="flight in flights" :key="flight.codigo">
             <TableCell>
-              {{ flight.dateTime }}
+              {{ flight.data }}
             </TableCell>
-            <TableCell> {{ flight.originAirport }} </TableCell>
-            <TableCell>{{ flight.destinationAirport }}</TableCell>
-            <TableCell>{{ flight.status }}</TableCell>
+            <TableCell> {{ flight.aeroporto_origem.codigo }} </TableCell>
+            <TableCell>{{ flight.aeroporto_destino.codigo }}</TableCell>
+            <TableCell>{{ flight.estado }}</TableCell>
             <TableCell class="w-[200px]">
               <Button
-                v-if="(flight.status !== 'REALIZADO') | 'CANCELADO'"
+                v-if="flight.estado === 'CONFIRMADO'"
                 class="bg-green bg-green-500"
-                @click="handleConfirmBoarding(flight.code)"
+                @click="handleConfirmBoarding(flight.codigo)"
                 >Confirmar embarque</Button
               >
             </TableCell>
             <TableCell class="w-[150px]">
               <Button
-                v-if="flight.status === 'CONFIRMADO'"
+                v-if="flight.estado === 'CONFIRMADO'"
                 variant="destructive"
-                @click="handleCancelFlightDialog(flight.code)"
+                @click="handleCancelFlightDialog(flight.codigo)"
               >
                 Cancelar voo
               </Button>
             </TableCell>
             <TableCell class="w-[150px]">
               <Button
-                v-if="flight.status === 'CONFIRMADO'"
-                @click="handlePerformFlight(flight.code)"
+                v-if="flight.estado === 'CONFIRMADO'"
+                @click="handlePerformFlight(flight.codigo)"
               >
                 Realizar Voo
               </Button>

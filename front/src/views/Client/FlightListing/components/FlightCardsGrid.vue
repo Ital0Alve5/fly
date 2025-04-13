@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import Skeleton from '@/components/ui/skeleton/Skeleton.vue'
-import type { Flight } from '@/mock/flight'
+import type { Flight } from '@/types/Flight'
 
 defineProps<{
   flights: Flight[]

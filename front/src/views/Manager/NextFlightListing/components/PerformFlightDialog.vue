@@ -23,28 +23,25 @@ const { toast } = useToast()
 const handleConfirmPerformance = async () => {
   try {
     const flight = getFlightByCode(props.selectedFlightCode)
+
     if (!flight) {
       throw new Error('Voo não encontrado')
     }
 
     performFlight(props.selectedFlightCode)
 
-    console.log(props.selectedFlightCode)
-
     const reservations = await searchReservesByFlightCode(props.selectedFlightCode)
 
-    console.log(reservations)
-
     reservations.forEach(async (reservation) => {
-      const newStatus: Reserve['status'] =
-        reservation.status === 'EMBARCADA' ? 'REALIZADA' : 'NÃO REALIZADA'
+      const newStatus: Reserve['estado'] =
+        reservation.estado === 'EMBARCADA' ? 'REALIZADA' : 'NÃO REALIZADA'
 
-      await updateReservationStatus(reservation.reservationCode, newStatus)
+      await updateReservationStatus(reservation.codigo, newStatus)
     })
 
     toast({
       title: 'Operação concluída com sucesso',
-      description: `Voo ${flight.code} marcado como realizado.
+      description: `Voo ${flight.codigo} marcado como realizado.
                    ${reservations.length} reservas atualizadas.`,
       variant: 'default',
       duration: 1000,

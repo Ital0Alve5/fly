@@ -1,31 +1,30 @@
-import type { AuthenticatedUserData } from '@/types/Auth/AuthenticatedUserData'
+import type { Client } from '@/types/Auth/AuthenticatedUserData'
 import { ref } from 'vue'
 
-type ClientData = AuthenticatedUserData & {
-  cpf: string
-  cep: string
-  password: string
-  miles: number
-}
-
-const registeredClients = ref<ClientData[]>([
+const registeredClients = ref<Client[]>([
   {
-    userId: 1,
-    name: 'Heitor Plinta Pagodeiro',
+    codigo: 1,
+    nome: 'Heitor Plinta Pagodeiro',
     email: 'heitor@gmail.com',
     cpf: '123.456.789-00',
-    cep: '01001-000',
-    isManager: false,
-    password: '1234',
-    miles: 0,
+    saldo_milhas: 0,
+    endereco: {
+      cep: 'teste',
+      uf: 'teste',
+      cidade: 'teste',
+      bairro: 'teste',
+      rua: 'teste',
+      numero: 'teste',
+      complemento: 'teste',
+    },
   },
 ])
 
-export function getClientByEmail(email: string): ClientData | null {
+export function getClientByEmail(email: string): Client | null {
   return registeredClients.value.find((client) => client.email === email) || null
 }
 
-export function registerClient(newClient: ClientData): void {
+export function registerClient(newClient: Client): void {
   if (getClientByEmail(newClient.email)) {
     throw new Error('E-mail já cadastrado como cliente.')
   }

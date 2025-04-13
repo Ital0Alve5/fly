@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button'
 import { useToast } from '@/components/ui/toast'
 import { Input } from '@/components/ui/input'
 
-import { getReservationByCode, updateReservationStatus } from '@/mock/booking'
+import { getReservationByCodeAndFlightCode, updateReservationStatus } from '@/mock/booking'
 import { getFlightByCode } from '@/mock/flight'
 
 const props = defineProps<{
@@ -45,25 +45,28 @@ const handleConfirmBoarding = async () => {
       throw new Error('Digite o código da reserva.')
     }
 
-    const reservation = await getReservationByCode(reservationCode.value)
+    const reservation = await getReservationByCodeAndFlightCode(
+      reservationCode.value,
+      props.selectedFlightCode,
+    )
 
     if (!reservation) {
       throw new Error('Reserva não encontrada.')
     }
 
-    if (!getFlightByCode(reservation.flightCode)) {
+    if (!getFlightByCode(reservation.voo.codigo)) {
       throw new Error('Esta reserva não pertence a este voo.')
     }
 
-    if (reservation.status !== 'CHECK-IN') {
+    if (reservation.estado !== 'CHECK-IN') {
       throw new Error('A reserva não está no estado CHECK-IN.')
     }
 
-    await updateReservationStatus(reservation.reservationCode, 'EMBARCADA')
+    await updateReservationStatus(reservation.codigo, 'EMBARCADA')
 
     toast({
       title: 'Embarque confirmado',
-      description: `Reserva ${reservation.reservationCode} marcada como EMBARCADA.`,
+      description: `Reserva ${reservation.codigo} marcada como EMBARCADA.`,
       variant: 'default',
       duration: 1000,
     })

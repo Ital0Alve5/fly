@@ -86,8 +86,11 @@ router.beforeEach((to) => {
 
   if (
     (!authStore.user && to.meta.requiresAuth) ||
-    (authStore.user && !authStore.user.isManager && to.meta.isManager) ||
-    (authStore.user && authStore.user.isManager && !to.meta.isManager && to.name !== 'auth')
+    (authStore.user && authStore.user.tipo !== 'FUNCIONARIO' && to.meta.isManager) ||
+    (authStore.user &&
+      authStore.user.tipo === 'FUNCIONARIO' &&
+      !to.meta.isManager &&
+      to.name !== 'auth')
   ) {
     return { name: 'auth' }
   }

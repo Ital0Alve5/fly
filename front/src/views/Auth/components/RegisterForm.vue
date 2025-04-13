@@ -16,6 +16,7 @@ import {
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import type { Client } from '@/types/Auth/AuthenticatedUserData'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -23,28 +24,32 @@ const globalStore = useGlobalStore()
 
 const { handleSubmit, name, registerEmail, cpf, cep } = useRegisterForm()
 
-const { street, neighborhood, city, state } = useAddressByCep(cep.value)
+const { street, neighborhood, city, state, number, complement } = useAddressByCep(cep.value)
 
 const onSubmit = handleSubmit(async (values) => {
-  const newUserData = {
-    name: values.name,
+  const newUserData: Client = {
+    codigo: Date.now(),
+    nome: values.name,
     email: values.registerEmail,
     cpf: values.cpf,
-    cep: values.cep,
-    street: street.value,
-    neighborhood: neighborhood.value,
-    city: city.value,
-    state: state.value,
+    saldo_milhas: 0,
+    endereco: {
+      cep: values.cep,
+      rua: street.value,
+      bairro: neighborhood.value,
+      cidade: city.value,
+      uf: state.value,
+      complemento: complement.value,
+      numero: number.value,
+    },
   }
 
   await authStore.register(newUserData)
-
   globalStore.setNotification({
     title: 'Cadastro realizado!',
     description: 'Verifique seu e-mail para a senha',
     variant: 'default',
   })
-
   router.push('/reservas')
 })
 </script>
@@ -98,12 +103,20 @@ const onSubmit = handleSubmit(async (values) => {
           </FormItem>
         </FormField>
 
-        <FormItem>
-          <FormLabel>Rua</FormLabel>
-          <FormControl>
-            <Input v-model="street" type="text" disabled />
-          </FormControl>
-        </FormItem>
+        <div class="flex justify-between">
+          <FormItem>
+            <FormLabel>Rua</FormLabel>
+            <FormControl>
+              <Input v-model="street" type="text" disabled />
+            </FormControl>
+          </FormItem>
+          <FormItem class="max-w-20">
+            <FormLabel>Número</FormLabel>
+            <FormControl>
+              <Input v-model="number" type="number" />
+            </FormControl>
+          </FormItem>
+        </div>
 
         <FormItem>
           <FormLabel>Bairro</FormLabel>
@@ -111,18 +124,26 @@ const onSubmit = handleSubmit(async (values) => {
             <Input v-model="neighborhood" type="text" disabled />
           </FormControl>
         </FormItem>
+        <div class="flex justify-between">
+          <FormItem>
+            <FormLabel>Cidade</FormLabel>
+            <FormControl>
+              <Input v-model="city" type="text" disabled />
+            </FormControl>
+          </FormItem>
+
+          <FormItem class="max-w-20">
+            <FormLabel>Estado</FormLabel>
+            <FormControl>
+              <Input v-model="state" type="text" disabled />
+            </FormControl>
+          </FormItem>
+        </div>
 
         <FormItem>
-          <FormLabel>Cidade</FormLabel>
+          <FormLabel>Complemento</FormLabel>
           <FormControl>
-            <Input v-model="city" type="text" disabled />
-          </FormControl>
-        </FormItem>
-
-        <FormItem>
-          <FormLabel>Estado</FormLabel>
-          <FormControl>
-            <Input v-model="state" type="text" disabled />
+            <Input v-model="complement" type="text" />
           </FormControl>
         </FormItem>
 

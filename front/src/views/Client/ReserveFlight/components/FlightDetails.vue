@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import type { Flight } from '@/mock/flight'
+import type { Flight } from '@/types/Flight'
 
 defineProps<{
   flight: Flight | null
@@ -17,19 +17,19 @@ defineProps<{
       <ul class="flex flex-col gap-4">
         <li class="flex gap-2">
           <b>Código do voo:</b>
-          <p>{{ flight.code }}</p>
+          <p>{{ flight.codigo }}</p>
         </li>
         <li class="flex gap-2">
           <b>Origem:</b>
-          <p>{{ flight.origin }} ({{ flight.originAirport }})</p>
+          <p>{{ flight.aeroporto_origem.cidade }} ({{ flight.aeroporto_origem.codigo }})</p>
         </li>
         <li class="flex gap-2">
           <b>Destino:</b>
-          <p>{{ flight.destination }} ({{ flight.destinationAirport }})</p>
+          <p>{{ flight.aeroporto_destino.cidade }} ({{ flight.aeroporto_destino.codigo }})</p>
         </li>
         <li class="flex gap-2">
           <b>Data e hora:</b>
-          <p>{{ flight.dateTime }}</p>
+          <p>{{ flight.data }}</p>
         </li>
       </ul>
     </CardContent>

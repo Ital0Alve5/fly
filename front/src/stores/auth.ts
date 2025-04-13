@@ -1,8 +1,9 @@
 import { defineStore } from 'pinia'
 import { useLocalStorage } from '@vueuse/core'
-import type { AuthenticatedUserData } from '@/types/Auth/AuthenticatedUserData'
+import type { AuthenticatedUserData, Client, Employee } from '@/types/Auth/AuthenticatedUserData'
 import clientsMock from '@/mock/clients'
 import employeesMock from '@/mock/employees'
+import { passwords } from '@/mock/auth'
 
 function generatedRandomPassword(): string {
   return Math.floor(1000 + Math.random() * 9000).toString()
@@ -22,48 +23,67 @@ export const useAuthStore = defineStore('auth', () => {
   })
 
   async function login(email: string, password: string): Promise<AuthenticatedUserData | null> {
-    const client = clientsMock.getClientByEmail(email)
-    const employee = employeesMock.getEmployeeByEmail(email)
+    let authenticatedUser: Client | Employee | null = null
 
-    const authenticatedUser = client || employee
-    const passwordMatches = authenticatedUser?.password === password
+    if (email.includes('@empresa.com')) {
+      authenticatedUser = employeesMock.getEmployeeByEmail(email)
 
-    if (authenticatedUser && passwordMatches) {
-      isAuthenticated.value = true
-      user.value = authenticatedUser
+      if (passwords.employee[email] === password) {
+        isAuthenticated.value = true
 
-      return authenticatedUser
+        user.value = {
+          access_token: '',
+          token_type: '',
+          tipo: 'FUNCIONARIO',
+          senha: password,
+          usuario: authenticatedUser!,
+        }
+
+        return user.value
+      }
+    } else {
+      authenticatedUser = clientsMock.getClientByEmail(email)
+
+      if (passwords.client[email] === password) {
+        isAuthenticated.value = true
+
+        user.value = {
+          access_token: '',
+          token_type: '',
+          tipo: 'CLIENTE',
+          senha: password,
+          usuario: authenticatedUser!,
+        }
+
+        return user.value
+      }
     }
 
     return null
   }
 
-  async function register(newUser: {
-    name: string
-    email: string
-    cpf: string
-    cep: string
-    isManager?: boolean
-  }): Promise<AuthenticatedUserData | null> {
-    if (!newUser.name || !newUser.email || !newUser.cpf || !newUser.cep) {
+  async function register(newUser: Client): Promise<AuthenticatedUserData | null> {
+    if (!newUser.nome || !newUser.email || !newUser.cpf || !newUser.endereco.cep) {
       throw new Error('Todos os campos são obrigatórios.')
     }
 
     const senha = generatedRandomPassword()
-    const newClient = {
-      ...newUser,
-      userId: Date.now(),
-      isManager: false,
-      password: senha,
-      miles: 0,
+
+    clientsMock.registerClient(newUser)
+
+    sendPasswordOnEmail(newUser.email, senha)
+
+    isAuthenticated.value = true
+
+    user.value = {
+      access_token: '',
+      token_type: '',
+      tipo: 'CLIENTE',
+      senha: senha,
+      usuario: newUser,
     }
 
-    clientsMock.registerClient(newClient)
-    sendPasswordOnEmail(newClient.email, senha)
-    isAuthenticated.value = true
-    user.value = newClient
-
-    return newClient
+    return user.value
   }
 
   function logout() {

@@ -131,10 +131,10 @@ const onSubmit = handleSubmit(async (data) => {
                 <SelectContent>
                   <SelectGroup>
                     <SelectItem
-                      :key="aipoirt.code"
+                      :key="aipoirt.codigo"
                       v-for="aipoirt in airpoirtsList"
-                      :value="aipoirt.code"
-                      >{{ aipoirt.code }} - {{ aipoirt.name }}
+                      :value="aipoirt.codigo"
+                      >{{ aipoirt.codigo }} - {{ aipoirt.nome }}
                     </SelectItem>
                   </SelectGroup>
                 </SelectContent>
@@ -155,10 +155,10 @@ const onSubmit = handleSubmit(async (data) => {
                 <SelectContent>
                   <SelectGroup>
                     <SelectItem
-                      :key="aipoirt.code"
+                      :key="aipoirt.codigo"
                       v-for="aipoirt in airpoirtsList"
-                      :value="aipoirt.code"
-                      >{{ aipoirt.code }} - {{ aipoirt.name }}
+                      :value="aipoirt.codigo"
+                      >{{ aipoirt.codigo }} - {{ aipoirt.nome }}
                     </SelectItem>
                   </SelectGroup>
                 </SelectContent>

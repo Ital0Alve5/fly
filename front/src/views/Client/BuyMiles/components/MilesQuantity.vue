@@ -35,13 +35,13 @@ const totalPrice = computed(() => milesStore.totalPrice)
 
 const onSubmit = async () => {
   const newExtract: ExtractItem = {
-    userId: authStore.user?.userId || 0,
-    date: getTodayDate(),
-    reservationCode: null,
-    value: totalPrice.value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
-    miles: currentCheckoutMiles.value,
-    description: 'COMPRA DE MILHAS',
-    type: 'ENTRADA',
+    codigo_cliente: authStore.user?.usuario.codigo || 0,
+    data: getTodayDate(),
+    codigo_reserva: null,
+    valor_reais: totalPrice.value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
+    quantidade_milhas: currentCheckoutMiles.value,
+    descricao: 'COMPRA DE MILHAS',
+    tipo: 'ENTRADA',
   }
 
   registerExtract(newExtract)

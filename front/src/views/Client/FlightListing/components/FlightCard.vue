@@ -1,23 +1,16 @@
 <script setup lang="ts">
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import type { Flight } from '@/types/Flight'
 import { useRouter } from 'vue-router'
 
 const props = defineProps<{
-  flight: {
-    originAirport: string
-    destinationAirport: string
-    dateTime: string
-    code: string
-    origin: string
-    destination: string
-    price: number
-  }
+  flight: Flight
 }>()
 
 const router = useRouter()
 
 function handleClickCard() {
-  router.push({ name: 'flightDetails', params: { code: props.flight.code } })
+  router.push({ name: 'flightDetails', params: { code: props.flight.codigo } })
 }
 </script>
 
@@ -27,7 +20,10 @@ function handleClickCard() {
     class="w-full max-w-md col-span-3 cursor-pointer hover:opacity-80 transition-opacity"
   >
     <CardHeader>
-      <CardTitle>Voo de {{ flight.originAirport }} à {{ flight.destinationAirport }}</CardTitle>
+      <CardTitle
+        >Voo de {{ flight.aeroporto_origem.codigo }} à
+        {{ flight.aeroporto_destino.codigo }}</CardTitle
+      >
       <CardDescription>Informações do vôo:</CardDescription>
     </CardHeader>
     <CardContent>
@@ -35,19 +31,19 @@ function handleClickCard() {
         <ul class="space-y-2">
           <li class="flex gap-2">
             <b>Data:</b>
-            <p>{{ flight.dateTime }}</p>
+            <p>{{ flight.data }}</p>
           </li>
           <li class="flex gap-2">
             <b>Código:</b>
-            <p>{{ flight.code }}</p>
+            <p>{{ flight.codigo }}</p>
           </li>
           <li class="flex gap-2">
             <b>Origem:</b>
-            <p>{{ flight.origin }}</p>
+            <p>{{ flight.aeroporto_origem.cidade }}</p>
           </li>
           <li class="flex gap-2">
             <b>Destino:</b>
-            <p>{{ flight.destination }}</p>
+            <p>{{ flight.aeroporto_destino.cidade }}</p>
           </li>
         </ul>
       </section>

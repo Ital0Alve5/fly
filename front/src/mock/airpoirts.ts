@@ -1,44 +1,49 @@
 import type { Airport } from '@/types/Airpoirt'
 
 export const aipoirts: Airport[] = [
-  { code: 'GRU', name: 'São Paulo/Guarulhos International Airport', city: 'São Paulo', uf: 'SP' },
-  { code: 'JFK', name: 'John F. Kennedy International Airport', city: 'New York', uf: 'NY' },
-  { code: 'CDG', name: 'Charles de Gaulle Airport', city: 'Paris', uf: 'N/A' },
-  { code: 'LAX', name: 'Los Angeles International Airport', city: 'Los Angeles', uf: 'CA' },
-  { code: 'LHR', name: 'Heathrow Airport', city: 'London', uf: 'N/A' },
-  { code: 'MEX', name: 'Mexico City International Airport', city: 'Mexico City', uf: 'N/A' },
-  { code: 'MAD', name: 'Adolfo Suárez Madrid–Barajas Airport', city: 'Madrid', uf: 'N/A' },
-  { code: 'NRT', name: 'Narita International Airport', city: 'Tokyo', uf: 'N/A' },
-  { code: 'FRA', name: 'Frankfurt Airport', city: 'Frankfurt', uf: 'N/A' },
-  { code: 'MIA', name: 'Miami International Airport', city: 'Miami', uf: 'FL' },
   {
-    code: 'GIG',
-    name: 'Rio de Janeiro/Galeão International Airport',
-    city: 'Rio de Janeiro',
+    codigo: 'GRU',
+    nome: 'São Paulo/Guarulhos International Airport',
+    cidade: 'São Paulo',
+    uf: 'SP',
+  },
+  { codigo: 'JFK', nome: 'John F. Kennedy International Airport', cidade: 'New York', uf: 'NY' },
+  { codigo: 'CDG', nome: 'Charles de Gaulle Airport', cidade: 'Paris', uf: 'N/A' },
+  { codigo: 'LAX', nome: 'Los Angeles International Airport', cidade: 'Los Angeles', uf: 'CA' },
+  { codigo: 'LHR', nome: 'Heathrow Airport', cidade: 'London', uf: 'N/A' },
+  { codigo: 'MEX', nome: 'Mexico City International Airport', cidade: 'Mexico City', uf: 'N/A' },
+  { codigo: 'MAD', nome: 'Adolfo Suárez Madrid–Barajas Airport', cidade: 'Madrid', uf: 'N/A' },
+  { codigo: 'NRT', nome: 'Narita International Airport', cidade: 'Tokyo', uf: 'N/A' },
+  { codigo: 'FRA', nome: 'Frankfurt Airport', cidade: 'Frankfurt', uf: 'N/A' },
+  { codigo: 'MIA', nome: 'Miami International Airport', cidade: 'Miami', uf: 'FL' },
+  {
+    codigo: 'GIG',
+    nome: 'Rio de Janeiro/Galeão International Airport',
+    cidade: 'Rio de Janeiro',
     uf: 'RJ',
   },
   {
-    code: 'BSB',
-    name: 'Presidente Juscelino Kubitschek International Airport',
-    city: 'Brasília',
+    codigo: 'BSB',
+    nome: 'Presidente Juscelino Kubitschek International Airport',
+    cidade: 'Brasília',
     uf: 'DF',
   },
-  { code: 'LIS', name: 'Humberto Delgado Airport', city: 'Lisboa', uf: 'N/A' },
-  { code: 'SDU', name: 'Santos Dumont Airport', city: 'Rio de Janeiro', uf: 'RJ' },
-  { code: 'CWB', name: 'Afonso Pena International Airport', city: 'Curitiba', uf: 'PR' },
-  { code: 'MAO', name: 'Eduardo Gomes International Airport', city: 'Manaus', uf: 'AM' },
-  { code: 'CGH', name: 'Congonhas Airport', city: 'São Paulo', uf: 'SP' },
-  { code: 'REC', name: 'Guararapes International Airport', city: 'Recife', uf: 'PE' },
+  { codigo: 'LIS', nome: 'Humberto Delgado Airport', cidade: 'Lisboa', uf: 'N/A' },
+  { codigo: 'SDU', nome: 'Santos Dumont Airport', cidade: 'Rio de Janeiro', uf: 'RJ' },
+  { codigo: 'CWB', nome: 'Afonso Pena International Airport', cidade: 'Curitiba', uf: 'PR' },
+  { codigo: 'MAO', nome: 'Eduardo Gomes International Airport', cidade: 'Manaus', uf: 'AM' },
+  { codigo: 'CGH', nome: 'Congonhas Airport', cidade: 'São Paulo', uf: 'SP' },
+  { codigo: 'REC', nome: 'Guararapes International Airport', cidade: 'Recife', uf: 'PE' },
   {
-    code: 'FOR',
-    name: 'Pinto Martins – Fortaleza International Airport',
-    city: 'Fortaleza',
+    codigo: 'FOR',
+    nome: 'Pinto Martins – Fortaleza International Airport',
+    cidade: 'Fortaleza',
     uf: 'CE',
   },
   {
-    code: 'EZE',
-    name: 'Ministro Pistarini International Airport',
-    city: 'Buenos Aires',
+    codigo: 'EZE',
+    nome: 'Ministro Pistarini International Airport',
+    cidade: 'Buenos Aires',
     uf: 'N/A',
   },
 ]
@@ -47,14 +52,14 @@ export async function loadAllAirpoirts() {
   return aipoirts
 }
 
-export function loadCityByAirpoirt(code: string): string {
-  const airpoirt = aipoirts.find((a) => a.code === code)
+export function loadCityByAirpoirt(codigo: string): string {
+  const airpoirt = aipoirts.find((a) => a.codigo === codigo)
 
   if (!airpoirt) {
     throw new Error('Cidade não encontrada')
   }
 
-  return airpoirt.city
+  return airpoirt.cidade
 }
 
 export default { loadAllAirpoirts, loadCityByAirpoirt }
