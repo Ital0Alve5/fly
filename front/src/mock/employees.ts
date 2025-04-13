@@ -29,4 +29,10 @@ export function registerEmployee(newEmployee: Employee): void {
   registeredEmployees.value.push(newEmployee)
 }
 
-export default { registeredEmployees, registerEmployee, getEmployeeByEmail }
+export async function deleteEmployee(employee: Employee) {
+  registeredEmployees.value = registeredEmployees.value.filter(
+    (emp) => emp.codigo !== employee.codigo,
+  )
+}
+
+export default { registeredEmployees, registerEmployee, getEmployeeByEmail, deleteEmployee }
