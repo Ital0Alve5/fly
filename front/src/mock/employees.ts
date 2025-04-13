@@ -1,40 +1,28 @@
-import type { AuthenticatedUserData } from '@/types/Auth/AuthenticatedUserData'
+import type { Employee } from '@/types/Auth/Employee'
 import { ref } from 'vue'
 
-type EmployeeData = AuthenticatedUserData & {
-  password: string
-  cpf: string
-  phone: string
-}
-
-const registeredEmployees = ref<EmployeeData[]>([
+const registeredEmployees = ref<Employee[]>([
   {
-    userId: 11,
-    miles: 0,
-    name: 'Ítalo Zedelinski',
+    codigo: 11,
+    nome: 'Ítalo Zedelinski',
     email: 'italo@empresa.com',
-    isManager: true,
-    password: '1234',
     cpf: '123.456.789-10',
-    phone: '(81) 99999-9999',
+    telefone: '(81) 99999-9999',
   },
   {
-    userId: 12,
-    miles: 0,
-    name: 'Jully Juju',
+    codigo: 12,
+    nome: 'Jully Juju',
     email: 'jully@empresa.com',
-    isManager: false,
-    password: '1234',
     cpf: '111.222.333-44',
-    phone: '(41) 99999-9999',
+    telefone: '(41) 99999-9999',
   },
 ])
 
-export function getEmployeeByEmail(email: string): EmployeeData | null {
+export function getEmployeeByEmail(email: string): Employee | null {
   return registeredEmployees.value.find((employee) => employee.email === email) || null
 }
 
-export function registerEmployee(newEmployee: EmployeeData): void {
+export function registerEmployee(newEmployee: Employee): void {
   if (getEmployeeByEmail(newEmployee.email)) {
     throw new Error('E-mail já cadastrado como funcionário.')
   }
