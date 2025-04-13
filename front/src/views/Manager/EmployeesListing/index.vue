@@ -14,6 +14,7 @@ import UpdateEmployeeDialog from './components/UpdateEmployeeDialog.vue'
 import employeeService from '@/mock/employees'
 import type { Employee } from '@/types/Auth/AuthenticatedUserData'
 
+
 const employees = computed(() =>
   employeeService.registeredEmployees.value.slice().sort((a, b) => a.nome.localeCompare(b.nome)),
 )
@@ -27,7 +28,9 @@ function editEmployee(employee: Employee) {
   selectedEmployee.value = employee
 }
 
-function deleteEmployee() {}
+async function handleDeleteEmployee(employee: Employee) {
+  await employeeService.deleteEmployee(employee)
+}
 </script>
 
 <template>
@@ -58,8 +61,8 @@ function deleteEmployee() {}
             <Button size="icon" variant="secondary" @click="editEmployee(employee)">
               <Pencil class="h-4 w-4" />
             </Button>
-            <Button size="icon" variant="destructive" @click="deleteEmployee()">
-              <Trash2 class="h-4 w-4" />
+            <Button size="icon" variant="destructive" @click="handleDeleteEmployee(employee)">
+             <Trash2 class="h-4 w-4" />
             </Button>
           </TableCell>
         </TableRow>
