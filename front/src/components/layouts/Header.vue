@@ -39,8 +39,8 @@ const managerNavigationLinks: NavigationItem[] = [
   },
   {
     label: 'Funcionários',
-    link: '/todos-funcionarios'
-  }
+    link: '/todos-funcionarios',
+  },
 ]
 
 const authStore = useAuthStore()
