@@ -75,7 +75,6 @@ const router = createRouter({
           path: '/todos-funcionarios',
           name: 'todosFuncionarios',
           component: EmployeesListing,
-          meta: { requiresAuth: true },
         },
       ],
     },
