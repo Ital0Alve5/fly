@@ -3,7 +3,7 @@ DROP TABLE IF EXISTS cliente CASCADE;
 DROP TABLE IF EXISTS endereco CASCADE;
 
 CREATE TABLE IF NOT EXISTS endereco (
-  id SERIAL PRIMARY KEY,
+  id BIGSERIAL PRIMARY KEY,
   cep VARCHAR(10),
   uf VARCHAR(2),
   cidade VARCHAR(100),
@@ -14,17 +14,17 @@ CREATE TABLE IF NOT EXISTS endereco (
 );
 
 CREATE TABLE IF NOT EXISTS cliente (
-  codigo SERIAL PRIMARY KEY,
-  enderecoId INTEGER,
+  codigo BIGSERIAL PRIMARY KEY,
+  endereco_id BIGINT,
   cpf VARCHAR(14) NOT NULL UNIQUE,
   email VARCHAR(100) NOT NULL UNIQUE,
   nome VARCHAR(100) NOT NULL,
-  saldoMilhas INTEGER DEFAULT 0
+  saldo_milhas INTEGER DEFAULT 0
 );
 
 CREATE TABLE IF NOT EXISTS transacoes (
-  id SERIAL PRIMARY KEY,
-  codigoCliente INTEGER,
+  id BIGSERIAL PRIMARY KEY,
+  codigo_cliente BIGINT,
   data TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   valor_reais NUMERIC(10,2),
   quantidade_milhas INTEGER,
@@ -35,13 +35,13 @@ CREATE TABLE IF NOT EXISTS transacoes (
 
 ALTER TABLE cliente
 ADD CONSTRAINT fk_endereco
-FOREIGN KEY (enderecoId)
+FOREIGN KEY (endereco_id)
 REFERENCES endereco(id)
 ON DELETE SET NULL;
 
 ALTER TABLE transacoes
 ADD CONSTRAINT fk_cliente
-FOREIGN KEY (codigoCliente)
+FOREIGN KEY (codigo_cliente)
 REFERENCES cliente(codigo)
 ON DELETE CASCADE;
 
@@ -57,7 +57,7 @@ VALUES (
 );
 
 
-INSERT INTO cliente (enderecoId, cpf, email, nome, saldoMilhas)
+INSERT INTO cliente (endereco_id, cpf, email, nome, saldo_milhas)
 VALUES (
   1,
   '90769281001',
