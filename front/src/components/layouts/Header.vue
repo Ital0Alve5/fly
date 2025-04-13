@@ -37,6 +37,10 @@ const managerNavigationLinks: NavigationItem[] = [
     label: 'Voos',
     link: '/adm/voos',
   },
+  {
+    label: 'Funcionários',
+    link: '/todos-funcionarios',
+  },
 ]
 
 const authStore = useAuthStore()

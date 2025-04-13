@@ -3,6 +3,8 @@ import { ref } from 'vue'
 
 type EmployeeData = AuthenticatedUserData & {
   password: string
+  cpf: string
+  phone: string
 }
 
 const registeredEmployees = ref<EmployeeData[]>([
@@ -13,6 +15,8 @@ const registeredEmployees = ref<EmployeeData[]>([
     email: 'italo@empresa.com',
     isManager: true,
     password: '1234',
+    cpf: '123.456.789-10',
+    phone: '(81) 99999-9999',
   },
   {
     userId: 12,
@@ -21,6 +25,8 @@ const registeredEmployees = ref<EmployeeData[]>([
     email: 'jully@empresa.com',
     isManager: false,
     password: '1234',
+    cpf: '111.222.333-44',
+    phone: '(41) 99999-9999',
   },
 ])
 
