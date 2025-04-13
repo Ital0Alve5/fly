@@ -105,9 +105,7 @@ const checkReserveCode = async () => {
     <DialogContent>
       <DialogHeader>
         <DialogTitle>Consultar Reserva</DialogTitle>
-        <DialogDescription
-          >Escreva o código que recebeu para pesquisar sua reserva.</DialogDescription
-        >
+        <DialogDescription>Escreva o código que recebeu para pesquisar sua reserva.</DialogDescription>
       </DialogHeader>
       <Label for="reserveCode" class="flex gap-4">Código da Reserva</Label>
       <div class="flex items-center space-x-2">
