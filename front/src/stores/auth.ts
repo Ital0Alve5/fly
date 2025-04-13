@@ -3,7 +3,7 @@ import { useLocalStorage } from '@vueuse/core'
 import type { AuthenticatedUserData, Client, Employee } from '@/types/Auth/AuthenticatedUserData'
 import clientsMock from '@/mock/clients'
 import employeesMock from '@/mock/employees'
-import { passwords } from '@/mock/auth'
+import { passwords, addEmployeePassword, addClientPassword } from '@/mock/auth'
 
 function generatedRandomPassword(): string {
   return Math.floor(1000 + Math.random() * 9000).toString()
@@ -83,7 +83,20 @@ export const useAuthStore = defineStore('auth', () => {
       usuario: newUser,
     }
 
+    addClientPassword(newUser.email, senha)
+
     return user.value
+  }
+
+  async function registerEmployee(newEmployee: Employee) {
+
+    const senha = generatedRandomPassword();
+
+    employeesMock.registerEmployee(newEmployee);
+
+    sendPasswordOnEmail(newEmployee.email, senha);
+
+    addEmployeePassword(newEmployee.email, senha);
   }
 
   function logout() {
@@ -97,5 +110,6 @@ export const useAuthStore = defineStore('auth', () => {
     login,
     register,
     logout,
+    registerEmployee
   }
 })
