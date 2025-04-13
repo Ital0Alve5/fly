@@ -1,7 +1,9 @@
+import type { Flight } from './Flight'
+
 export type Reserve = {
-  id: number
-  userId: number
-  status:
+  codigo: string
+  codigo_cliente: number
+  estado:
     | 'CRIADA'
     | 'CHECK-IN'
     | 'CANCELADA'
@@ -10,12 +12,9 @@ export type Reserve = {
     | 'REALIZADA'
     | 'NÃO REALIZADA'
     | 'CANCELADO VOO'
-  dateTimeR: string // yyyy-mm-dd hh:mm
-  dateTimeF: string // yyyy-mm-dd hh:mm
-  origin: string
-  destination: string
-  flightCode: string
-  reservationCode: string
-  price: number
-  miles: number
+  data: string
+  valor: number
+  milhas_utilizadas: number
+  quantidade_poltronas: number
+  voo: Flight
 }

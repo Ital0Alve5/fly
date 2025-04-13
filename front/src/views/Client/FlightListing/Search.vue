@@ -2,9 +2,10 @@
 import FlightCard from './components/FlightCard.vue'
 import FlightCardsGrid from './components/FlightCardsGrid.vue'
 import SearchFlightForm from './components/SearchFlightForm.vue'
-import { searchFlights, type Flight } from '@/mock/flight'
+import { searchFlights } from '@/mock/flight'
 import { useAuthStore } from '@/stores/auth'
 import { useGlobalStore } from '@/stores/global'
+import type { Flight } from '@/types/Flight'
 import { ref } from 'vue'
 
 const authStore = useAuthStore()
@@ -43,7 +44,7 @@ async function handleSearch(originAipoirt: string, destinationAirpoirt: string) 
     <section class="w-11/12 max-w-2xl">
       <div class="flex flex-col gap-1">
         <h1 class="text-4xl font-bold">
-          Qual será a próxima, {{ authStore.user?.name.split(' ')?.[0] }}?
+          Qual será a próxima, {{ authStore.user?.usuario.nome.split(' ')?.[0] }}?
         </h1>
         <p class="text-xl">
           Insira o aeroporto de origem e destino e descubra sua próxima aventura!

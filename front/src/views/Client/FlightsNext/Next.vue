@@ -18,16 +18,16 @@ import CancelReservationDialog from '@/components/dialogs/CancelReservationDialo
 const { toast } = useToast()
 
 const checkin = (reserve: Reserve) => {
-  reserve.status = 'CHECK-IN'
+  reserve.estado = 'CHECK-IN'
   toast({
     title: 'Status atualizado',
-    description: `O status foi alterado para ${reserve.status}.`,
+    description: `O status foi alterado para ${reserve.estado}.`,
     variant: 'default',
     duration: 2000,
   })
 }
 
-const selectedReservationId = ref<number | null>(null)
+const selectedReservationcode = ref<string | null>(null)
 const isCancelDialogOpen = ref(false)
 const flights = ref<Reserve[]>([])
 
@@ -39,14 +39,17 @@ async function setFlights() {
   flights.value = await getCheckInFlightsInNext48Hrs()
 }
 
-function handleCancelFlight(selectedReservation: number) {
+function handleCancelFlight(selectedReservation: string) {
   isCancelDialogOpen.value = true
-  selectedReservationId.value = selectedReservation
+  selectedReservationcode.value = selectedReservation
 }
 </script>
 
 <template>
-  <CancelReservationDialog :reservation-id="selectedReservationId" v-model="isCancelDialogOpen" />
+  <CancelReservationDialog
+    :reservation-code="selectedReservationcode"
+    v-model="isCancelDialogOpen"
+  />
   <div class="flex flex-col justify-center h-screen">
     <div class="max-h-[500px] overflow-y-auto">
       <Card>
@@ -68,34 +71,36 @@ function handleCancelFlight(selectedReservation: number) {
               <template v-for="reserve in flights" :key="reserve.id">
                 <TableRow>
                   <TableCell class="text-center px-6 py-4 text-lg">{{
-                    reserve.dateTimeF
+                    reserve.voo.data
                   }}</TableCell>
-                  <TableCell class="text-center px-6 py-4 text-lg">{{ reserve.origin }}</TableCell>
                   <TableCell class="text-center px-6 py-4 text-lg">{{
-                    reserve.destination
+                    reserve.voo.aeroporto_origem.codigo
+                  }}</TableCell>
+                  <TableCell class="text-center px-6 py-4 text-lg">{{
+                    reserve.voo.aeroporto_destino.codigo
                   }}</TableCell>
                   <TableCell class="text-center px-6 py-4 text-lg">
                     <span
                       :class="{
-                        'text-purple-500': reserve.status === 'CHECK-IN',
-                        'text-blue-500': reserve.status === 'CRIADA',
+                        'text-purple-500': reserve.estado === 'CHECK-IN',
+                        'text-blue-500': reserve.estado === 'CRIADA',
                       }"
                     >
-                      {{ reserve.status }}
+                      {{ reserve.estado }}
                     </span>
                   </TableCell>
                   <TableCell class="text-center">
                     <Button
-                      v-if="reserve.status === 'CRIADA'"
+                      v-if="reserve.estado === 'CRIADA'"
                       @click="checkin(reserve)"
                       class="mr-2"
                     >
                       Check-in
                     </Button>
                     <Button
-                      v-if="reserve.status === 'CRIADA' || reserve.status === 'CHECK-IN'"
+                      v-if="reserve.estado === 'CRIADA' || reserve.estado === 'CHECK-IN'"
                       variant="destructive"
-                      @click="handleCancelFlight(reserve.id)"
+                      @click="handleCancelFlight(reserve.codigo)"
                     >
                       Cancelar
                     </Button>

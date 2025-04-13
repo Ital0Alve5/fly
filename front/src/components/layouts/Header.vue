@@ -39,8 +39,8 @@ const managerNavigationLinks: NavigationItem[] = [
   },
   {
     label: 'Funcionários',
-    link: '/todos-funcionarios'
-  }
+    link: '/todos-funcionarios',
+  },
 ]
 
 const authStore = useAuthStore()
@@ -55,7 +55,7 @@ function handleLogout() {
   <header class="flex justify-end p-4 rounded-xl fixed w-full bg-background shadow-md">
     <ul class="ml-auto flex gap-4">
       <li
-        v-for="navigation in authStore.user?.isManager
+        v-for="navigation in authStore.user?.tipo === 'FUNCIONARIO'
           ? managerNavigationLinks
           : clientNavigationLinks"
         :key="navigation.link || navigation.label"
@@ -69,7 +69,7 @@ function handleLogout() {
         </RouterLink>
       </li>
     </ul>
-    <p class="ml-auto font-semibold">Olá, {{ authStore.user?.name.split(' ')[0] }}!</p>
+    <p class="ml-auto font-semibold">Olá, {{ authStore.user?.usuario.nome.split(' ')[0] }}!</p>
     <LogOut @click="handleLogout" class="ml-6 cursor-pointer" />
   </header>
 </template>

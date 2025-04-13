@@ -14,7 +14,7 @@ import UpdateEmployeeDialog from './components/UpdateEmployeeDialog.vue'
 import employeeService from '@/mock/employees'
 
 const employees = computed(() =>
-  employeeService.registeredEmployees.value.slice().sort((a, b) => a.name.localeCompare(b.name)),
+  employeeService.registeredEmployees.value.slice().sort((a, b) => a.nome.localeCompare(b.nome)),
 )
 const isUpdateEmployeeDialog = ref(false)
 const selectEmployeeId = ref<number | null>(null)
@@ -51,10 +51,10 @@ function deleteEmployee() {}
       </TableHeader>
       <TableBody>
         <TableRow v-for="employee in employees" :key="employee.email">
-          <TableCell>{{ employee.name }}</TableCell>
+          <TableCell>{{ employee.nome }}</TableCell>
           <TableCell>{{ employee.cpf }}</TableCell>
           <TableCell>{{ employee.email }}</TableCell>
-          <TableCell>{{ employee.phone }}</TableCell>
+          <TableCell>{{ employee.telefone }}</TableCell>
           <TableCell class="flex justify-center gap-2">
             <Button size="icon" variant="secondary" @click="editEmployee(employee.userId)">
               <Pencil class="h-4 w-4" />

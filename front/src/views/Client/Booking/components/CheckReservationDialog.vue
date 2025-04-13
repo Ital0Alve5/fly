@@ -46,22 +46,22 @@ watch(openDialog, (newVal) => {
 })
 
 const checkin = (reserva: Reserve) => {
-  reserva.status = 'CHECK-IN'
+  reserva.estado = 'CHECK-IN'
   openDialog.value = false
   toast({
     title: 'Status atualizado',
-    description: `O status foi alterado para ${reserva.status}.`,
+    description: `O status foi alterado para ${reserva.estado}.`,
     variant: 'default',
     duration: 2000,
   })
 }
 
 const toCancel = (reserva: Reserve) => {
-  reserva.status = 'CANCELADA'
+  reserva.estado = 'CANCELADA'
   openDialog.value = false
   toast({
     title: 'Status atualizado',
-    description: `O status foi alterado para ${reserva.status}.`,
+    description: `O status foi alterado para ${reserva.estado}.`,
     variant: 'default',
     duration: 2000,
   })
@@ -69,7 +69,7 @@ const toCancel = (reserva: Reserve) => {
 
 const isWithin48Hours = (reserva: Reserve): boolean => {
   const now = new Date()
-  const [datePart, timePart] = reserva.dateTimeF.split(' ')
+  const [datePart, timePart] = reserva.voo.data.split(' ')
   const [day, month, year] = datePart.split('/').map(Number)
   const [hours, minutes] = timePart.split(':').map(Number)
   const reserveDate = new Date(2000 + year, month - 1, day, hours, minutes)
@@ -113,51 +113,51 @@ const checkReserveCode = async () => {
         <Button @click="checkReserveCode">Consultar</Button>
       </div>
       <div v-if="reserveFound.length > 0" class="mt-4">
-        <div v-for="reserva in reserveFound" :key="reserva.id">
+        <div v-for="reserva in reserveFound" :key="reserva.codigo">
           <section>
             <ul class="space-y-2">
               <li class="flex gap-2">
                 <b>Data:</b>
-                <p>{{ reserva.dateTimeF }}</p>
+                <p>{{ reserva.voo.data }}</p>
               </li>
               <li class="flex gap-2">
                 <b>Código:</b>
-                <p>{{ reserva.reservationCode }}</p>
+                <p>{{ reserva.codigo }}</p>
               </li>
               <li class="flex gap-2">
                 <b>Origem:</b>
-                <p>{{ reserva.origin }}</p>
+                <p>{{ reserva.voo.aeroporto_origem.nome }}</p>
               </li>
               <li class="flex gap-2">
                 <b>Destino:</b>
-                <p>{{ reserva.destination }}</p>
+                <p>{{ reserva.voo.aeroporto_destino.nome }}</p>
               </li>
               <li class="flex gap-2">
                 <b>Valor:</b>
                 <p>
                   {{
-                    reserva.price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+                    reserva.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
                   }}
                 </p>
               </li>
               <li class="flex gap-2">
                 <b>Milhas gastas:</b>
-                <p>{{ reserva.miles }}</p>
+                <p>{{ reserva.milhas_utilizadas }}</p>
               </li>
               <li class="flex gap-2">
                 <b>Estado da reserva:</b>
-                <p>{{ reserva.status }}</p>
+                <p>{{ reserva.estado }}</p>
               </li>
             </ul>
           </section>
           <div class="mt-4 flex justify-center gap-4">
             <Button
-              v-if="reserva.status === 'CRIADA' && isWithin48Hours(reserva)"
+              v-if="reserva.estado === 'CRIADA' && isWithin48Hours(reserva)"
               @click="checkin(reserva)"
               >Check-in</Button
             >
             <Button
-              v-if="reserva.status === 'CRIADA'"
+              v-if="reserva.estado === 'CRIADA'"
               variant="destructive"
               @click="toCancel(reserva)"
               >Cancelar</Button

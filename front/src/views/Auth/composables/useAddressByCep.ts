@@ -6,6 +6,8 @@ export function useAddressByCep(cep: Ref<string>) {
   const neighborhood = ref('')
   const city = ref('')
   const state = ref('')
+  const number = ref('')
+  const complement = ref('')
 
   function resetAddressFields() {
     street.value = ''
@@ -52,5 +54,7 @@ export function useAddressByCep(cep: Ref<string>) {
     city,
     state,
     resetAddressFields,
+    number,
+    complement,
   }
 }

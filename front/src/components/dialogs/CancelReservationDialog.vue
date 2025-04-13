@@ -12,7 +12,7 @@ import { useToast } from '@/components/ui/toast'
 
 const props = defineProps<{
   modelValue: boolean
-  reservationId: number | null
+  reservationCode: string | null
 }>()
 
 const { toast } = useToast()
@@ -24,7 +24,7 @@ const handleOpenChange = (open: boolean) => {
 }
 
 function handleCancelReservation() {
-  cancelReservation(props.reservationId as number)
+  cancelReservation(props.reservationCode as string)
   emit('update:modelValue', false)
 
   toast({

@@ -13,7 +13,7 @@ import {
 import { useRouter } from 'vue-router'
 import { useMilesStore } from '@/stores/miles'
 import CancelReservationDialog from '@/components/dialogs/CancelReservationDialog.vue'
-import { getBookingByUserId } from '@/mock/booking'
+import { getBookingByUserCode } from '@/mock/booking'
 import CheckReservationDialog from './components/CheckReservationDialog.vue'
 import type { Reserve } from '@/types/Reserve'
 
@@ -22,22 +22,22 @@ const milesStore = useMilesStore()
 const booking = ref<Reserve[]>([])
 
 onMounted(async () => {
-  booking.value = await getBookingByUserId()
+  booking.value = await getBookingByUserCode()
 })
 
-const viewReservation = async (id: number) => {
-  const reserva = booking.value.find((r) => r.id === id)
+const viewReservation = async (codigo: string) => {
+  const reserva = booking.value.find((r) => r.codigo === codigo)
   if (reserva) {
-    router.push({ name: 'reserva', params: { code: reserva.reservationCode } })
+    router.push({ name: 'reserva', params: { code: reserva.codigo } })
   }
 }
-const selectedReservationId = ref<number | null>(null)
+const selectedReservationCide = ref<string | null>(null)
 const isCancelDialogOpen = ref(false)
 const isCheckReservationDialogOpen = ref(false)
 
-function handleCancelFlight(selectedReservation: number) {
+function handleCancelFlight(selectedReservation: string) {
   isCancelDialogOpen.value = true
-  selectedReservationId.value = selectedReservation
+  selectedReservationCide.value = selectedReservation
 }
 
 function openCheckReservationDialog() {
@@ -48,7 +48,7 @@ function openCheckReservationDialog() {
 <template>
   <div>
     <CancelReservationDialog
-      :reservation-id="selectedReservationId as number"
+      :reservation-code="selectedReservationCide as string"
       v-model="isCancelDialogOpen"
     />
     <CheckReservationDialog v-model:open="isCheckReservationDialogOpen" />
@@ -78,36 +78,36 @@ function openCheckReservationDialog() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                <TableRow v-for="reservation in booking" :key="reservation.id">
+                <TableRow v-for="reservation in booking" :key="reservation.codigo">
                   <TableCell class="text-center px-6 py-4 text-lg">{{
-                    reservation.dateTimeR
+                    reservation.data
                   }}</TableCell>
                   <TableCell class="text-center px-6 py-4 text-lg">{{
-                    reservation.origin
+                    reservation.voo.aeroporto_origem.codigo
                   }}</TableCell>
                   <TableCell class="text-center px-6 py-4 text-lg">{{
-                    reservation.destination
+                    reservation.voo.aeroporto_destino.codigo
                   }}</TableCell>
                   <TableCell class="text-center px-6 py-4 text-lg">
                     <span
                       :class="{
-                        'text-green-500': reservation.status === 'REALIZADA',
-                        'text-blue-500': reservation.status === 'CRIADA',
-                        'text-red-500': reservation.status === 'CANCELADA',
-                        'text-purple-500': reservation.status === 'CHECK-IN',
+                        'text-green-500': reservation.estado === 'REALIZADA',
+                        'text-blue-500': reservation.estado === 'CRIADA',
+                        'text-red-500': reservation.estado === 'CANCELADA',
+                        'text-purple-500': reservation.estado === 'CHECK-IN',
                       }"
                     >
-                      {{ reservation.status }}
+                      {{ reservation.estado }}
                     </span>
                   </TableCell>
                   <TableCell class="text-center">
-                    <Button class="mr-2" @click="viewReservation(reservation.id)"
+                    <Button class="mr-2" @click="viewReservation(reservation.codigo)"
                       >Ver Reserva</Button
                     >
                     <Button
-                      v-if="reservation.status === 'CRIADA' || reservation.status === 'CHECK-IN'"
+                      v-if="reservation.estado === 'CRIADA' || reservation.estado === 'CHECK-IN'"
                       variant="destructive"
-                      @click="handleCancelFlight(reservation.id)"
+                      @click="handleCancelFlight(reservation.codigo)"
                       >Cancelar</Button
                     >
                   </TableCell>

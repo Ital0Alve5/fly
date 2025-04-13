@@ -17,8 +17,9 @@ const { handleSubmit, email, password } = useLoginForm()
 
 const onSubmit = handleSubmit(async (values) => {
   const userData = await authStore.login(values.email, values.password)
+
   if (userData) {
-    router.push(userData.isManager ? '/adm/voos' : '/reservas')
+    router.push(userData.tipo === 'FUNCIONARIO' ? '/adm/voos' : '/reservas')
   } else {
     globalStore.setNotification({
       title: 'Erro no login!',

@@ -21,11 +21,12 @@ import { useRoute, useRouter } from 'vue-router'
 
 import { useMilesStore } from '@/stores/miles'
 import FlightDetails from './components/FlightDetails.vue'
-import { getFlightByCode, type Flight } from '@/mock/flight'
+import { getFlightByCode } from '@/mock/flight'
 import { createNewReservation } from '@/mock/booking'
 import { registerExtract } from '@/mock/extract'
 import { useAuthStore } from '@/stores/auth'
 import { getTodayDate } from '@/utils/date/getTodayDate'
+import type { Flight } from '@/types/Flight'
 
 const route = useRoute()
 const router = useRouter()
@@ -40,26 +41,26 @@ const generatedCode = ref('')
 
 const valueToPay = computed(() => {
   const discount = miles.value * milesStore.pricePerMile
-  return (flight.value?.price ?? discount) - discount
+  return (flight.value?.valor_passagem ?? discount) - discount
 })
 
 async function handleReserveFlight() {
   milesStore.setTotalMiles(milesStore.totalMiles - miles.value)
 
   generatedCode.value = await createNewReservation({
-    flight: flight.value,
+    flight: flight.value!,
     price: valueToPay.value,
     miles: miles.value,
   })
 
   registerExtract({
-    userId: authStore.user?.userId as number,
-    date: getTodayDate(),
-    reservationCode: generatedCode.value,
-    value: valueToPay.value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
-    miles: miles.value,
-    description: `${flight.value?.originAirport}->${flight.value?.destinationAirport}`,
-    type: 'SAÍDA',
+    codigo_cliente: authStore.user?.usuario.codigo as number,
+    data: getTodayDate(),
+    codigo_reserva: generatedCode.value,
+    valor_reais: valueToPay.value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
+    quantidade_milhas: miles.value,
+    descricao: `${flight.value?.aeroporto_origem.codigo}->${flight.value?.aeroporto_destino.codigo}`,
+    tipo: 'SAÍDA',
   })
 }
 </script>

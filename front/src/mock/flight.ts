@@ -1,174 +1,276 @@
 import { formatFromDate } from '@/utils/date/formatFromDate'
 import { loadCityByAirpoirt } from './airpoirts'
-
-export type Flight = {
-  originAirport: string
-  destinationAirport: string
-  dateTime: string
-  code: string
-  origin: string
-  destination: string
-  price: number
-  status: 'CONFIRMADO' | 'CANCELADO' | 'REALIZADO'
-}
+import type { Flight } from '@/types/Flight'
 
 export const flights: Flight[] = [
   {
-    originAirport: 'GRU',
-    destinationAirport: 'JFK',
-    dateTime: '08/04/25 14:00',
-    code: 'HGP123',
-    origin: 'São Paulo',
-    destination: 'New York',
-    price: 250.0,
-    status: 'CONFIRMADO',
+    codigo: 'HGP123',
+    data: '14/04/25 14:00',
+    valor_passagem: 250.0,
+    quantidade_poltronas_total: 180,
+    quantidade_poltronas_ocupadas: 150,
+    estado: 'CONFIRMADO',
+    aeroporto_origem: {
+      codigo: 'GRU',
+      nome: 'Aeroporto de Guarulhos',
+      cidade: 'São Paulo',
+      uf: 'SP',
+    },
+    aeroporto_destino: {
+      codigo: 'JFK',
+      nome: 'John F. Kennedy International Airport',
+      cidade: 'New York',
+      uf: 'NY',
+    },
   },
   {
-    originAirport: 'GIG',
-    destinationAirport: 'MIA',
-    dateTime: '20/04/25 14:00',
-    code: 'STU901',
-    origin: 'Rio de Janeiro',
-    destination: 'Miami',
-    price: 200.0,
-    status: 'REALIZADO',
+    codigo: 'STU901',
+    data: '15/04/25 14:00',
+    valor_passagem: 200.0,
+    quantidade_poltronas_total: 180,
+    quantidade_poltronas_ocupadas: 170,
+    estado: 'CONFIRMADO',
+    aeroporto_origem: {
+      codigo: 'GIG',
+      nome: 'Aeroporto do Galeão',
+      cidade: 'Rio de Janeiro',
+      uf: 'RJ',
+    },
+    aeroporto_destino: {
+      codigo: 'MIA',
+      nome: 'Miami International Airport',
+      cidade: 'Miami',
+      uf: 'FL',
+    },
   },
   {
-    originAirport: 'BSB',
-    destinationAirport: 'LIS',
-    dateTime: '22/04/25 14:00',
-    code: 'MNO345',
-    origin: 'Brasília',
-    destination: 'Lisboa',
-    price: 50.0,
-    status: 'CANCELADO',
+    codigo: 'MNO345',
+    data: '22/04/25 14:00',
+    valor_passagem: 50.0,
+    quantidade_poltronas_total: 180,
+    quantidade_poltronas_ocupadas: 40,
+    estado: 'CONFIRMADO',
+    aeroporto_origem: {
+      codigo: 'BSB',
+      nome: 'Aeroporto de Brasília',
+      cidade: 'Brasília',
+      uf: 'DF',
+    },
+    aeroporto_destino: {
+      codigo: 'LIS',
+      nome: 'Aeroporto Humberto Delgado',
+      cidade: 'Lisboa',
+      uf: 'PT',
+    },
   },
   {
-    originAirport: 'GRU',
-    destinationAirport: 'SDU',
-    dateTime: '30/04/25 09:15',
-    code: 'FLW316',
-    origin: 'São Paulo',
-    destination: 'Rio de Janeiro',
-    price: 245.5,
-    status: 'REALIZADO',
+    codigo: 'FLW316',
+    data: '30/04/25 09:15',
+    valor_passagem: 245.5,
+    quantidade_poltronas_total: 180,
+    quantidade_poltronas_ocupadas: 160,
+    estado: 'CONFIRMADO',
+    aeroporto_origem: {
+      codigo: 'GRU',
+      nome: 'Aeroporto de Guarulhos',
+      cidade: 'São Paulo',
+      uf: 'SP',
+    },
+    aeroporto_destino: {
+      codigo: 'SDU',
+      nome: 'Santos Dumont',
+      cidade: 'Rio de Janeiro',
+      uf: 'RJ',
+    },
   },
   {
-    originAirport: 'GRU',
-    destinationAirport: 'EZE',
-    dateTime: '02/05/25 08:45',
-    code: 'FLK822',
-    origin: 'São Paulo',
-    destination: 'Buenos Aires',
-    price: 320,
-    status: 'REALIZADO',
+    codigo: 'FLK822',
+    data: '02/05/25 08:45',
+    valor_passagem: 320.0,
+    quantidade_poltronas_total: 180,
+    quantidade_poltronas_ocupadas: 170,
+    estado: 'CONFIRMADO',
+    aeroporto_origem: {
+      codigo: 'GRU',
+      nome: 'Aeroporto de Guarulhos',
+      cidade: 'São Paulo',
+      uf: 'SP',
+    },
+    aeroporto_destino: {
+      codigo: 'EZE',
+      nome: 'Ministro Pistarini',
+      cidade: 'Buenos Aires',
+      uf: 'AR',
+    },
   },
   {
-    originAirport: 'BSB',
-    destinationAirport: 'CGH',
-    dateTime: '04/05/25 07:30',
-    code: 'FLY156',
-    origin: 'Brasília',
-    destination: 'São Paulo',
-    price: 175.2,
-    status: 'REALIZADO',
+    codigo: 'FLY156',
+    data: '04/05/25 07:30',
+    valor_passagem: 175.2,
+    quantidade_poltronas_total: 180,
+    quantidade_poltronas_ocupadas: 165,
+    estado: 'CONFIRMADO',
+    aeroporto_origem: {
+      codigo: 'BSB',
+      nome: 'Aeroporto de Brasília',
+      cidade: 'Brasília',
+      uf: 'DF',
+    },
+    aeroporto_destino: {
+      codigo: 'CGH',
+      nome: 'Congonhas',
+      cidade: 'São Paulo',
+      uf: 'SP',
+    },
   },
   {
-    originAirport: 'CWB',
-    destinationAirport: 'MAO',
-    dateTime: '06/05/25 12:00',
-    code: 'PGP001',
-    origin: 'Curitiba',
-    destination: 'Manaus',
-    price: 2000,
-    status: 'REALIZADO',
+    codigo: 'PGP001',
+    data: '06/05/25 12:00',
+    valor_passagem: 2000.0,
+    quantidade_poltronas_total: 180,
+    quantidade_poltronas_ocupadas: 180,
+    estado: 'CONFIRMADO',
+    aeroporto_origem: {
+      codigo: 'CWB',
+      nome: 'Aeroporto Afonso Pena',
+      cidade: 'Curitiba',
+      uf: 'PR',
+    },
+    aeroporto_destino: {
+      codigo: 'MAO',
+      nome: 'Eduardo Gomes',
+      cidade: 'Manaus',
+      uf: 'AM',
+    },
   },
   {
-    originAirport: 'REC',
-    destinationAirport: 'FOR',
-    dateTime: '08/05/25 18:20',
-    code: 'FLT413',
-    origin: 'Recife',
-    destination: 'Fortaleza',
-    price: 1.9,
-    status: 'REALIZADO',
+    codigo: 'FLT413',
+    data: '08/05/25 18:20',
+    valor_passagem: 1.9,
+    quantidade_poltronas_total: 180,
+    quantidade_poltronas_ocupadas: 30,
+    estado: 'CONFIRMADO',
+    aeroporto_origem: {
+      codigo: 'REC',
+      nome: 'Aeroporto do Recife',
+      cidade: 'Recife',
+      uf: 'PE',
+    },
+    aeroporto_destino: {
+      codigo: 'FOR',
+      nome: 'Pinto Martins',
+      cidade: 'Fortaleza',
+      uf: 'CE',
+    },
   },
   {
-    originAirport: 'GRU',
-    destinationAirport: 'MEX',
-    dateTime: '12/04/25 15:00',
-    code: 'NOA001',
-    origin: 'São Paulo',
-    destination: 'Mexico City',
-    price: 1800,
-    status: 'CONFIRMADO',
+    codigo: 'NOA001',
+    data: '12/04/25 15:00',
+    valor_passagem: 1800.0,
+    quantidade_poltronas_total: 180,
+    quantidade_poltronas_ocupadas: 120,
+    estado: 'CONFIRMADO',
+    aeroporto_origem: {
+      codigo: 'GRU',
+      nome: 'Aeroporto de Guarulhos',
+      cidade: 'São Paulo',
+      uf: 'SP',
+    },
+    aeroporto_destino: {
+      codigo: 'MEX',
+      nome: 'Benito Juárez',
+      cidade: 'Mexico City',
+      uf: 'MX',
+    },
   },
   {
-    originAirport: 'FRA',
-    destinationAirport: 'LHR',
-    dateTime: '11/04/25 08:45',
-    code: 'NOB002',
-    origin: 'Frankfurt',
-    destination: 'London',
-    price: 900,
-    status: 'CONFIRMADO',
+    codigo: 'NOB002',
+    data: '11/04/25 08:45',
+    valor_passagem: 900.0,
+    quantidade_poltronas_total: 180,
+    quantidade_poltronas_ocupadas: 160,
+    estado: 'CONFIRMADO',
+    aeroporto_origem: {
+      codigo: 'FRA',
+      nome: 'Frankfurt am Main',
+      cidade: 'Frankfurt',
+      uf: 'DE',
+    },
+    aeroporto_destino: {
+      codigo: 'LHR',
+      nome: 'Heathrow',
+      cidade: 'London',
+      uf: 'UK',
+    },
   },
   {
-    originAirport: 'MIA',
-    destinationAirport: 'GRU',
-    dateTime: '11/04/25 23:00',
-    code: 'NOC003',
-    origin: 'Miami',
-    destination: 'São Paulo',
-    price: 1200,
-    status: 'CONFIRMADO',
+    codigo: 'NOC003',
+    data: '11/04/25 23:00',
+    valor_passagem: 1200.0,
+    quantidade_poltronas_total: 180,
+    quantidade_poltronas_ocupadas: 150,
+    estado: 'CONFIRMADO',
+    aeroporto_origem: {
+      codigo: 'MIA',
+      nome: 'Miami International Airport',
+      cidade: 'Miami',
+      uf: 'FL',
+    },
+    aeroporto_destino: {
+      codigo: 'GRU',
+      nome: 'Aeroporto de Guarulhos',
+      cidade: 'São Paulo',
+      uf: 'SP',
+    },
   },
   {
-    originAirport: 'CDG',
-    destinationAirport: 'FRA',
-    dateTime: '12/04/25 06:30',
-    code: 'NOD004',
-    origin: 'Paris',
-    destination: 'Frankfurt',
-    price: 700,
-    status: 'CONFIRMADO',
+    codigo: 'NOD004',
+    data: '12/04/25 06:30',
+    valor_passagem: 700.0,
+    quantidade_poltronas_total: 180,
+    quantidade_poltronas_ocupadas: 145,
+    estado: 'CONFIRMADO',
+    aeroporto_origem: {
+      codigo: 'CDG',
+      nome: 'Charles de Gaulle',
+      cidade: 'Paris',
+      uf: 'FR',
+    },
+    aeroporto_destino: {
+      codigo: 'FRA',
+      nome: 'Frankfurt am Main',
+      cidade: 'Frankfurt',
+      uf: 'DE',
+    },
   },
 ]
 
 export function getFlightByCode(code: string): Flight | undefined {
-  return flights.find((f) => f.code === code)
+  return flights.find((f) => f.codigo === code)
 }
 
 export async function searchFlights(origin: string, destination: string): Promise<Flight[]> {
   const searchOrigin = origin.toLowerCase().trim()
   const searchDestination = destination.toLowerCase().trim()
 
-  // Simula chamada à API com um delay de 2 segundos
-  await new Promise((resolve) => setTimeout(() => resolve(undefined), 2000))
+  await new Promise((resolve) => setTimeout(resolve, 2000))
 
   const now = new Date()
 
   return flights.filter((flight) => {
-    const flightDate = parseDateTime(flight.dateTime)
-
+    const flightDate = parseDateTime(flight.data)
     if (flightDate <= now) return false
 
-    const flightOriginCity = flight.origin.toLowerCase()
-    const flightOriginAirport = flight.originAirport.toLowerCase()
-    const flightDestinationCity = flight.destination.toLowerCase()
-    const flightDestinationAirport = flight.destinationAirport.toLowerCase()
+    const flightCityOrigin = flight.aeroporto_origem.cidade.toLowerCase()
+    const flightCityDestination = flight.aeroporto_destino.cidade.toLowerCase()
+    const flightCodeOrigin = flight.aeroporto_origem.codigo.toLowerCase()
+    const flightCodeDestination = flight.aeroporto_destino.codigo.toLowerCase()
 
-    const matchesOrigin =
-      !searchOrigin ||
-      flightOriginCity.includes(searchOrigin) ||
-      flightOriginAirport.includes(searchOrigin)
-
-    const matchesDestination =
-      !searchDestination ||
-      flightDestinationCity.includes(searchDestination) ||
-      flightDestinationAirport.includes(searchDestination)
-
-    return matchesOrigin && matchesDestination
+    return (
+      (flightCityOrigin.includes(searchOrigin) || flightCodeOrigin.includes(searchOrigin)) &&
+      (flightCityDestination.includes(searchDestination) ||
+        flightCodeDestination.includes(searchDestination))
+    )
   })
 }
 
@@ -180,23 +282,20 @@ function parseDateTime(dateTime: string): Date {
 }
 
 function sortFlightsByDateTime(flights: Flight[]): Flight[] {
-  return [...flights].sort((a, b) => {
-    const dateA = parseDateTime(a.dateTime).getTime()
-    const dateB = parseDateTime(b.dateTime).getTime()
-    return dateA - dateB
-  })
+  return [...flights].sort(
+    (a, b) => parseDateTime(a.data).getTime() - parseDateTime(b.data).getTime(),
+  )
 }
 
 export function getFlightsInNext48Hours(): Flight[] {
   const now = new Date()
   const in48h = new Date(now.getTime() + 48 * 60 * 60 * 1000)
-
-  const filtered = flights.filter((flight) => {
-    const flightDate = parseDateTime(flight.dateTime)
-    return flightDate > now && flightDate <= in48h && flight.status !== 'CANCELADO'
-  })
-
-  return sortFlightsByDateTime(filtered)
+  return sortFlightsByDateTime(
+    flights.filter((flight) => {
+      const flightDate = parseDateTime(flight.data)
+      return flightDate > now && flightDate <= in48h && flight.estado !== 'CANCELADO'
+    }),
+  )
 }
 
 type RegisterFlightFormType = {
@@ -209,37 +308,45 @@ type RegisterFlightFormType = {
 }
 
 export async function registerFlight(data: RegisterFlightFormType) {
-  // Simula chamada à API com um delay de 2 segundos
-  await new Promise((resolve) => setTimeout(() => resolve(undefined), 2000))
+  await new Promise((resolve) => setTimeout(resolve, 2000))
 
-  const origin = loadCityByAirpoirt(data.originAirport)
-  const destination = loadCityByAirpoirt(data.destinationAirport)
+  const originCity = loadCityByAirpoirt(data.originAirport)
+  const destinationCity = loadCityByAirpoirt(data.destinationAirport)
 
   flights.push({
-    originAirport: data.originAirport,
-    destinationAirport: data.destinationAirport,
-    price: data.price,
-    code: data.code,
-    dateTime: formatFromDate(data.date),
-    origin,
-    destination,
-    status: 'CONFIRMADO',
+    codigo: data.code,
+    data: formatFromDate(data.date),
+    valor_passagem: data.price,
+    quantidade_poltronas_total: data.seatsNumber,
+    quantidade_poltronas_ocupadas: 0,
+    estado: 'CONFIRMADO',
+    aeroporto_origem: {
+      codigo: data.originAirport,
+      nome: `Aeroporto de ${originCity}`,
+      cidade: originCity,
+      uf: '',
+    },
+    aeroporto_destino: {
+      codigo: data.destinationAirport,
+      nome: `Aeroporto de ${destinationCity}`,
+      cidade: destinationCity,
+      uf: '',
+    },
   })
 }
 
 export function cancelFlight(code: string): boolean {
-  const flight = flights.find((flight) => flight.code === code)
+  const flight = flights.find((f) => f.codigo === code)
   if (flight) {
-    flight.status = 'CANCELADO'
+    flight.estado = 'CANCELADO'
     return true
   }
   return false
 }
-export function performFlight(flightCode: string) {
-  const flight = flights.find((f) => f.code === flightCode)
-  if (flight) {
-    flight.status = 'REALIZADO'
-  }
+
+export function performFlight(code: string): void {
+  const flight = flights.find((f) => f.codigo === code)
+  if (flight) flight.estado = 'REALIZADO'
 }
 
 export default {

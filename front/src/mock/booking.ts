@@ -1,51 +1,70 @@
 import type { Reserve } from '@/types/Reserve'
 import { ref, type Ref } from 'vue'
-import type { Flight } from './flight'
 import { getTodayDate } from '@/utils/date/getTodayDate'
 import { generateUniqueCode } from '@/utils/generateRandomCode'
 import { useAuthStore } from '@/stores/auth'
 import { useMilesStore } from '@/stores/miles'
 import { registerExtract, type ExtractItem } from './extract'
+import type { Flight } from '@/types/Flight'
 
 export const booking: Ref<Reserve[]> = ref([
   {
-    id: 2,
-    userId: 1,
-    status: 'REALIZADA',
-    dateTimeR: '20/03/25 08:30',
-    dateTimeF: '21/03/25 14:00',
-    origin: 'Rio de Janeiro',
-    destination: 'Miami',
-    reservationCode: 'STU901',
-    flightCode: 'STU901',
-    price: 200.0,
-    miles: 2,
+    codigo: 'AWN123',
+    codigo_cliente: 1,
+    estado: 'CHECK-IN',
+    data: '10/04/25 08:30',
+    valor: 200,
+    milhas_utilizadas: 17,
+    quantidade_poltronas: 2,
+    voo: {
+      codigo: 'STU901',
+      data: '15/04/25 14:00',
+      valor_passagem: 200,
+      quantidade_poltronas_total: 180,
+      quantidade_poltronas_ocupadas: 170,
+      estado: 'REALIZADO',
+      aeroporto_origem: {
+        codigo: 'GIG',
+        nome: 'Aeroporto do Galeão',
+        cidade: 'Rio de Janeiro',
+        uf: 'RJ',
+      },
+      aeroporto_destino: {
+        codigo: 'MIA',
+        nome: 'Miami International Airport',
+        cidade: 'Miami',
+        uf: 'FL',
+      },
+    },
   },
   {
-    id: 3,
-    userId: 1,
-    status: 'CANCELADA',
-    dateTimeR: '15/03/25 16:45',
-    dateTimeF: '22/04/25 14:00',
-    origin: 'Brasília',
-    destination: 'Lisboa',
-    reservationCode: 'MNO345',
-    flightCode: 'MNO345',
-    price: 50.0,
-    miles: 16,
-  },
-  {
-    id: 9,
-    userId: 1,
-    status: 'CHECK-IN',
-    dateTimeR: '10/04/25 12:00',
-    dateTimeF: '13/04/25 15:00',
-    origin: 'São Paulo',
-    destination: 'Mexico City',
-    reservationCode: 'NOW001',
-    flightCode: 'NOA001',
-    price: 1800,
-    miles: 36000,
+    codigo: 'AWA566',
+    codigo_cliente: 1,
+    estado: 'EMBARCADA',
+    data: '10/04/25 08:30',
+    valor: 50,
+    milhas_utilizadas: 11,
+    quantidade_poltronas: 3,
+    voo: {
+      codigo: 'MNO345',
+      data: '10/04/25 14:00',
+      valor_passagem: 50,
+      quantidade_poltronas_total: 180,
+      quantidade_poltronas_ocupadas: 40,
+      estado: 'CANCELADO',
+      aeroporto_origem: {
+        codigo: 'BSB',
+        nome: 'Aeroporto de Brasília',
+        cidade: 'Brasília',
+        uf: 'DF',
+      },
+      aeroporto_destino: {
+        codigo: 'LIS',
+        nome: 'Humberto Delgado Airport',
+        cidade: 'Lisboa',
+        uf: 'N/A',
+      },
+    },
   },
 ])
 
@@ -55,11 +74,15 @@ export async function getBooking(): Promise<Reserve[]> {
   })
 }
 
-export async function getBookingByUserId(): Promise<Reserve[]> {
+export async function getBookingByUserCode(): Promise<Reserve[]> {
   const authStore = useAuthStore()
 
   return new Promise((res) => {
-    res(booking.value.filter((reservation) => reservation.userId === authStore.user?.userId))
+    res(
+      booking.value.filter(
+        (reservation) => reservation.codigo_cliente === authStore.user?.usuario.codigo,
+      ),
+    )
   })
 }
 
@@ -67,59 +90,67 @@ export async function searchReserves(code: string): Promise<Reserve[]> {
   const searchCode = code.trim().toUpperCase()
   const booking = await getBooking()
 
-  return booking.filter((reserve) => reserve.reservationCode.toUpperCase() === searchCode)
+  return booking.filter((reserve) => reserve.codigo.toUpperCase() === searchCode)
 }
 
 export async function searchReservesByFlightCode(code: string): Promise<Reserve[]> {
   const searchCode = code.trim().toUpperCase()
   const booking = await getBooking()
 
-  return booking.filter((reserve) => reserve.flightCode.toUpperCase() === searchCode)
+  return booking.filter(
+    (reserve) => reserve.voo.codigo.toLocaleLowerCase() === searchCode.toLocaleLowerCase(),
+  )
 }
 
-export async function cancelReservation(reservationid: number) {
+export async function cancelReservation(reservationCode: string) {
   const milesStore = useMilesStore()
   const authStore = useAuthStore()
 
-  if (!reservationid) return
+  if (!reservationCode) return
 
-  const reservation = booking.value.find((r) => r.id === reservationid)
+  const reservation = booking.value.find((r) => r.codigo === reservationCode)
 
   if (reservation) {
-    reservation.status = 'CANCELADA'
-    milesStore.setTotalMiles(milesStore.totalMiles + reservation.miles)
+    reservation.estado = 'CANCELADA'
+    milesStore.setTotalMiles(milesStore.totalMiles + reservation.milhas_utilizadas)
 
     const newExtract: ExtractItem = {
-      userId: authStore.user?.userId || 0,
-      date: getTodayDate(),
-      reservationCode: null,
-      value: (milesStore.pricePerMile * reservation.miles).toLocaleString('pt-BR', {
-        style: 'currency',
-        currency: 'BRL',
-      }),
-      miles: reservation.miles,
-      description: 'DEVOLUÇÃO DE MILHAS',
-      type: 'ENTRADA',
+      codigo_cliente: authStore.user?.usuario.codigo || 0,
+      data: getTodayDate(),
+      codigo_reserva: null,
+      valor_reais: (milesStore.pricePerMile * reservation.milhas_utilizadas).toLocaleString(
+        'pt-BR',
+        {
+          style: 'currency',
+          currency: 'BRL',
+        },
+      ),
+      quantidade_milhas: reservation.milhas_utilizadas,
+      descricao: 'DEVOLUÇÃO DE MILHAS',
+      tipo: 'ENTRADA',
     }
 
     registerExtract(newExtract)
   } else {
-    console.log(`Reserva com ID ${reservationid} não encontrada.`)
+    console.log(`Reserva com ID ${reservationCode} não encontrada.`)
   }
 }
 
-export async function getReservationByCode(code: string): Promise<Reserve | undefined> {
+export async function getReservationByCodeAndFlightCode(
+  code: string,
+  flightCode: string,
+): Promise<Reserve | undefined> {
   const booking = await getBooking()
 
-  return booking.find((reserve) => reserve.reservationCode === code)
+  return booking.find((reserve) => reserve.codigo === code && reserve.voo.codigo === flightCode)
 }
 
 export async function cancelReservationByFlightCode(flightCode: string) {
-  const booking = await getBookingByUserId()
+  const booking = await getBookingByUserCode()
 
   booking.forEach((reservation) => {
-    if (reservation.flightCode === flightCode) {
-      reservation.status = 'CANCELADO VOO'
+    if (reservation.voo.codigo === flightCode) {
+      reservation.estado = 'CANCELADO VOO'
     }
   })
 }
@@ -128,10 +159,10 @@ async function getFlightsInNext48hrs(): Promise<Reserve[]> {
   const now = new Date()
   const nowTime = now.getTime()
   const limitTime = nowTime + 48 * 60 * 60 * 1000
-  const booking = await getBookingByUserId()
+  const booking = await getBookingByUserCode()
 
   return booking.filter((reserve) => {
-    const [datePart, timePart] = reserve.dateTimeF.split(' ')
+    const [datePart, timePart] = reserve.voo.data.split(' ')
     const [day, month, year] = datePart.split('/').map(Number)
     const [hour, minute] = timePart.split(':').map(Number)
 
@@ -144,21 +175,19 @@ async function getFlightsInNext48hrs(): Promise<Reserve[]> {
 
 export async function getCheckInFlightsInNext48Hrs(): Promise<Reserve[]> {
   const flights = await getFlightsInNext48hrs()
-  console.log(
-    flights.filter((reserve) => ['CRIADA', 'CHECK-IN'].includes(reserve.status.toUpperCase())),
-  )
-  return flights.filter((reserve) => ['CRIADA', 'CHECK-IN'].includes(reserve.status.toUpperCase()))
+
+  return flights.filter((reserve) => ['CRIADA', 'CHECK-IN'].includes(reserve.estado.toUpperCase()))
 }
 
 export async function updateReservationStatus(
   reservationCode: string,
-  newStatus: Reserve['status'],
+  newStatus: Reserve['estado'],
 ): Promise<void> {
   const booking = await getBooking()
-  const reservation = booking.find((r) => r.reservationCode === reservationCode)
+  const reservation = booking.find((r) => r.codigo === reservationCode)
 
   if (reservation) {
-    reservation.status = newStatus
+    reservation.estado = newStatus
   } else {
     console.error(`Reserva com código ${reservationCode} não encontrada`)
     throw new Error(`Reserva com código ${reservationCode} não encontrada`)
@@ -176,17 +205,33 @@ export async function createNewReservation(data: {
     const code = generateUniqueCode()
 
     booking.value.push({
-      id: booking.value[booking.value.length - 1].id + 1,
-      userId: authStore.user!.userId,
-      status: 'CRIADA',
-      dateTimeR: getTodayDate(),
-      dateTimeF: data.flight.dateTime ?? '',
-      origin: data.flight.originAirport ?? '',
-      destination: data.flight.destinationAirport ?? '',
-      flightCode: data.flight.code ?? '',
-      reservationCode: code,
-      price: data.price,
-      miles: data.miles,
+      codigo: code,
+      codigo_cliente: authStore.user!.usuario.codigo,
+      estado: 'CRIADA',
+      data: getTodayDate(),
+      valor: data.price,
+      milhas_utilizadas: data.miles,
+      quantidade_poltronas: 3,
+      voo: {
+        codigo: data.flight.codigo ?? '',
+        data: data.flight.data ?? '',
+        valor_passagem: 213,
+        quantidade_poltronas_total: 180,
+        quantidade_poltronas_ocupadas: 155,
+        estado: 'CONFIRMADO',
+        aeroporto_origem: {
+          codigo: data.flight.aeroporto_origem.codigo ?? '',
+          nome: data.flight.aeroporto_origem.nome ?? '',
+          cidade: data.flight.aeroporto_origem.cidade ?? '',
+          uf: data.flight.aeroporto_origem.uf ?? '',
+        },
+        aeroporto_destino: {
+          codigo: data.flight.aeroporto_destino.codigo ?? '',
+          nome: data.flight.aeroporto_destino.nome ?? '',
+          cidade: data.flight.aeroporto_destino.cidade ?? '',
+          uf: data.flight.aeroporto_destino.uf ?? '',
+        },
+      },
     })
 
     res(code)
