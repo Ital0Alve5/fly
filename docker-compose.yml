@@ -83,9 +83,7 @@ services:
     volumes:
       - ./back/auth-service:/app
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://pgdb:5432/auth_service
-      - SPRING_DATASOURCE_USERNAME=admin
-      - SPRING_DATASOURCE_PASSWORD=admin
+      - MONGO_URI=mongodb://admin:admin@mongodb:27017/auth_service?authSource=admin
     depends_on:
       - pgdb
       - rabbitmq
