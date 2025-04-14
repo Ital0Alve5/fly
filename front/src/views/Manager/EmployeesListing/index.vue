@@ -14,7 +14,9 @@ import UpdateEmployeeDialog from './components/UpdateEmployeeDialog.vue'
 import AddEmployeeDialog from './components/AddEmployeeDialog.vue'
 import employeeService from '@/mock/employees'
 import type { Employee } from '@/types/Auth/AuthenticatedUserData'
+import { useAuthStore } from '@/stores/auth'
 
+const authStore = useAuthStore()
 const employees = computed(() =>
   employeeService.registeredEmployees.value.slice().sort((a, b) => a.nome.localeCompare(b.nome)),
 )
@@ -65,7 +67,12 @@ async function handleDeleteEmployee(employee: Employee) {
             <Button size="icon" variant="secondary" @click="editEmployee(employee)">
               <Pencil class="h-4 w-4" />
             </Button>
-            <Button size="icon" variant="destructive" @click="handleDeleteEmployee(employee)">
+            <Button
+              v-if="employee.codigo !== authStore.user?.usuario.codigo"
+              size="icon"
+              variant="destructive"
+              @click="handleDeleteEmployee(employee)"
+            >
               <Trash2 class="h-4 w-4" />
             </Button>
           </TableCell>
