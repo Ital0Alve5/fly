@@ -72,9 +72,9 @@ const onSubmit = handleSubmit(async (values) => {
     )
 
     if (index !== -1) {
-      const oldEmail = employeeService.registeredEmployees.value[index].email;
-      
-      updateEmail(oldEmail, values.email, 'employee');
+      const oldEmail = employeeService.registeredEmployees.value[index].email
+
+      updateEmail(oldEmail, values.email, 'employee')
 
       employeeService.registeredEmployees.value[index] = {
         ...employeeService.registeredEmployees.value[index],

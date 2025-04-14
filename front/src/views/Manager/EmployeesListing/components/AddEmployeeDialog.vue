@@ -15,14 +15,13 @@ const { toast } = useToast()
 const authStore = useAuthStore()
 
 const formSchema = toTypedSchema(
-z.object({
+  z.object({
     name: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres'),
     email: z.string().email('E-mail inválido'),
     phone: z.string().min(14, 'Telefone inválido').max(15, 'Telefone inválido'),
     cpf: z.string().refine((cpf) => isValidCPF(cpf), 'CPF inválido'),
-}),
+  }),
 )
-
 
 function isValidCPF(cpf: string): boolean {
   cpf = cpf.replace(/[^\d]/g, '')
@@ -49,7 +48,6 @@ function isValidCPF(cpf: string): boolean {
   return true
 }
 
-
 const { handleSubmit, resetForm } = useForm({
   validationSchema: formSchema,
 })
@@ -64,7 +62,9 @@ const emit = defineEmits<{
 
 const openDialog = ref(props.open)
 
-watch(() => props.open, (newVal) => {
+watch(
+  () => props.open,
+  (newVal) => {
     openDialog.value = newVal
   },
 )
@@ -75,20 +75,18 @@ watch(openDialog, (newVal) => {
 
 const onSubmit = handleSubmit(async (values) => {
   try {
-
-    await authStore.registerEmployee(createEmployeeObject(values));
+    await authStore.registerEmployee(createEmployeeObject(values))
 
     toast({
-    title: 'Funcionário adicionado',
-    description: `Acesse sua senha no email ${values.email}.`,
-    variant: 'default',
-    duration: 500,
+      title: 'Funcionário adicionado',
+      description: `Acesse sua senha no email ${values.email}.`,
+      variant: 'default',
+      duration: 500,
     })
 
     openDialog.value = false
-    }
-  catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido';
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido'
     toast({
       title: 'Erro ao atualizar',
       description: 'Ocorreu um erro ao tentar adicionar o funcionário. ' + errorMessage,
@@ -98,21 +96,25 @@ const onSubmit = handleSubmit(async (values) => {
   }
 })
 
-const createEmployeeObject = (values: { name?: string; email?: string; phone?: string; cpf?: string }): Employee => {
-    return {
-        codigo: Date.now(),
-        nome: values.name ?? '',
-        email: values.email ?? '',
-        telefone: values.phone ?? '',
-        cpf: values.cpf ?? '',
-    }
+const createEmployeeObject = (values: {
+  name?: string
+  email?: string
+  phone?: string
+  cpf?: string
+}): Employee => {
+  return {
+    codigo: Date.now(),
+    nome: values.name ?? '',
+    email: values.email ?? '',
+    telefone: values.phone ?? '',
+    cpf: values.cpf ?? '',
+  }
 }
 
 const cancel = () => {
   openDialog.value = false
   resetForm()
 }
-
 </script>
 
 <template>
@@ -147,7 +149,7 @@ const cancel = () => {
           <FormItem>
             <FormLabel>CPF</FormLabel>
             <FormControl>
-              <Input v-bind="componentField" type="text" v-mask="'###.###.###-##'"/>
+              <Input v-bind="componentField" type="text" v-mask="'###.###.###-##'" />
             </FormControl>
             <FormMessage />
           </FormItem>

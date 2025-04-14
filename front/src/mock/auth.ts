@@ -16,18 +16,22 @@ export const passwords: {
 }
 
 export const addClientPassword = (email: string, password: string): void => {
-  passwords.client[email] = password;
+  passwords.client[email] = password
 }
 
 export const addEmployeePassword = (email: string, password: string): void => {
-  passwords.employee[email] = password;
+  passwords.employee[email] = password
 }
-export const updateEmail: (oldEmail: string, newEmail: string, userType: 'client' | 'employee') => void = (oldEmail, newEmail, userType) => {
-  const userPasswords = passwords[userType];
+export const updateEmail: (
+  oldEmail: string,
+  newEmail: string,
+  userType: 'client' | 'employee',
+) => void = (oldEmail, newEmail, userType) => {
+  const userPasswords = passwords[userType]
   if (userPasswords[oldEmail]) {
-    userPasswords[newEmail] = userPasswords[oldEmail];
-    delete userPasswords[oldEmail];
+    userPasswords[newEmail] = userPasswords[oldEmail]
+    delete userPasswords[oldEmail]
   } else {
-    throw new Error(`Email ${oldEmail} não encontrado.`);
+    throw new Error(`Email ${oldEmail} não encontrado.`)
   }
 }

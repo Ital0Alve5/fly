@@ -89,14 +89,13 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function registerEmployee(newEmployee: Employee) {
+    const senha = generatedRandomPassword()
 
-    const senha = generatedRandomPassword();
+    employeesMock.registerEmployee(newEmployee)
 
-    employeesMock.registerEmployee(newEmployee);
+    sendPasswordOnEmail(newEmployee.email, senha)
 
-    sendPasswordOnEmail(newEmployee.email, senha);
-
-    addEmployeePassword(newEmployee.email, senha);
+    addEmployeePassword(newEmployee.email, senha)
   }
 
   function logout() {
@@ -110,6 +109,6 @@ export const useAuthStore = defineStore('auth', () => {
     login,
     register,
     logout,
-    registerEmployee
+    registerEmployee,
   }
 })
