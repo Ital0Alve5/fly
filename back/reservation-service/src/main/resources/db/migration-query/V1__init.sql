@@ -10,5 +10,6 @@ CREATE TABLE IF NOT EXISTS reserva (
   estado VARCHAR(30),
   aeroporto_origem VARCHAR(4),
   aeroporto_destino VARCHAR(4),
-  valor NUMERIC(10,2)
+  valor NUMERIC(10,2),
+  historico JSONB
 );
