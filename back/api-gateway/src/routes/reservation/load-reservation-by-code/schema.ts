@@ -6,6 +6,11 @@ export const loadReservationByCodeSchema: FastifySchema = {
   tags: ['Reservas'],
   summary: 'Buscar uma reserva específica',
   description: 'Retorna os detalhes de uma reserva específica',
+  security: [
+    {
+      bearerAuth: [],
+    },
+  ],
   params: z.object({
     codigoReserva: z.string().describe('Código da reserva'),
   }),

@@ -6,6 +6,11 @@ export const updateEmployeeSchema: FastifySchema = {
   tags: ['Funcionários'],
   summary: 'Alterar um funcionário',
   description: 'Alterar os dados de um funcionário existente',
+  security: [
+    {
+      bearerAuth: [],
+    },
+  ],
   params: z.object({
     codigoFuncionario: z.number(),
   }),

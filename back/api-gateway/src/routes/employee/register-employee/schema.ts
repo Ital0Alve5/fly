@@ -6,6 +6,11 @@ export const registerEmployeeSchema: FastifySchema = {
   tags: ['Funcionários'],
   summary: 'Criar um novo funcionário',
   description: 'Criar um novo funcionário',
+  security: [
+    {
+      bearerAuth: [],
+    },
+  ],
   body: z.object({
     cpf: z.string().refine(
       (value) => {

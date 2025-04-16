@@ -3,6 +3,7 @@ import { FastifyTypedInstance } from 'src/shared/types'
 import { FastifyReply, FastifyRequest } from 'fastify'
 import { Env } from 'src/shared/env'
 import { loadAllFlightsSchema } from './schema'
+import { userAuthMiddleware } from 'src/middlewares/user-auth'
 
 export async function loadAllFlightsRoute(app: FastifyTypedInstance) {
   const path = '/voos'
@@ -11,6 +12,7 @@ export async function loadAllFlightsRoute(app: FastifyTypedInstance) {
     path,
     {
       schema: loadAllFlightsSchema,
+      preHandler: userAuthMiddleware,
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
@@ -23,6 +25,9 @@ export async function loadAllFlightsRoute(app: FastifyTypedInstance) {
         
         const response = await axios.get(`${Env.FLY_SERVICE_URL}/voos`, {
           params: query,
+          headers: {
+            Authorization: `Bearer ${request.user?.token}`,
+          },
         })
         
         return reply.send(response.data)

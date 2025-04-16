@@ -6,6 +6,11 @@ export const registerFlySchema: FastifySchema = {
   tags: ['Voos'],
   summary: 'Inserir um voo novo',
   description: 'Cria um novo voo com os dados fornecidos',
+  security: [
+    {
+      bearerAuth: [],
+    },
+  ],
   body: z.object({
     data: z.string(),
     valor_passagem: z.number().positive('O valor da passagem deve ser positivo'),

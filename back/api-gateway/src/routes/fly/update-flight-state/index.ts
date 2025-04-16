@@ -3,6 +3,7 @@ import { FastifyTypedInstance } from 'src/shared/types'
 import { FastifyReply, FastifyRequest } from 'fastify'
 import { Env } from 'src/shared/env'
 import { updateFlightStateSchema } from './schema'
+import { employeeAuthMiddleware } from 'src/middlewares/employee-auth'  
 
 export async function updateFlightStateRoute(app: FastifyTypedInstance) {
   const path = '/voos/:codigoVoo/estado'
@@ -11,6 +12,7 @@ export async function updateFlightStateRoute(app: FastifyTypedInstance) {
     path,
     {
       schema: updateFlightStateSchema,
+      preHandler: employeeAuthMiddleware,
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
@@ -19,7 +21,12 @@ export async function updateFlightStateRoute(app: FastifyTypedInstance) {
 
         const response = await axios.patch(
           `${Env.FLY_SERVICE_URL}/voos/${codigoVoo}/estado`,
-          { estado },
+            { estado },
+          {
+            headers: {
+              Authorization: `Bearer ${request.user?.token}`,
+            },
+          },
         )
         
         return reply.send(response.data)

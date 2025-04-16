@@ -6,6 +6,11 @@ export const loadAllAirportsSchema: FastifySchema = {
   tags: ['Voos'],
   summary: 'Buscar Aeroportos',
   description: 'Retorna a lista de todos os aeroportos disponíveis',
+  security: [
+    {
+      bearerAuth: [],
+    },
+  ],
   response: {
     [HttpStatusCode.Ok]: z.array(
       z.object({

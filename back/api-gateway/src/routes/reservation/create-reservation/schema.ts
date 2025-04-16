@@ -6,6 +6,11 @@ export const createReservationSchema: FastifySchema = {
   tags: ['Reservas'],
   summary: 'Criar uma reserva',
   description: 'Cria uma nova reserva para um voo',
+  security: [
+    {
+      bearerAuth: [],
+    },
+  ],
   body: z.object({
     codigo_cliente: z.number().describe('Código do cliente'),
     valor: z.number().describe('Valor da reserva'),

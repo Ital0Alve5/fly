@@ -3,6 +3,7 @@ import { FastifyTypedInstance } from 'src/shared/types'
 import { FastifyReply, FastifyRequest } from 'fastify'
 import { Env } from 'src/shared/env'
 import { loadReservationsByClientSchema } from './schema'
+import { clientAuthMiddleware } from 'src/middlewares/client-auth'
 
 export async function loadReservationsByClientRoute(app: FastifyTypedInstance) {
   const path = '/clientes/:codigoCliente/reservas'
@@ -11,6 +12,7 @@ export async function loadReservationsByClientRoute(app: FastifyTypedInstance) {
     path,
     {
       schema: loadReservationsByClientSchema,
+      preHandler: clientAuthMiddleware,
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
@@ -18,6 +20,11 @@ export async function loadReservationsByClientRoute(app: FastifyTypedInstance) {
 
         const reservationsResponse = await axios.get(
           `${Env.RESERVATION_SERVICE_URL}/clientes/${codigoCliente}/reservas`,
+          {
+            headers: {
+              Authorization: `Bearer ${request.user?.token}`,
+            },
+          },
         )
 
         const enrichedReservations = await Promise.all(

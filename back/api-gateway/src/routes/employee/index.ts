@@ -1,8 +1,8 @@
 import { FastifyTypedInstance } from 'src/shared/types'
-import { registerEmployeeRoute } from './register'
-import { loadAllEmployeesRoute } from './load-all'
-import { deleteEmployeeRoute } from './delete'
-import { updateEmployeeRoute } from './update'
+import { registerEmployeeRoute } from './register-employee'
+import { loadAllEmployeesRoute } from './load-all-employees'
+import { deleteEmployeeRoute } from './delete-employee'
+import { updateEmployeeRoute } from './update-employee'
 
 export async function employeeRoutes(app: FastifyTypedInstance) {
   registerEmployeeRoute(app)

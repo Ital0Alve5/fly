@@ -3,6 +3,7 @@ import { FastifyTypedInstance } from 'src/shared/types'
 import { FastifyReply, FastifyRequest } from 'fastify'
 import { Env } from 'src/shared/env'
 import { loadMilesTransactionsSchema } from './schema'
+import { clientAuthMiddleware } from 'src/middlewares/client-auth'
 
 export async function loadMilesTransactionsRoute(app: FastifyTypedInstance) {
   const path = '/clientes/:codigoCliente/milhas'
@@ -11,12 +12,18 @@ export async function loadMilesTransactionsRoute(app: FastifyTypedInstance) {
     path,
     {
       schema: loadMilesTransactionsSchema,
+      preHandler: clientAuthMiddleware,
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
         const { codigoCliente } = request.params as { codigoCliente: string }
         const response = await axios.get(
           `${Env.CLIENT_SERVICE_URL}/clientes/${codigoCliente}/milhas`,
+          {
+            headers: {
+              Authorization: `Bearer ${request.user?.token}`,
+            },
+          },
         )
         return reply.send(response.data)
       } catch (err) {

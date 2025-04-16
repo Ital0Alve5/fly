@@ -3,6 +3,7 @@ import { FastifyTypedInstance } from 'src/shared/types'
 import { FastifyReply, FastifyRequest } from 'fastify'
 import { Env } from 'src/shared/env'
 import { createReservationSchema } from './schema'
+import { clientAuthMiddleware } from 'src/middlewares/client-auth'
 
 export async function createReservationRoute(app: FastifyTypedInstance) {
   const path = '/reservas'
@@ -11,6 +12,7 @@ export async function createReservationRoute(app: FastifyTypedInstance) {
     path,
     {
       schema: createReservationSchema,
+      preHandler: clientAuthMiddleware,
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
@@ -27,6 +29,11 @@ export async function createReservationRoute(app: FastifyTypedInstance) {
         const reservationResponse = await axios.post(
           `${Env.RESERVATION_SERVICE_URL}/reservas`,
           reservationData,
+          {
+            headers: {
+              Authorization: `Bearer ${request.user?.token}`,
+            },
+          },
         )
  
         try {

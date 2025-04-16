@@ -4,8 +4,8 @@ import { z } from 'zod'
 
 export const registerSchema: FastifySchema = {
   tags: ['Autenticação'],
-  summary: 'Inserir um cliente não cadastrado',
-  description: 'Rota para cadastrar um cliente',
+  summary: 'Se cadastrar como um cliente',
+  description: 'Rota para se cadastrar como um cliente',
   body: z.object({
     login: z.object({
       cpf: z.string().refine(

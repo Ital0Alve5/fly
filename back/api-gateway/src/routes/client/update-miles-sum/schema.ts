@@ -6,6 +6,11 @@ export const updateMilesSumSchema: FastifySchema = {
   tags: ['Clientes'],
   summary: 'Somar a quantidade de milhas',
   description: 'Adiciona milhas ao saldo do cliente',
+  security: [
+    {
+      bearerAuth: [],
+    },
+  ],
   params: z.object({
     codigoCliente: z.number(),
   }),

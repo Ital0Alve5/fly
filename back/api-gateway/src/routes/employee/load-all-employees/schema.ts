@@ -6,6 +6,11 @@ export const loadAllEmployeesSchema: FastifySchema = {
   tags: ['Funcionários'],
   summary: 'Buscar todos os funcionários',
   description: 'Buscar todos os funcionários',
+  security: [
+    {
+      bearerAuth: [],
+    },
+  ],
   response: {
     [HttpStatusCode.Ok]: z
       .object({

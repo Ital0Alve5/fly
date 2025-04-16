@@ -2,29 +2,33 @@ import axios, { HttpStatusCode } from 'axios'
 import { FastifyTypedInstance } from 'src/shared/types'
 import { FastifyReply, FastifyRequest } from 'fastify'
 import { Env } from 'src/shared/env'
-import { updateEmployeeSchema } from './schema'
+import { deleteEmployeeSchema } from './schema'
+import { employeeAuthMiddleware } from 'src/middlewares/employee-auth'  
 
-export async function updateEmployeeRoute(app: FastifyTypedInstance) {
+export async function deleteEmployeeRoute(app: FastifyTypedInstance) {
   const path = '/funcionarios/:codigoFuncionario'
-
-  app.put(
+  app.delete(
     path,
     {
-      schema: updateEmployeeSchema,
+      schema: deleteEmployeeSchema,
+      preHandler: employeeAuthMiddleware,
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
         const { codigoFuncionario } = request.params as { codigoFuncionario: string }
-        const response = await axios.put(
+        const response = await axios.delete(
           `${Env.EMPLOYEE_SERVICE_URL}/funcionarios/${codigoFuncionario}`,
-          request.body,
+          {
+            headers: {
+              Authorization: `Bearer ${request.user?.token}`,
+            },
+          },
         )
         return reply.send(response.data)
-      } catch (err) {
+      } catch (err: any) {
         if (axios.isAxiosError(err) && err.response) {
           return reply.status(err.response.status).send(err.response.data)
         }
-
         return reply
           .status(HttpStatusCode.BadGateway)
           .send({ error: 'Erro ao encaminhar a requisição para o upstream' })

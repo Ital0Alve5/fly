@@ -6,6 +6,11 @@ export const loadClientByCodeSchema: FastifySchema = {
   tags: ['Clientes'],
   summary: 'Buscar dados de um cliente',
   description: 'Buscar os dados de um cliente pelo código fornecido na URL',
+  security: [
+    {
+      bearerAuth: [],
+    },
+  ],
   params: z.object({
     codigoCliente: z.number(),
   }),
@@ -26,7 +31,14 @@ export const loadClientByCodeSchema: FastifySchema = {
         complemento: z.string(),
       }),
     }),
-    [HttpStatusCode.Unauthorized]: z.null(),
-    [HttpStatusCode.NotFound]: z.null(),
+    [HttpStatusCode.Unauthorized]: z.object({
+      error: z.string(),
+    }),
+    [HttpStatusCode.Forbidden]: z.object({
+      error: z.string(),
+    }),
+    [HttpStatusCode.NotFound]: z.object({
+      error: z.string(),
+    }),
   },
 } 

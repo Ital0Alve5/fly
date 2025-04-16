@@ -2,19 +2,25 @@ import axios, { HttpStatusCode } from 'axios'
 import { FastifyTypedInstance } from 'src/shared/types'
 import { FastifyReply, FastifyRequest } from 'fastify'
 import { Env } from 'src/shared/env'
-import { loadAllEmployeesSchema } from './schema'
+import { registerEmployeeSchema } from './schema'
+import { employeeAuthMiddleware } from 'src/middlewares/employee-auth'
 
-export async function loadAllEmployeesRoute(app: FastifyTypedInstance) {
+export async function registerEmployeeRoute(app: FastifyTypedInstance) {
   const path = '/funcionarios'
 
-  app.get(
+  app.post(
     path,
     {
-      schema: loadAllEmployeesSchema,
+      schema: registerEmployeeSchema,
+      preHandler: employeeAuthMiddleware,
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
-        const response = await axios.post(Env.EMPLOYEE_SERVICE_URL + path, request.body)
+        const response = await axios.post(Env.EMPLOYEE_SERVICE_URL + path, request.body, {
+          headers: {
+            Authorization: `Bearer ${request.user?.token}`,
+          },
+        })
         return reply.send(response.data)
       } catch (err) {
         if (axios.isAxiosError(err) && err.response) {

@@ -3,6 +3,7 @@ import { FastifyTypedInstance } from 'src/shared/types'
 import { FastifyReply, FastifyRequest } from 'fastify'
 import { Env } from 'src/shared/env'
 import { registerFlySchema } from './schema'
+import { employeeAuthMiddleware } from 'src/middlewares/employee-auth'
 
 export async function registerFlyRoute(app: FastifyTypedInstance) {
   const path = '/voos'
@@ -11,12 +12,18 @@ export async function registerFlyRoute(app: FastifyTypedInstance) {
     path,
     {
       schema: registerFlySchema,
+      preHandler: employeeAuthMiddleware,
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
         const response = await axios.post(
           `${Env.FLY_SERVICE_URL}/voos`,
           request.body,
+          {
+            headers: {
+              Authorization: `Bearer ${request.user?.token}`,
+            },
+          },
         )
         return reply.status(HttpStatusCode.Created).send(response.data)
       } catch (err) {

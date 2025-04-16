@@ -3,6 +3,7 @@ import { FastifyTypedInstance } from 'src/shared/types'
 import { FastifyReply, FastifyRequest } from 'fastify'
 import { Env } from 'src/shared/env'
 import { updateReservationStateSchema } from './schema'
+import { employeeAuthMiddleware } from 'src/middlewares/employee-auth'
 
 export async function updateReservationStateRoute(app: FastifyTypedInstance) {
   const path = '/reservas/:codigoReserva/estado'
@@ -11,6 +12,7 @@ export async function updateReservationStateRoute(app: FastifyTypedInstance) {
     path,
     {
       schema: updateReservationStateSchema,
+      preHandler: employeeAuthMiddleware,
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
@@ -20,6 +22,11 @@ export async function updateReservationStateRoute(app: FastifyTypedInstance) {
         const reservationResponse = await axios.patch(
           `${Env.RESERVATION_SERVICE_URL}/reservas/${codigoReserva}/estado`,
           { estado },
+          {
+            headers: {
+              Authorization: `Bearer ${request.user?.token}`,
+            },
+          },
         )
 
         try {

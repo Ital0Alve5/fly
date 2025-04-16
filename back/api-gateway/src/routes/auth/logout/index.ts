@@ -3,6 +3,7 @@ import { FastifyTypedInstance } from 'src/shared/types'
 import { FastifyReply, FastifyRequest } from 'fastify'
 import { Env } from 'src/shared/env'
 import { logoutSchema } from './schema'
+import { userAuthMiddleware } from 'src/middlewares/user-auth'
 
 export async function logoutRoute(app: FastifyTypedInstance) {
   const path = '/logout'
@@ -11,10 +12,16 @@ export async function logoutRoute(app: FastifyTypedInstance) {
     path,
     {
       schema: logoutSchema,
+      preHandler: userAuthMiddleware,
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
-        const response = await axios.post(Env.AUTH_SERVICE_URL + path, request.body)
+        const response = await axios.post(Env.AUTH_SERVICE_URL + path, request.body, {
+          headers: {
+            Authorization: `Bearer ${request.user?.token}`,
+          },
+        })
+
         return reply.send(response.data)
       } catch (err) {
         if (axios.isAxiosError(err) && err.response) {

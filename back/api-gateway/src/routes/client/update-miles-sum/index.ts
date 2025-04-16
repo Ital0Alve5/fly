@@ -3,6 +3,7 @@ import { FastifyTypedInstance } from 'src/shared/types'
 import { FastifyReply, FastifyRequest } from 'fastify'
 import { Env } from 'src/shared/env'
 import { updateMilesSumSchema } from './schema'
+import { clientAuthMiddleware } from 'src/middlewares/client-auth'
 
 export async function updateMilesSumRoute(app: FastifyTypedInstance) {
   const path = '/clientes/:codigoCliente/milhas'
@@ -11,6 +12,7 @@ export async function updateMilesSumRoute(app: FastifyTypedInstance) {
     path,
     {
       schema: updateMilesSumSchema,
+      preHandler: clientAuthMiddleware,
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
@@ -18,6 +20,11 @@ export async function updateMilesSumRoute(app: FastifyTypedInstance) {
         const response = await axios.put(
           `${Env.CLIENT_SERVICE_URL}/clientes/${codigoCliente}/milhas`,
           request.body,
+          {
+            headers: {
+              Authorization: `Bearer ${request.user?.token}`,
+            },
+          },
         )
         return reply.send(response.data)
       } catch (err) {
