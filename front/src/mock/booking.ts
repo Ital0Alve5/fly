@@ -198,6 +198,7 @@ export async function createNewReservation(data: {
   flight: Flight
   price: number
   miles: number
+  seats: number
 }): Promise<string> {
   const authStore = useAuthStore()
 
@@ -211,7 +212,7 @@ export async function createNewReservation(data: {
       data: getTodayDate(),
       valor: data.price,
       milhas_utilizadas: data.miles,
-      quantidade_poltronas: 3,
+      quantidade_poltronas: data.seats,
       voo: {
         codigo: data.flight.codigo ?? '',
         data: data.flight.data ?? '',

@@ -66,6 +66,10 @@ onMounted(async () => {
               <b>Estado da reserva:</b>
               <p>{{ reservation.estado }}</p>
             </li>
+            <li class="flex gap-2">
+              <b>Quantidade de poltronas:</b>
+              <p>{{ reservation.quantidade_poltronas }}</p>
+            </li>
           </ul>
         </section>
       </CardContent>
