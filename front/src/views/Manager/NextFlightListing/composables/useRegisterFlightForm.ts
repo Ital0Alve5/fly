@@ -13,10 +13,19 @@ const flightSchema = toTypedSchema(
         .min(1, 'Campo obrigatório'),
       price: z
         .string({ required_error: 'O preço é obrigatório' })
-        .regex(/^R\$\s*\d+(?:\.\d{3})*,\d{2}$/, 'Insira no formato válido: R$1000,00'),
+        .regex(/^R\$\s*\d+(?:\.\d{3})*,\d{2}$/, 'Insira no formato válido: R$1000,00')
+        .refine((val) => {
+          const numericValue = parseFloat(
+            val.replace(/R\$\s*/g, '').replace(/\./g, '').replace(',', '.')
+          );
+          return numericValue <= 10000000;
+        }, {
+          message: 'Deve ser menor que R$ 10.000.000,00'
+        }),
       seatsNumber: z.coerce
         .number({ invalid_type_error: 'A quantidade de poltronas é obrigatória' })
-        .min(1, 'Deve ser maior que zero'),
+        .min(1, 'Deve ser maior que zero')
+        .max(10000000, 'Deve ser menor que 10.000.000'),
       date: z.preprocess(
         (arg) => {
           if (typeof arg === 'string' || arg instanceof Date) {

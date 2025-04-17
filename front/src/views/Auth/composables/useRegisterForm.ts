@@ -1,6 +1,7 @@
 import { useForm, useField } from 'vee-validate'
 import { z } from 'zod'
 import { toTypedSchema } from '@vee-validate/zod'
+import { isValidCPF } from '@/lib/utils'
 
 const registerSchema = toTypedSchema(
   z.object({
@@ -9,7 +10,7 @@ const registerSchema = toTypedSchema(
       .string({ required_error: 'E-mail é obrigatório' })
       .email('E-mail inválido')
       .min(1, 'Campo obrigatório'),
-    cpf: z.string({ required_error: 'CPF é obrigatório' }).min(1, 'Campo obrigatório'),
+    cpf: z.string().refine((cpf) => isValidCPF(cpf), 'CPF inválido'),
     cep: z.string({ required_error: 'CEP é obrigatório' }).min(1, 'Campo obrigatório'),
   }),
 )

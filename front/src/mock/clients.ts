@@ -1,5 +1,7 @@
 import type { Client } from '@/types/Auth/AuthenticatedUserData'
 import { ref } from 'vue'
+import { getEmployeeByCPF, getEmployeeByEmail } from '@/mock/employees'
+
 
 const registeredClients = ref<Client[]>([
   {
@@ -24,11 +26,18 @@ export function getClientByEmail(email: string): Client | null {
   return registeredClients.value.find((client) => client.email === email) || null
 }
 
+export function getClientByCPF(cpf: string): Client | null {
+  return registeredClients.value.find((client) => client.cpf === cpf) || null
+}
+
 export function registerClient(newClient: Client): void {
-  if (getClientByEmail(newClient.email)) {
-    throw new Error('E-mail já cadastrado como cliente.')
+  if (getEmployeeByEmail(newClient.email) || getClientByEmail(newClient.email)) {
+    throw new Error('E-mail já cadastrado.')
+  }
+  if (getEmployeeByCPF(newClient.cpf) || getClientByCPF(newClient.cpf)) {
+    throw new Error('CPF já cadastrado.')
   }
   registeredClients.value.push(newClient)
 }
 
-export default { registeredClients, registerClient, getClientByEmail }
+export default { registeredClients, registerClient, getClientByEmail, getClientByCPF }

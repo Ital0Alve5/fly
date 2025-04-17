@@ -72,7 +72,7 @@ const onSubmit = async () => {
     <h2 class="text-lg font-semibold text-center">Selecione a quantidade de milhas</h2>
 
     <div class="px-6 pb-6">
-      <NumberField id="miles" v-model="currentCheckoutMiles" :min="0">
+      <NumberField id="miles" v-model="currentCheckoutMiles" :min="0" :max="10000000">
         <Label>Milhas</Label>
         <NumberFieldContent>
           <NumberFieldDecrement />
