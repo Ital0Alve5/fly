@@ -349,6 +349,14 @@ export function performFlight(code: string): void {
   if (flight) flight.estado = 'REALIZADO'
 }
 
+export function reserveSeats(code: string, numberOfSeats: number): void {
+  const flight = flights.find((f) => f.codigo === code)
+  if (flight) {
+    flight.quantidade_poltronas_ocupadas += numberOfSeats;
+  }
+}
+
+
 export default {
   flights,
   searchFlights,
@@ -356,4 +364,5 @@ export default {
   cancelFlight,
   performFlight,
   registerFlight,
+  reserveSeats
 }

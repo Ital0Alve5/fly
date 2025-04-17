@@ -21,7 +21,7 @@ import { useRoute, useRouter } from 'vue-router'
 
 import { useMilesStore } from '@/stores/miles'
 import FlightDetails from './components/FlightDetails.vue'
-import { getFlightByCode } from '@/mock/flight'
+import { getFlightByCode, reserveSeats } from '@/mock/flight'
 import { createNewReservation } from '@/mock/booking'
 import { registerExtract } from '@/mock/extract'
 import { useAuthStore } from '@/stores/auth'
@@ -37,11 +37,27 @@ const authStore = useAuthStore()
 const code = route.params.code as string
 const flight = ref<Flight | null>(getFlightByCode(code) ?? null)
 const miles = ref(0)
+const seats = ref(1)
 const generatedCode = ref('')
 
 const valueToPay = computed(() => {
   const discount = miles.value * milesStore.pricePerMile
-  return (flight.value?.valor_passagem ?? discount) - discount
+  if (!flight.value || flight.value.valor_passagem === undefined) {
+    return -1;
+  }
+  const totalValue = flight.value.valor_passagem * seats.value;
+  return totalValue - discount;
+})
+
+const availableSeats = computed(() => {
+    return (flight.value ? flight.value.quantidade_poltronas_total - flight.value.quantidade_poltronas_ocupadas : 0);
+  })
+
+const availableMilesToUse = computed(() => {
+  const maxMilesToCoverFullPrice = flight.value 
+    ? Math.floor((flight.value.valor_passagem * seats.value) / milesStore.pricePerMile) 
+    : 0;
+  return Math.min(maxMilesToCoverFullPrice, milesStore.totalMiles);
 })
 
 async function handleReserveFlight() {
@@ -51,6 +67,7 @@ async function handleReserveFlight() {
     flight: flight.value!,
     price: valueToPay.value,
     miles: miles.value,
+    seats: seats.value,
   })
 
   registerExtract({
@@ -62,6 +79,8 @@ async function handleReserveFlight() {
     descricao: `${flight.value?.aeroporto_origem.codigo}->${flight.value?.aeroporto_destino.codigo}`,
     tipo: 'SAÍDA',
   })
+
+  reserveSeats(flight.value?.codigo || '', seats.value)
 }
 </script>
 <template>
@@ -105,7 +124,16 @@ async function handleReserveFlight() {
 
         <ResizablePanel :default-size="40" class="bg-black">
           <div class="h-full flex flex-col p-6 gap-4">
-            <NumberField id="miles" v-model="miles" :min="0" :max="milesStore.totalMiles">
+            <NumberField id="seat" v-model="seats" :min="1" :max="availableSeats" :disabled="availableSeats === 0">
+              <label>Quantidade de poltronas:</label>
+              <NumberFieldContent>
+                <NumberFieldDecrement />
+                <NumberFieldInput />
+                <NumberFieldIncrement />
+              </NumberFieldContent>
+            </NumberField>
+
+            <NumberField id="miles" v-model="miles" :min="0" :max="availableMilesToUse">
               <label>Milhas a usar</label>
               <NumberFieldContent>
                 <NumberFieldDecrement />
@@ -122,7 +150,13 @@ async function handleReserveFlight() {
             </p>
 
             <DialogTrigger as-child>
-              <Button @click="handleReserveFlight" class="w-full mt-auto"> Pagar </Button>
+              <Button 
+                @click="handleReserveFlight" 
+                class="w-full mt-auto"
+                :disabled="availableSeats === 0"
+              > 
+                {{ availableSeats === 0 ? 'Este voo já está cheio!' : 'Pagar' }} 
+            </Button>
             </DialogTrigger>
           </div>
         </ResizablePanel>
