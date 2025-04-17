@@ -24,9 +24,16 @@ export function getClientByEmail(email: string): Client | null {
   return registeredClients.value.find((client) => client.email === email) || null
 }
 
+export function getClientByCPF(cpf: string): Client | null {
+  return registeredClients.value.find((client) => client.cpf === cpf) || null
+}
+
 export function registerClient(newClient: Client): void {
   if (getClientByEmail(newClient.email)) {
     throw new Error('E-mail já cadastrado como cliente.')
+  }
+  if (getClientByCPF(newClient.cpf)) {
+    throw new Error('CPF já cadastrado como cliente.')
   }
   registeredClients.value.push(newClient)
 }
