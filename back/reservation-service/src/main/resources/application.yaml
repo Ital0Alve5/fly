@@ -34,3 +34,8 @@ spring:
       locations: classpath:db/migration-command
     query:
       locations: classpath:db/migration-query
+  rabbitmq:
+    host: rabbitmq
+    port: 5672
+    username: guest
+    password: guest

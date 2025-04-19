@@ -1,0 +1,24 @@
+package com.dac.fly.reservationservice.publisher;
+
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.stereotype.Component;
+
+import com.dac.fly.reservationservice.config.RabbitMQConfig;
+import com.dac.fly.reservationservice.dto.ReservationDto;
+
+@Component
+public class ReservationPublisher {
+
+    private final RabbitTemplate rabbitTemplate;
+
+    public ReservationPublisher(RabbitTemplate rabbitTemplate) {
+        this.rabbitTemplate = rabbitTemplate;
+    }
+
+    public void publishCreatedReservation(ReservationDto payloadJson) {
+        rabbitTemplate.convertAndSend(
+                RabbitMQConfig.EXCHANGE_RESERVA,
+                RabbitMQConfig.ROUTING_KEY_RESERVA_CRIADA,
+                payloadJson);
+    }
+}
