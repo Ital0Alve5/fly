@@ -7,13 +7,14 @@ import org.springframework.stereotype.Service;
 
 import com.dac.fly.reservationservice.dto.HistoryDto;
 import com.dac.fly.reservationservice.dto.ReservationDto;
+import com.dac.fly.reservationservice.dto.response.ClientReservationsDto;
 import com.dac.fly.reservationservice.entity.command.Historico;
-import com.dac.fly.reservationservice.entity.command.Reserva;
 import com.dac.fly.reservationservice.enums.ReservationStatusEnum;
 import com.dac.fly.reservationservice.publisher.ReservationPublisher;
 import com.dac.fly.reservationservice.repository.command.EstadoRepository;
 import com.dac.fly.reservationservice.repository.command.HistoryRepository;
 import com.dac.fly.reservationservice.repository.command.ReservaCommandRepository;
+import com.dac.fly.reservationservice.repository.query.ReservaQueryRepository;
 
 @Service
 public class ReservationService {
@@ -22,18 +23,35 @@ public class ReservationService {
     private final EstadoRepository estadoRepository;
     private final ReservationPublisher publisher;
     private final HistoryRepository historyRepository;
+    private final ReservaQueryRepository reservaQueryRepository;
 
     public ReservationService(
             ReservaCommandRepository repository, EstadoRepository estadoRepository, ReservationPublisher publisher,
-            com.dac.fly.reservationservice.repository.command.HistoryRepository historyRepository) {
+            com.dac.fly.reservationservice.repository.command.HistoryRepository historyRepository,
+            ReservaQueryRepository reservaQueryRepository) {
         this.repository = repository;
         this.estadoRepository = estadoRepository;
         this.publisher = publisher;
         this.historyRepository = historyRepository;
+        this.reservaQueryRepository = reservaQueryRepository;
+    }
+
+    public List<ClientReservationsDto> getReservationByClientCode(Long clientCode) {
+        List<com.dac.fly.reservationservice.entity.query.Reserva> reservations = reservaQueryRepository
+                .findBycodigoCliente(clientCode);
+
+        return reservations.stream().map(r -> new ClientReservationsDto(
+                r.getCodigo(),
+                r.getDataReserva(),
+                r.getValor(),
+                r.getMilhasUtilizadas(),
+                r.getQuantidadePoltronas(),
+                r.getCodigoCliente(),
+                ReservationStatusEnum.valueOf(r.getEstado()))).toList();
     }
 
     public void createReservation(ReservationDto reservationDto) {
-        Reserva reserva = new Reserva();
+        com.dac.fly.reservationservice.entity.command.Reserva reserva = new com.dac.fly.reservationservice.entity.command.Reserva();
         reserva.setCodigo(generateCode());
         reserva.setCodigoCliente(reservationDto.getCodigo_cliente());
         reserva.setQuantidadePoltronas(reservationDto.getQuantidade_poltronas());
@@ -63,7 +81,7 @@ public class ReservationService {
         reservationDto.setCodigo(reserva.getCodigo());
         reservationDto.setHistorico(historyDto);
         reservationDto.setDataReserva(reserva.getDataReserva());
-        
+
         try {
             publisher.publishCreatedReservation(reservationDto);
         } catch (Exception e) {

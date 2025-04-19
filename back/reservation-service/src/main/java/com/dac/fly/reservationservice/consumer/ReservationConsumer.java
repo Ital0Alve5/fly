@@ -33,12 +33,12 @@ public class ReservationConsumer {
         reserva.setQuantidadePoltronas(message.getQuantidade_poltronas());
         reserva.setCodigoCliente(message.getCodigo_cliente());
         reserva.setEstado(ReservationStatusEnum.CRIADA.name());
+        reserva.setCodigoVoo(message.getCodigo_voo());
         reserva.setAeroportoOrigem(message.getCodigo_aeroporto_origem());
         reserva.setAeroportoDestino(message.getCodigo_aeroporto_destino());
         reserva.setValor(message.getValor());
 
         String historicoJson = objectMapper.writeValueAsString(message.getHistorico());
-        reserva.setHistorico(historicoJson);
 
         reserva.setHistorico(historicoJson);
 

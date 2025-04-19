@@ -15,7 +15,22 @@ public class ReservationDto {
     private String codigo_aeroporto_destino;
     private List<HistoryDto> historico;
 
-    public ReservationDto() {}
+    public ReservationDto() {
+    }
+
+    public ReservationDto(String codigo, Long codigo_cliente, LocalDateTime data_reserva, Double valor,
+            Integer milhas_utilizadas, String codigo_voo, String codigo_aeroporto_origem,
+            String codigo_aeroporto_destino, List<HistoryDto> historico) {
+        this.codigo = codigo;
+        this.codigo_cliente = codigo_cliente;
+        this.data_reserva = data_reserva;
+        this.valor = valor;
+        this.milhas_utilizadas = milhas_utilizadas;
+        this.codigo_voo = codigo_voo;
+        this.codigo_aeroporto_origem = codigo_aeroporto_origem;
+        this.codigo_aeroporto_destino = codigo_aeroporto_destino;
+        this.historico = historico;
+    }
 
     public Long getCodigo_cliente() {
         return codigo_cliente;

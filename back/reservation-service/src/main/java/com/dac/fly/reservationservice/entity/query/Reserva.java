@@ -28,6 +28,9 @@ public class Reserva {
 
     private String estado;
 
+    @Column(name = "codigo_voo")
+    private String codigoVoo;
+
     @Column(name = "aeroporto_origem")
     private String aeroportoOrigem;
 
@@ -134,5 +137,13 @@ public class Reserva {
 
     public void setHistorico(String historico) {
         this.historico = historico;
+    }
+    
+    public String getCodigoVoo() {
+        return codigoVoo;
+    }
+
+    public void setCodigoVoo(String codigoVoo) {
+        this.codigoVoo = codigoVoo;
     }
 }
