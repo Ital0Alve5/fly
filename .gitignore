@@ -1,3 +1,2 @@
 .docker/pgdb/data/
 .docker/mongodb/*
-!**/bin
