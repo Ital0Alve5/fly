@@ -8,4 +8,9 @@ public enum ReservationStatusEnum {
     EMBARCADA,
     REALIZADA,
     NAO_REALIZADA;
+
+    @Override
+    public String toString() {
+        return this.name().replace("_", "-");
+    }
 }

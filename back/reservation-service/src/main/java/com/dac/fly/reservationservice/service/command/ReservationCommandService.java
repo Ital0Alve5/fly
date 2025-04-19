@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 
 import com.dac.fly.reservationservice.dto.HistoryDto;
 import com.dac.fly.reservationservice.dto.ReservationDto;
+import com.dac.fly.reservationservice.dto.events.ReservationUpdatedEventDto;
+import com.dac.fly.reservationservice.dto.request.ReservationUpdateStatusDto;
 import com.dac.fly.reservationservice.entity.command.Historico;
 import com.dac.fly.reservationservice.entity.command.Reserva;
 import com.dac.fly.reservationservice.enums.ReservationStatusEnum;
@@ -99,6 +101,38 @@ public class ReservationCommandService {
         } catch (Exception e) {
             throw new RuntimeException("Erro ao publicar evento de reserva", e);
         }
+    }
+
+    public void updateReservationStatusByCode(String codigoReserva, ReservationUpdateStatusDto novoEstado) {
+        Reserva reserva = repository.findById(codigoReserva)
+                .orElseThrow(() -> new RuntimeException("Reserva não encontrada"));
+
+        Long idNovoEstado = estadoRepository.findByNome(novoEstado.estado().name())
+                .orElseThrow(() -> new RuntimeException("Estado não encontrado"))
+                .getCodigo();
+
+        Long idEstadoAnterior = reserva.getEstado();
+        reserva.setEstado(idNovoEstado);
+        repository.save(reserva);
+
+        Historico historico = new Historico(
+                reserva.getCodigo(),
+                LocalDateTime.now(),
+                idEstadoAnterior,
+                idNovoEstado);
+        historyRepository.save(historico);
+
+        List<HistoryDto> historicoAtualizado = getReservationHistory(reserva.getCodigo());
+
+        ReservationUpdatedEventDto reservationUpdatedEventDto = ReservationUpdatedEventDto.fromCommand(reserva,
+                novoEstado.estado(), historicoAtualizado);
+
+        try {
+            publisher.publishReservationUpdated(reservationUpdatedEventDto);
+        } catch (Exception e) {
+            throw new RuntimeException("Erro ao publicar evento de reserva", e);
+        }
+
     }
 
     private List<HistoryDto> getReservationHistory(String reservationCode) {

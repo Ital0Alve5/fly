@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import com.dac.fly.reservationservice.config.RabbitMQConfig;
 import com.dac.fly.reservationservice.dto.HistoryDto;
 import com.dac.fly.reservationservice.dto.ReservationDto;
+import com.dac.fly.reservationservice.dto.events.ReservationUpdatedEventDto;
 
 @Component
 public class ReservationPublisher {
@@ -31,4 +32,12 @@ public class ReservationPublisher {
                 RabbitMQConfig.ROUTING_KEY_RESERVA_CANCELADA,
                 history);
     }
+
+    public void publishReservationUpdated(ReservationUpdatedEventDto event) {
+        rabbitTemplate.convertAndSend(
+                RabbitMQConfig.EXCHANGE_RESERVA,
+                RabbitMQConfig.ROUTING_KEY_RESERVA_ATUALIZADA,
+                event);
+    }
+
 }
