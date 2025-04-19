@@ -10,4 +10,6 @@ import com.dac.fly.reservationservice.entity.query.Reserva;
 @Repository
 public interface ReservaQueryRepository extends JpaRepository<Reserva, String> {
     List<Reserva> findBycodigoCliente(Long codigoCliente);
+
+    Reserva findBycodigo(String code);
 }
