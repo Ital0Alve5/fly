@@ -12,7 +12,7 @@ export async function loadReservationByCodeRoute(app: FastifyTypedInstance) {
     path,
     {
       schema: loadReservationByCodeSchema,
-      // preHandler: userAuthMiddleware,
+      preHandler: userAuthMiddleware,
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
