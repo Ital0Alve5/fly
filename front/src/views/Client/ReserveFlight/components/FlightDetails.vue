@@ -33,7 +33,11 @@ defineProps<{
         </li>
         <li class="flex gap-2">
           <b>Preço da poltrona:</b>
-          <p>{{ flight.valor_passagem.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) }}</p>
+          <p>
+            {{
+              flight.valor_passagem.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+            }}
+          </p>
         </li>
       </ul>
     </CardContent>
