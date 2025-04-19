@@ -1,4 +1,4 @@
-package com.dac.fly.reservationservice.service;
+package com.dac.fly.reservationservice.service.command;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -8,58 +8,32 @@ import org.springframework.stereotype.Service;
 import com.dac.fly.reservationservice.dto.HistoryDto;
 import com.dac.fly.reservationservice.dto.ReservationDto;
 import com.dac.fly.reservationservice.entity.command.Historico;
+import com.dac.fly.reservationservice.entity.command.Reserva;
 import com.dac.fly.reservationservice.enums.ReservationStatusEnum;
 import com.dac.fly.reservationservice.publisher.ReservationPublisher;
 import com.dac.fly.reservationservice.repository.command.EstadoRepository;
 import com.dac.fly.reservationservice.repository.command.HistoryRepository;
 import com.dac.fly.reservationservice.repository.command.ReservaCommandRepository;
-import com.dac.fly.reservationservice.repository.query.ReservaQueryRepository;
 
 @Service
-public class ReservationService {
+public class ReservationCommandService {
 
     private final ReservaCommandRepository repository;
     private final EstadoRepository estadoRepository;
     private final ReservationPublisher publisher;
     private final HistoryRepository historyRepository;
-    private final ReservaQueryRepository reservaQueryRepository;
 
-    public ReservationService(
-            ReservaCommandRepository repository, EstadoRepository estadoRepository, ReservationPublisher publisher,
-            com.dac.fly.reservationservice.repository.command.HistoryRepository historyRepository,
-            ReservaQueryRepository reservaQueryRepository) {
+    public ReservationCommandService(
+            ReservaCommandRepository repository, EstadoRepository estadoRepository,
+            ReservationPublisher publisher, HistoryRepository historyRepository) {
         this.repository = repository;
         this.estadoRepository = estadoRepository;
         this.publisher = publisher;
         this.historyRepository = historyRepository;
-        this.reservaQueryRepository = reservaQueryRepository;
-    }
-
-    public List<com.dac.fly.reservationservice.dto.response.ReservationDto> getReservationByClientCode(
-            Long clientCode) {
-        List<com.dac.fly.reservationservice.entity.query.Reserva> reservations = reservaQueryRepository
-                .findBycodigoCliente(clientCode);
-
-        return reservations.stream().map(r -> new com.dac.fly.reservationservice.dto.response.ReservationDto(
-                r.getCodigo(),
-                r.getDataReserva(),
-                r.getValor(),
-                r.getMilhasUtilizadas(),
-                r.getQuantidadePoltronas(),
-                r.getCodigoCliente(),
-                ReservationStatusEnum.valueOf(r.getEstado()))).toList();
-    }
-
-    public com.dac.fly.reservationservice.dto.response.ReservationDto getReservationByCode(
-            String code) {
-        com.dac.fly.reservationservice.entity.query.Reserva reservation = reservaQueryRepository
-                .findBycodigo(code);
-
-        return com.dac.fly.reservationservice.dto.response.ReservationDto.from(reservation);
     }
 
     public void createReservation(ReservationDto reservationDto) {
-        com.dac.fly.reservationservice.entity.command.Reserva reserva = new com.dac.fly.reservationservice.entity.command.Reserva();
+        Reserva reserva = new Reserva();
         reserva.setCodigo(generateCode());
         reserva.setCodigoCliente(reservationDto.getCodigo_cliente());
         reserva.setQuantidadePoltronas(reservationDto.getQuantidade_poltronas());
@@ -97,10 +71,40 @@ public class ReservationService {
         }
     }
 
+    public void cancelReservationByCode(String codigoReserva) {
+        Reserva reservation = repository.findById(codigoReserva)
+                .orElseThrow(() -> new RuntimeException("Reserva não encontrada: " + codigoReserva));
+
+        Long currentStatus = reservation.getEstado();
+        Long canceledStatusId = estadoRepository.findByNome(ReservationStatusEnum.CANCELADA.name())
+                .orElseThrow(() -> new RuntimeException("Estado 'CANCELADA' não encontrado"))
+                .getCodigo();
+
+        reservation.setEstado(canceledStatusId);
+
+        repository.save(reservation);
+
+        Historico history = new Historico(
+                reservation.getCodigo(),
+                LocalDateTime.now(),
+                currentStatus,
+                canceledStatusId);
+
+        historyRepository.save(history);
+
+        List<HistoryDto> historyDto = getReservationHistory(codigoReserva);
+
+        try {
+            publisher.publishReservationCancelled(historyDto);
+        } catch (Exception e) {
+            throw new RuntimeException("Erro ao publicar evento de reserva", e);
+        }
+    }
+
     private List<HistoryDto> getReservationHistory(String reservationCode) {
         List<Historico> history = historyRepository.findByCodigoReserva(reservationCode);
 
-        List<HistoryDto> historyDto = history.stream()
+        return history.stream()
                 .map(h -> new HistoryDto(
                         h.getId(),
                         h.getCodigoReserva(),
@@ -108,8 +112,6 @@ public class ReservationService {
                         resolveEstadoNome(h.getEstadoOrigem()),
                         resolveEstadoNome(h.getEstadoDestino())))
                 .toList();
-
-        return historyDto;
     }
 
     private String resolveEstadoNome(Long id) {

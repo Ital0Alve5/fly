@@ -17,6 +17,9 @@ public class RabbitMQConfig {
     public static final String QUEUE_RESERVA_CRIADA = "reserva.criada";
     public static final String ROUTING_KEY_RESERVA_CRIADA = "reserva.criada";
 
+    public static final String QUEUE_RESERVA_CANCELADA = "reserva.cancelada";
+    public static final String ROUTING_KEY_RESERVA_CANCELADA = "reserva.cancelada";
+
     @Bean
     public DirectExchange reservaExchange() {
         return new DirectExchange(EXCHANGE_RESERVA);
@@ -33,6 +36,19 @@ public class RabbitMQConfig {
                 .bind(createdReservationQueue)
                 .to(reservaExchange)
                 .with(ROUTING_KEY_RESERVA_CRIADA);
+    }
+
+    @Bean
+    public Queue cancelledReservationQueue() {
+        return new Queue(QUEUE_RESERVA_CANCELADA, true);
+    }
+
+    @Bean
+    public Binding bindingReservaCancelada(Queue cancelledReservationQueue, DirectExchange reservaExchange) {
+        return BindingBuilder
+                .bind(cancelledReservationQueue)
+                .to(reservaExchange)
+                .with(ROUTING_KEY_RESERVA_CANCELADA);
     }
 
     @Bean

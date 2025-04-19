@@ -1,10 +1,13 @@
 package com.dac.fly.reservationservice.consumer;
 
+import java.util.List;
+
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 
 import com.dac.fly.reservationservice.config.RabbitMQConfig;
+import com.dac.fly.reservationservice.dto.HistoryDto;
 import com.dac.fly.reservationservice.dto.ReservationDto;
 import com.dac.fly.reservationservice.entity.query.Reserva;
 import com.dac.fly.reservationservice.enums.ReservationStatusEnum;
@@ -44,4 +47,21 @@ public class ReservationConsumer {
 
         repository.save(reserva);
     }
+
+    @RabbitListener(queues = RabbitMQConfig.QUEUE_RESERVA_CANCELADA)
+    public void listenReservationCanceled(@Payload List<HistoryDto> history) throws JsonProcessingException {
+
+        Reserva reservation = repository.findById(history.get(0).getCodigo_reserva())
+                .orElseThrow(
+                        () -> new RuntimeException("reserva não encontrada no banco query!"));
+
+        reservation.setEstado(ReservationStatusEnum.CANCELADA.name());
+
+        String historicoJson = objectMapper.writeValueAsString(history);
+
+        reservation.setHistorico(historicoJson);
+
+        repository.save(reservation);
+    }
+
 }
