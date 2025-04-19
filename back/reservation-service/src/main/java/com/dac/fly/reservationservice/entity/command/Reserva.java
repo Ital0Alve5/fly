@@ -25,16 +25,20 @@ public class Reserva {
     @Column(name = "data_reserva")
     private LocalDateTime dataReserva;
 
+    @Column(name = "quantidade_poltronas")
+    private Integer quantidadePoltronas;
+
     @Column(name = "valor_pago")
     private Double valorPago;
 
     @Column(name = "milhas_utilizadas")
     private Integer milhasUtilizadas;
 
-    public Reserva() {}
+    public Reserva() {
+    }
 
     public Reserva(String codigo, String codigoVoo, Long codigoCliente, Long estado,
-                   LocalDateTime dataReserva, Double valorPago, Integer milhasUtilizadas) {
+            LocalDateTime dataReserva, Double valorPago, Integer milhasUtilizadas) {
         this.codigo = codigo;
         this.codigoVoo = codigoVoo;
         this.codigoCliente = codigoCliente;
@@ -98,5 +102,13 @@ public class Reserva {
 
     public void setMilhasUtilizadas(Integer milhasUtilizadas) {
         this.milhasUtilizadas = milhasUtilizadas;
+    }
+
+    public Integer getQuantidadePoltronas() {
+        return quantidadePoltronas;
+    }
+
+    public void setQuantidadePoltronas(Integer quantidadePoltronas) {
+        this.quantidadePoltronas = quantidadePoltronas;
     }
 }

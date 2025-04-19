@@ -36,6 +36,7 @@ public class ReservationService {
         Reserva reserva = new Reserva();
         reserva.setCodigo(generateCode());
         reserva.setCodigoCliente(reservationDto.getCodigo_cliente());
+        reserva.setQuantidadePoltronas(reservationDto.getQuantidade_poltronas());
         reserva.setCodigoVoo(reservationDto.getCodigo_voo());
         reserva.setDataReserva(LocalDateTime.now());
         reserva.setMilhasUtilizadas(reservationDto.getMilhas_utilizadas());
