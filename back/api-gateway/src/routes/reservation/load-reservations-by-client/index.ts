@@ -19,7 +19,7 @@ export async function loadReservationsByClientRoute(app: FastifyTypedInstance) {
         const { codigoCliente } = request.params as { codigoCliente: string }
 
         const reservationsResponse = await axios.get(
-          `${Env.RESERVATION_SERVICE_URL}/clientes/${codigoCliente}/reservas`,
+          `${Env.RESERVATION_SERVICE_URL}/reservas/clientes/${codigoCliente}`,
           {
             headers: {
               Authorization: `Bearer ${request.user?.token}`,

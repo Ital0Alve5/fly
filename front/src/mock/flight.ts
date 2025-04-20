@@ -352,10 +352,9 @@ export function performFlight(code: string): void {
 export function reserveSeats(code: string, numberOfSeats: number): void {
   const flight = flights.find((f) => f.codigo === code)
   if (flight) {
-    flight.quantidade_poltronas_ocupadas += numberOfSeats;
+    flight.quantidade_poltronas_ocupadas += numberOfSeats
   }
 }
-
 
 export default {
   flights,
@@ -364,5 +363,5 @@ export default {
   cancelFlight,
   performFlight,
   registerFlight,
-  reserveSeats
+  reserveSeats,
 }
