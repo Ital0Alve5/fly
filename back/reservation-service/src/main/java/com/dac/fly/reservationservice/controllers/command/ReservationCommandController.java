@@ -1,10 +1,13 @@
 package com.dac.fly.reservationservice.controllers.command;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.dac.fly.reservationservice.dto.ReservationDto;
+import com.dac.fly.reservationservice.dto.request.ReservationCreateRequestDto;
 import com.dac.fly.reservationservice.dto.request.ReservationUpdateStatusDto;
+import com.dac.fly.reservationservice.dto.response.ApiResponse;
+import com.dac.fly.reservationservice.dto.response.ReservationResponseDto;
 import com.dac.fly.reservationservice.service.command.ReservationCommandService;
 
 @RestController
@@ -18,29 +21,40 @@ public class ReservationCommandController {
     }
 
     @PostMapping
-    public ResponseEntity<Void> createReservation(@RequestBody ReservationDto dto) {
-        reservationService.createReservation(dto);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<ApiResponse<ReservationResponseDto>> createReservation(
+            @RequestBody ReservationCreateRequestDto dto) {
+        try {
+            ReservationResponseDto response = reservationService.createReservation(dto);
+            return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(response));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ApiResponse.error("Erro ao criar reserva", 400));
+        }
     }
 
     @DeleteMapping("/{codigoReserva}")
-    public ResponseEntity<ReservationDto> cancelReservationByCode(@PathVariable String codigoReserva) {
+    public ResponseEntity<ApiResponse<ReservationResponseDto>> cancelReservationByCode(
+            @PathVariable String codigoReserva) {
         try {
-            reservationService.cancelReservationByCode(codigoReserva);
-            return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(null);
+            ReservationResponseDto response = reservationService.cancelReservationByCode(codigoReserva);
+            return ResponseEntity.ok(ApiResponse.success(response));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(ApiResponse.error(e.getMessage(), 404));
         }
     }
 
     @PatchMapping("/{codigoReserva}/estado")
-    public ResponseEntity<ReservationDto> updateReservationStatus(@PathVariable String codigoReserva,
+    public ResponseEntity<ApiResponse<ReservationResponseDto>> updateReservationStatus(
+            @PathVariable String codigoReserva,
             @RequestBody ReservationUpdateStatusDto newStatus) {
         try {
-            reservationService.updateReservationStatusByCode(codigoReserva, newStatus);
-            return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(null);
+            ReservationResponseDto response = reservationService.updateReservationStatusByCode(codigoReserva,
+                    newStatus);
+            return ResponseEntity.ok(ApiResponse.success(response));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(ApiResponse.error(e.getMessage(), 404));
         }
     }
 }
