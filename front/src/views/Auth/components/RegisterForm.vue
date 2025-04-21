@@ -4,6 +4,9 @@ import { useRegisterForm } from '../composables/useRegisterForm'
 import { useAddressByCep } from '../composables/useAddressByCep'
 import { useAuthStore } from '@/stores/auth'
 import { useGlobalStore } from '@/stores/global'
+import { useToast } from '@/components/ui/toast'
+
+const { toast } = useToast()
 
 import {
   Card,
@@ -27,30 +30,39 @@ const { handleSubmit, name, registerEmail, cpf, cep } = useRegisterForm()
 const { street, neighborhood, city, state, number, complement } = useAddressByCep(cep.value)
 
 const onSubmit = handleSubmit(async (values) => {
-  const newUserData: Client = {
-    codigo: Date.now(),
-    nome: values.name,
-    email: values.registerEmail,
-    cpf: values.cpf,
-    saldo_milhas: 0,
-    endereco: {
-      cep: values.cep,
-      rua: street.value,
-      bairro: neighborhood.value,
-      cidade: city.value,
-      uf: state.value,
-      complemento: complement.value,
-      numero: number.value,
-    },
-  }
+  try {
+    const newUserData: Client = {
+      codigo: Date.now(),
+      nome: values.name,
+      email: values.registerEmail,
+      cpf: values.cpf,
+      saldo_milhas: 0,
+      endereco: {
+        cep: values.cep,
+        rua: street.value,
+        bairro: neighborhood.value,
+        cidade: city.value,
+        uf: state.value,
+        complemento: complement.value,
+        numero: number.value,
+      },
+    }
 
-  await authStore.register(newUserData)
-  globalStore.setNotification({
-    title: 'Cadastro realizado!',
-    description: 'Verifique seu e-mail para a senha',
-    variant: 'default',
+    await authStore.register(newUserData)
+    globalStore.setNotification({
+      title: 'Cadastro realizado!',
+      description: 'Verifique seu e-mail para a senha',
+      variant: 'default',
+    })
+    router.push('/reservas')
+  } catch(error) {
+    toast({
+    title: 'Erro no cadastro',
+    description: error instanceof Error ? error.message : 'Falha ao tentar cadastrar',
+    variant: 'destructive',
+    duration: 2500,
   })
-  router.push('/reservas')
+  }
 })
 </script>
 
