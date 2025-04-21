@@ -2,7 +2,6 @@ import type { Client } from '@/types/Auth/AuthenticatedUserData'
 import { ref } from 'vue'
 import { getEmployeeByCPF, getEmployeeByEmail } from '@/mock/employees'
 
-
 const registeredClients = ref<Client[]>([
   {
     codigo: 1,

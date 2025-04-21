@@ -25,11 +25,11 @@ export const flights: Flight[] = [
   },
   {
     codigo: 'STU901',
-    data: '15/04/25 14:00',
-    valor_passagem: 200.0,
+    data: '22/04/25 14:00',
+    valor_passagem: 200,
     quantidade_poltronas_total: 180,
     quantidade_poltronas_ocupadas: 170,
-    estado: 'CONFIRMADO',
+    estado: 'REALIZADO',
     aeroporto_origem: {
       codigo: 'GIG',
       nome: 'Aeroporto do Galeão',
@@ -46,10 +46,10 @@ export const flights: Flight[] = [
   {
     codigo: 'MNO345',
     data: '22/04/25 14:00',
-    valor_passagem: 50.0,
+    valor_passagem: 50,
     quantidade_poltronas_total: 180,
     quantidade_poltronas_ocupadas: 40,
-    estado: 'CONFIRMADO',
+    estado: 'CANCELADO',
     aeroporto_origem: {
       codigo: 'BSB',
       nome: 'Aeroporto de Brasília',
@@ -310,6 +310,10 @@ type RegisterFlightFormType = {
 export async function registerFlight(data: RegisterFlightFormType) {
   await new Promise((resolve) => setTimeout(resolve, 2000))
 
+  if (flights.some((f) => f.codigo === data.code)) {
+    throw new Error('Código de voo já existe.')
+  }
+
   const originCity = loadCityByAirpoirt(data.originAirport)
   const destinationCity = loadCityByAirpoirt(data.destinationAirport)
 
@@ -352,6 +356,8 @@ export function performFlight(code: string): void {
 export function reserveSeats(code: string, numberOfSeats: number): void {
   const flight = flights.find((f) => f.codigo === code)
   if (flight) {
+    const disponiveis = flight.quantidade_poltronas_total - flight.quantidade_poltronas_ocupadas
+    if (numberOfSeats > disponiveis) throw new Error('Poltronas insuficientes.')
     flight.quantidade_poltronas_ocupadas += numberOfSeats
   }
 }

@@ -55,13 +55,13 @@ const onSubmit = handleSubmit(async (values) => {
       variant: 'default',
     })
     router.push('/reservas')
-  } catch(error) {
+  } catch (error) {
     toast({
-    title: 'Erro no cadastro',
-    description: error instanceof Error ? error.message : 'Falha ao tentar cadastrar',
-    variant: 'destructive',
-    duration: 2500,
-  })
+      title: 'Erro no cadastro',
+      description: error instanceof Error ? error.message : 'Falha ao tentar cadastrar',
+      variant: 'destructive',
+      duration: 2500,
+    })
   }
 })
 </script>

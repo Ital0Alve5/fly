@@ -41,12 +41,13 @@ const seats = ref(1)
 const generatedCode = ref('')
 
 const valueToPay = computed(() => {
-  const discount = miles.value * milesStore.pricePerMile
-  if (!flight.value || flight.value.valor_passagem === undefined) {
-    return -1
-  }
-  const totalValue = flight.value.valor_passagem * seats.value
-  return totalValue - discount
+  if (!flight.value || flight.value.valor_passagem === undefined) return -1
+
+  const totalPassagem = flight.value.valor_passagem * seats.value
+  const desconto = miles.value * milesStore.pricePerMile
+  const totalComDesconto = totalPassagem - desconto
+
+  return totalComDesconto > 0 ? totalComDesconto : 0
 })
 
 const availableSeats = computed(() => {
@@ -56,10 +57,12 @@ const availableSeats = computed(() => {
 })
 
 const availableMilesToUse = computed(() => {
-  const maxMilesToCoverFullPrice = flight.value
-    ? Math.floor((flight.value.valor_passagem * seats.value) / milesStore.pricePerMile)
-    : 0
-  return Math.min(maxMilesToCoverFullPrice, milesStore.totalMiles)
+  if (!flight.value) return 0
+
+  const valorMaximoDesconto = flight.value.valor_passagem * seats.value
+  const milhasNecessarias = Math.floor(valorMaximoDesconto / milesStore.pricePerMile)
+
+  return Math.min(milhasNecessarias, milesStore.totalMiles)
 })
 
 async function handleReserveFlight() {
@@ -72,11 +75,13 @@ async function handleReserveFlight() {
     seats: seats.value,
   })
 
+  const valorFinal = Math.max(0, valueToPay.value)
+
   registerExtract({
     codigo_cliente: authStore.user?.usuario.codigo as number,
     data: getTodayDate(),
     codigo_reserva: generatedCode.value,
-    valor_reais: valueToPay.value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
+    valor_reais: valorFinal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
     quantidade_milhas: miles.value,
     descricao: `${flight.value?.aeroporto_origem.codigo}->${flight.value?.aeroporto_destino.codigo}`,
     tipo: 'SAÍDA',
@@ -141,7 +146,13 @@ async function handleReserveFlight() {
               </NumberFieldContent>
             </NumberField>
 
-            <NumberField id="miles" v-model="miles" :min="0" :max="availableMilesToUse">
+            <NumberField
+              id="miles"
+              v-model="miles"
+              :min="0"
+              :max="availableMilesToUse"
+              :disabled="availableMilesToUse === 0"
+            >
               <label>Milhas a usar</label>
               <NumberFieldContent>
                 <NumberFieldDecrement />
@@ -161,7 +172,7 @@ async function handleReserveFlight() {
               <Button
                 @click="handleReserveFlight"
                 class="w-full mt-auto"
-                :disabled="availableSeats === 0"
+                :disabled="availableSeats === 0 || seats > availableSeats"
               >
                 {{ availableSeats === 0 ? 'Este voo já está cheio!' : 'Pagar' }}
               </Button>

@@ -42,4 +42,10 @@ export async function deleteEmployee(employee: Employee) {
   )
 }
 
-export default { registeredEmployees, registerEmployee, getEmployeeByEmail, deleteEmployee, getEmployeeByCPF }
+export default {
+  registeredEmployees,
+  registerEmployee,
+  getEmployeeByEmail,
+  deleteEmployee,
+  getEmployeeByCPF,
+}
