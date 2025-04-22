@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS aeroportos (
   codigo VARCHAR(4) PRIMARY KEY,
   nome VARCHAR(150) NOT NULL,
   cidade VARCHAR(100) NOT NULL,
-  uf CHAR(2) NOT NULL
+  uf VARCHAR(2) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS estado (
@@ -18,8 +18,8 @@ CREATE TABLE IF NOT EXISTS estado (
 
 CREATE TABLE IF NOT EXISTS voos (
   codigo VARCHAR(6) PRIMARY KEY,
-  data TIMESTAMP NOT NULL,
-  valor_passagem NUMERIC(10,2),
+  data TIMESTAMP WITH TIME ZONE NOT NULL,
+  valor_passagem FLOAT,
   quantidade_poltronas_total INTEGER,
   quantidade_poltronas_ocupadas INTEGER,
   estado BIGINT,
