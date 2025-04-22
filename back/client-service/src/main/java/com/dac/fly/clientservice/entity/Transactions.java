@@ -45,4 +45,28 @@ public class Transactions {
     private String codigoReserva;
 
     private String tipo;
+
+public static Transactions createCreditTransaction(Client client, Integer miles, String description) {
+    Transactions transaction = new Transactions();
+    transaction.setCliente(client);
+    transaction.setQuantidadeMilhas(miles);
+    transaction.setValorReais(calculateRealValue(miles));
+    transaction.setDescricao(description);
+    transaction.setTipo("ENTRADA");
+    return transaction;
+}
+
+public static Transactions createDebitTransaction(Client client, Integer miles, String reservationCode, String description) {
+    Transactions transaction = new Transactions();
+    transaction.setCliente(client);
+    transaction.setQuantidadeMilhas(miles);
+    transaction.setDescricao(description);
+    transaction.setCodigoReserva(reservationCode);
+    transaction.setTipo("SAIDA");
+    return transaction;
+}
+
+private static BigDecimal calculateRealValue(Integer miles) {
+    return BigDecimal.valueOf(miles * 5);
+}
 }

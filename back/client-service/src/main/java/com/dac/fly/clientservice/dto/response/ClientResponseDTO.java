@@ -2,13 +2,11 @@ package com.dac.fly.clientservice.dto.response;
 
 import com.dac.fly.clientservice.entity.Address;
 import com.dac.fly.clientservice.entity.Client;
-
 import lombok.Getter;
 
 @Getter
 public class ClientResponseDTO {
-
-    private final Integer codigo;
+    private final Long codigo;
     private final String cpf;
     private final String email;
     private final String nome;
