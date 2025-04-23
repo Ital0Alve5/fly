@@ -1,12 +1,14 @@
 package com.dac.fly.clientservice.controllers;
 
 import com.dac.fly.clientservice.dto.request.AddMilesRequestDTO;
+import com.dac.fly.clientservice.dto.request.CreateClientRequestDTO;
 import com.dac.fly.clientservice.dto.response.ApiResponse;
 import com.dac.fly.clientservice.dto.response.ClientResponseDTO;
 import com.dac.fly.clientservice.dto.response.MilesResponseDTO;
 import com.dac.fly.clientservice.dto.response.MilesStatementResponseDTO;
 import com.dac.fly.clientservice.service.ClientService;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,6 +18,19 @@ import org.springframework.web.bind.annotation.*;
 public class ClientController {
 
     private final ClientService clientService;
+
+    @PostMapping
+    public ResponseEntity<ApiResponse<ClientResponseDTO>> createClient(
+            @RequestBody CreateClientRequestDTO request) {
+        try {
+            ClientResponseDTO createdClient = clientService.createClient(request);
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(ApiResponse.success(createdClient));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                    .body(ApiResponse.error(e.getMessage(), 400));
+        }
+    }
 
     @GetMapping("/{codigoCliente}")
     public ResponseEntity<ApiResponse<ClientResponseDTO>> getClientById(

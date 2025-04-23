@@ -13,23 +13,13 @@ public class ClientResponseDTO {
     private final Integer saldoMilhas;
     private final AddressDTO endereco;
 
-    public ClientResponseDTO(Client cliente) {
-        this.codigo = cliente.getCodigo();
-        this.cpf = cliente.getCpf();
-        this.email = cliente.getEmail();
-        this.nome = cliente.getNome();
-        this.saldoMilhas = cliente.getSaldoMilhas();
-
-        Address address = cliente.getEndereco();
-        this.endereco = address != null ? new AddressDTO(
-            address.getCep(),
-            address.getUf(),
-            address.getCidade(),
-            address.getBairro(),
-            address.getRua(),
-            address.getNumero(),
-            address.getComplemento()
-        ) : null;
+    public ClientResponseDTO(Client client) {
+        this.codigo = client.getCodigo();
+        this.cpf = client.getCpf();
+        this.email = client.getEmail();
+        this.nome = client.getNome();
+        this.saldoMilhas = client.getSaldoMilhas();
+        this.endereco = client.getEndereco() != null ? new AddressDTO(client.getEndereco()) : null;
     }
 
     @Getter
@@ -42,14 +32,14 @@ public class ClientResponseDTO {
         private final String numero;
         private final String complemento;
 
-        public AddressDTO(String cep, String uf, String cidade, String bairro, String rua, String numero, String complemento) {
-            this.cep = cep;
-            this.uf = uf;
-            this.cidade = cidade;
-            this.bairro = bairro;
-            this.rua = rua;
-            this.numero = numero;
-            this.complemento = complemento;
+        public AddressDTO(Address address) {
+            this.cep = address.getCep();
+            this.uf = address.getUf();
+            this.cidade = address.getCidade();
+            this.bairro = address.getBairro();
+            this.rua = address.getRua();
+            this.numero = address.getNumero();
+            this.complemento = address.getComplemento();
         }
     }
 }

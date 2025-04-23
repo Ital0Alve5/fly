@@ -9,5 +9,5 @@ import com.dac.fly.clientservice.entity.Transactions;
 
 @Repository
 public interface TransactionsRepository extends JpaRepository<Transactions, Integer> {
-    List<Transactions> findByClienteCodigo(Integer codigoCliente);
+    List<Transactions> findByClienteCodigo(Long codigoCliente);
 }

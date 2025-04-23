@@ -1,14 +1,18 @@
 package com.dac.fly.clientservice.service;
 
 import com.dac.fly.clientservice.dto.request.AddMilesRequestDTO;
+import com.dac.fly.clientservice.dto.request.CreateClientRequestDTO;
 import com.dac.fly.clientservice.dto.response.ClientResponseDTO;
 import com.dac.fly.clientservice.dto.response.MilesResponseDTO;
 import com.dac.fly.clientservice.dto.response.MilesStatementResponseDTO;
+import com.dac.fly.clientservice.entity.Address;
 import com.dac.fly.clientservice.entity.Client;
 import com.dac.fly.clientservice.entity.Transactions;
 import com.dac.fly.clientservice.repository.ClientRepository;
 import com.dac.fly.clientservice.repository.TransactionsRepository;
+import com.dac.fly.clientservice.util.DocumentUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -19,10 +23,21 @@ public class ClientService {
     private final ClientRepository clientRepository;
     private final TransactionsRepository transactionsRepository;
 
-    public ClientService(ClientRepository clientRepository, 
-                       TransactionsRepository transactionsRepository) {
+    public ClientService(ClientRepository clientRepository,
+                        TransactionsRepository transactionsRepository) {
         this.clientRepository = clientRepository;
         this.transactionsRepository = transactionsRepository;
+    }
+
+    @Transactional
+    public ClientResponseDTO createClient(CreateClientRequestDTO request) {
+        validateClientData(request);
+
+        Address address = createAddress(request);
+        Client client = createClientEntity(request, address);
+
+        Client savedClient = clientRepository.save(client);
+        return new ClientResponseDTO(savedClient);
     }
 
     public ClientResponseDTO findByCodigo(Long codigo) {
@@ -32,38 +47,26 @@ public class ClientService {
         return new ClientResponseDTO(client);
     }
 
+    @Transactional
     public MilesResponseDTO addMiles(Long codigoCliente, AddMilesRequestDTO request) {
-        if (request.quantidade() == null || request.quantidade() <= 0) {
-            throw new RuntimeException("Quantidade de milhas deve ser positiva");
-        }
+        validateMilesRequest(request);
 
         Client client = clientRepository.findByCodigo(codigoCliente)
                 .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
 
-        Transactions transaction = new Transactions();
-        transaction.setCliente(client);
-        transaction.setQuantidadeMilhas(request.quantidade());
-        transaction.setValorReais(calculateRealValue(request.quantidade()));
-        transaction.setDescricao("COMPRA DE MILHAS");
-        transaction.setTipo("ENTRADA");
+        Transactions transaction = createCreditTransaction(client, request.quantidade());
         transactionsRepository.save(transaction);
 
-        int novoSaldo = client.getSaldoMilhas() + request.quantidade();
-        client.setSaldoMilhas(novoSaldo);
-        clientRepository.save(client);
-
-        return new MilesResponseDTO(client.getCodigo(), novoSaldo);
+        updateClientMilesBalance(client, request.quantidade());
+        
+        return new MilesResponseDTO(client.getCodigo(), client.getSaldoMilhas());
     }
 
     public MilesStatementResponseDTO getMilesStatement(Long codigoCliente) {
         Client client = clientRepository.findByCodigo(codigoCliente)
                 .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
 
-        List<MilesStatementResponseDTO.TransactionDTO> transactions = transactionsRepository
-                .findByClienteCodigo(codigoCliente.intValue())
-                .stream()
-                .map(this::convertToTransactionDTO)
-                .toList();
+        List<MilesStatementResponseDTO.TransactionDTO> transactions = getClientTransactions(codigoCliente);
 
         return new MilesStatementResponseDTO(
                 client.getCodigo(),
@@ -72,8 +75,68 @@ public class ClientService {
         );
     }
 
-    private BigDecimal calculateRealValue(int miles) {
-        return BigDecimal.valueOf(miles * 5);
+    private void validateClientData(CreateClientRequestDTO request) {
+        if (!DocumentUtils.isValidCpf(request.cpf())) {
+            throw new RuntimeException("CPF inválido");
+        }
+        
+        if (clientRepository.existsByCpf(DocumentUtils.unformat(request.cpf()))) {
+            throw new RuntimeException("CPF já cadastrado");
+        }
+        
+        if (clientRepository.existsByEmail(request.email())) {
+            throw new RuntimeException("Email já cadastrado");
+        }
+    }
+
+    private Address createAddress(CreateClientRequestDTO request) {
+        Address address = new Address();
+        address.setCep(DocumentUtils.formatCep(request.endereco().cep()));
+        address.setUf(request.endereco().uf());
+        address.setCidade(request.endereco().cidade());
+        address.setBairro(request.endereco().bairro());
+        address.setRua(request.endereco().rua());
+        address.setNumero(request.endereco().numero());
+        address.setComplemento(request.endereco().complemento());
+        return address;
+    }
+
+    private Client createClientEntity(CreateClientRequestDTO request, Address address) {
+        Client client = new Client();
+        client.setCpf(DocumentUtils.formatCpf(request.cpf()));
+        client.setEmail(request.email());
+        client.setNome(request.nome());
+        client.setSaldoMilhas(request.saldoMilhas() != null ? request.saldoMilhas() : 0);
+        client.setEndereco(address);
+        return client;
+    }
+
+    private void validateMilesRequest(AddMilesRequestDTO request) {
+        if (request.quantidade() == null || request.quantidade() <= 0) {
+            throw new RuntimeException("Quantidade de milhas deve ser positiva");
+        }
+    }
+
+    private Transactions createCreditTransaction(Client client, Integer miles) {
+        Transactions transaction = new Transactions();
+        transaction.setCliente(client);
+        transaction.setQuantidadeMilhas(miles);
+        transaction.setValorReais(calculateRealValue(miles));
+        transaction.setDescricao("COMPRA DE MILHAS");
+        transaction.setTipo("ENTRADA");
+        return transaction;
+    }
+
+    private void updateClientMilesBalance(Client client, Integer miles) {
+        client.setSaldoMilhas(client.getSaldoMilhas() + miles);
+        clientRepository.save(client);
+    }
+
+    private List<MilesStatementResponseDTO.TransactionDTO> getClientTransactions(Long codigoCliente) {
+        return transactionsRepository.findByClienteCodigo(codigoCliente)
+                .stream()
+                .map(this::convertToTransactionDTO)
+                .toList();
     }
 
     private MilesStatementResponseDTO.TransactionDTO convertToTransactionDTO(Transactions transaction) {
@@ -85,5 +148,9 @@ public class ClientService {
                 transaction.getCodigoReserva(),
                 transaction.getTipo()
         );
+    }
+
+    private BigDecimal calculateRealValue(Integer miles) {
+        return BigDecimal.valueOf(miles * 5);
     }
 }
