@@ -28,7 +28,7 @@ export async function loadReservationsByClientRoute(app: FastifyTypedInstance) {
         )
 
         const enrichedReservations = await Promise.all(
-          reservationsResponse.data.map(async (reservation: any) => {
+          reservationsResponse.data.data.map(async (reservation: any) => {
             try {
               const { data: flightResponse } = await axios.get(
                 `${Env.FLY_SERVICE_URL}/voos/${reservation.codigo_voo}`,
@@ -36,7 +36,7 @@ export async function loadReservationsByClientRoute(app: FastifyTypedInstance) {
 
               return {
                 ...reservation,
-                voo: flightResponse,
+                voo: flightResponse.data,
               }
             } catch (flightError) {
               console.error(`Erro ao buscar dados do voo ${reservation.codigo_voo}:`, flightError)
@@ -48,7 +48,7 @@ export async function loadReservationsByClientRoute(app: FastifyTypedInstance) {
         return reply.send(enrichedReservations)
       } catch (err) {
         if (axios.isAxiosError(err) && err.response) {
-          return reply.status(err.response.status).send(err.response.data)
+          return reply.status(err.response.status).send(err.response.data.data)
         }
 
         return reply

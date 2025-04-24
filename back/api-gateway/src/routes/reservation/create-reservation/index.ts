@@ -42,19 +42,19 @@ export async function createReservationRoute(app: FastifyTypedInstance) {
           )
 
           const combinedResponse = {
-            ...reservationResponse.data,
-            codigo_aeroporto_origem: flightResponse.codigo_aeroporto_origem,
-            codigo_aeroporto_destino: flightResponse.codigo_aeroporto_destino,
+            ...reservationResponse.data.data,
+            codigo_aeroporto_origem: flightResponse.data.codigo_aeroporto_origem,
+            codigo_aeroporto_destino: flightResponse.data.codigo_aeroporto_destino,
           }
 
           return reply.status(HttpStatusCode.Created).send(combinedResponse)
         } catch (flightError) {
           console.error('Erro ao buscar dados do voo:', flightError)
-          return reply.status(HttpStatusCode.Created).send(reservationResponse.data)
+          return reply.status(HttpStatusCode.Created).send(reservationResponse.data.data)
         }
       } catch (err) {
         if (axios.isAxiosError(err) && err.response) {
-          return reply.status(err.response.status).send(err.response.data)
+          return reply.status(err.response.status).send(err.response.data.data)
         }
 
         return reply

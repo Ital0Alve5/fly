@@ -1,9 +1,17 @@
 import { HttpStatusCode } from 'axios'
 import { FastifySchema } from 'fastify'
 import { z } from 'zod'
+import { apiErrorResponseSchema, createApiResponseSchema } from 'src/shared/api-response'
+
+const registerDataSchema = z.object({
+  codigo: z.number(),
+  cpf: z.string(),
+  email: z.string().email(),
+  nome: z.string(),
+})
 
 export const registerSchema: FastifySchema = {
-  tags: ['Autenticação'],
+  tags: ['Clientes'],
   summary: 'Se cadastrar como um cliente',
   description: 'Rota para se cadastrar como um cliente',
   body: z.object({
@@ -31,8 +39,8 @@ export const registerSchema: FastifySchema = {
     }),
   }),
   response: {
-    [HttpStatusCode.Created]: z.null().describe('Criado'),
-    [HttpStatusCode.Conflict]: z.null().describe('Usuário já cadastrado'),
-    [HttpStatusCode.BadRequest]: z.null().describe('Campo inválido'),
+    [HttpStatusCode.Created]: createApiResponseSchema(registerDataSchema),
+    [HttpStatusCode.Conflict]: apiErrorResponseSchema,
+    [HttpStatusCode.BadRequest]: apiErrorResponseSchema,
   },
 }
