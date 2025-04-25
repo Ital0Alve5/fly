@@ -8,10 +8,13 @@ export const loginSchema: FastifySchema = {
   description: 'Fazer login do usuário',
   body: z.object({
     login: z.string().email('E-mail inválido'),
-    password: z.string(),
+    senha: z.string(),
   }),
   response: {
-    [HttpStatusCode.Ok]: z.null().describe('Ok'),
-    [HttpStatusCode.Unauthorized]: z.null().describe('Não autorizado'),
+    [HttpStatusCode.Ok]: z.object({ 
+      token: z.string(),
+    }),
+    [HttpStatusCode.Unauthorized]: z.object({
+    }),
   },
 }

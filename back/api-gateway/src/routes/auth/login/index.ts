@@ -15,10 +15,10 @@ export async function loginRoute(app: FastifyTypedInstance) {
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
         const response = await axios.post(Env.AUTH_SERVICE_URL + path, request.body)
-        return reply.send(response.data)
+        return reply.send(response.data.data)
       } catch (err) {
         if (axios.isAxiosError(err) && err.response) {
-          return reply.status(err.response.status).send(err.response.data)
+          return reply.status(err.response.status).send(err.response.data.data)
         }
 
         return reply

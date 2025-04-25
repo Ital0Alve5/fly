@@ -29,22 +29,22 @@ export async function loadReservationByCodeRoute(app: FastifyTypedInstance) {
 
         try {
           const { data: flightResponse } = await axios.get(
-            `${Env.FLY_SERVICE_URL}/voos/${reservationResponse.data.codigo_voo}`,
+            `${Env.FLY_SERVICE_URL}/voos/${reservationResponse.data.data.codigo_voo}`,
           )
 
           const combinedResponse = {
-            ...reservationResponse.data,
-            voo: flightResponse,
+            ...reservationResponse.data.data,
+            voo: flightResponse.data,
           }
 
           return reply.send(combinedResponse)
         } catch (flightError) {
-          console.error(`Erro ao buscar dados do voo ${reservationResponse.data.codigo_voo}:`, flightError)
-          return reply.send(reservationResponse.data)
+          console.error(`Erro ao buscar dados do voo ${reservationResponse.data.data.codigo_voo}:`, flightError)
+          return reply.send(reservationResponse.data.data)
         }
       } catch (err) {
         if (axios.isAxiosError(err) && err.response) {
-          return reply.status(err.response.status).send(err.response.data)
+          return reply.status(err.response.status).send(err.response.data.data)
         }
 
         return reply
