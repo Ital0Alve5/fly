@@ -1,32 +1,13 @@
-# FROM maven:3.9.7-eclipse-temurin-21-alpine
-
-# WORKDIR /app
-
-# COPY pom.xml /app
-
-# RUN mvn dependency:go-offline
-
-# COPY src ./src
-
-# EXPOSE 8080
-
-# CMD ["mvn", "spring-boot:run"]
-
-FROM maven:3.9.7-eclipse-temurin-21-alpine AS builder
+FROM maven:3.9.7-eclipse-temurin-21-alpine
 
 WORKDIR /app
 
-COPY pom.xml .
+COPY pom.xml /app
+
+RUN mvn dependency:go-offline
+
 COPY src ./src
-
-RUN mvn clean package -DskipTests
-
-FROM eclipse-temurin:21-alpine
-
-WORKDIR /app
-
-COPY --from=builder /app/target/*.jar app.jar
 
 EXPOSE 8080
 
-ENTRYPOINT ["java", "-jar", "app.jar"]
+CMD ["mvn", "spring-boot:run"]
