@@ -1,0 +1,7 @@
+com/dac/fly/shared/dto/CreateReservationCommand.class
+com/dac/fly/shared/dto/SeatsUpdatedEvent.class
+com/dac/fly/shared/dto/UpdateSeatsCommand.class
+com/dac/fly/shared/config/RabbitConfig.class
+com/dac/fly/shared/dto/DeductMilesCommand.class
+com/dac/fly/shared/dto/MilesDeductedEvent.class
+com/dac/fly/shared/dto/StartReservationDto.class

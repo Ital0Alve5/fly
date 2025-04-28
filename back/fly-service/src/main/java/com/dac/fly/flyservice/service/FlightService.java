@@ -1,23 +1,29 @@
 package com.dac.fly.flyservice.service;
 
-import com.dac.fly.flyservice.dto.request.CreateNewFlightRequestDto;
-import com.dac.fly.flyservice.dto.request.UpdateFlightStatusRequestDto;
-import com.dac.fly.flyservice.dto.response.ApiResponse;
-import com.dac.fly.flyservice.dto.response.FlightDetailsResponseDto;
-import com.dac.fly.flyservice.dto.response.FlightResponseDto;
-import com.dac.fly.flyservice.dto.response.FlightGroupedResponseDto;
-import com.dac.fly.flyservice.entity.*;
-import com.dac.fly.flyservice.enums.ReservationStatusEnum;
-import com.dac.fly.flyservice.repository.*;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
-
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+
+import com.dac.fly.flyservice.dto.request.CreateNewFlightRequestDto;
+import com.dac.fly.flyservice.dto.request.UpdateFlightStatusRequestDto;
+import com.dac.fly.flyservice.dto.response.FlightDetailsResponseDto;
+import com.dac.fly.flyservice.dto.response.FlightGroupedResponseDto;
+import com.dac.fly.flyservice.dto.response.FlightResponseDto;
+import com.dac.fly.flyservice.entity.Aeroporto;
+import com.dac.fly.flyservice.entity.Estado;
+import com.dac.fly.flyservice.entity.Voo;
+import com.dac.fly.flyservice.enums.ReservationStatusEnum;
+import com.dac.fly.flyservice.repository.AeroportoRepository;
+import com.dac.fly.flyservice.repository.EstadoRepository;
+import com.dac.fly.flyservice.repository.VooRepository;
 import com.dac.fly.flyservice.util.FlightCodeGenerator;
+import com.dac.fly.shared.dto.response.ApiResponse;
+
 
 @Service
 public class FlightService {
@@ -139,6 +145,20 @@ public class FlightService {
                 detalhes);
 
         return ResponseEntity.ok(ApiResponse.success(resposta));
+    }
+
+    public boolean updateSeats(String flightCode, int seatsReserved) {
+        Voo flight = vooRepository.findById(flightCode)
+                .orElseThrow(() -> new RuntimeException("Voo não encontrado: " + flightCode));
+
+        if ((flight.getQuantidadePoltronasTotal() - flight.getQuantidadePoltronasOcupadas()) < seatsReserved) {
+            return false;
+        }
+
+        flight.setQuantidadePoltronasOcupadas(flight.getQuantidadePoltronasOcupadas() + seatsReserved);
+        vooRepository.save(flight);
+
+        return true;
     }
 
 }

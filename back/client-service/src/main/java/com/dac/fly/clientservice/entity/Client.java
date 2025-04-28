@@ -1,12 +1,19 @@
 package com.dac.fly.clientservice.entity;
 
-import jakarta.persistence.*;
-import lombok.Data;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 
-@Data
 @Entity
 @Table(name = "cliente")
 public class Client {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long codigo;
@@ -24,6 +31,57 @@ public class Client {
     @Column(nullable = false, length = 100)
     private String nome;
 
-    @Column(name = "saldo_milhas")
+    @Column(name = "saldo_milhas", nullable = false)
     private Integer saldoMilhas = 0;
+
+    public Client() {
+    }
+
+    public Long getCodigo() {
+        return codigo;
+    }
+
+    public void setCodigo(Long codigo) {
+        this.codigo = codigo;
+    }
+
+    public Address getEndereco() {
+        return endereco;
+    }
+
+    public void setEndereco(Address endereco) {
+        this.endereco = endereco;
+    }
+
+    public String getCpf() {
+        return cpf;
+    }
+
+    public void setCpf(String cpf) {
+        this.cpf = cpf;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
+
+    public Integer getSaldoMilhas() {
+        return saldoMilhas;
+    }
+
+    public void setSaldoMilhas(Integer saldoMilhas) {
+        this.saldoMilhas = saldoMilhas;
+    }
 }

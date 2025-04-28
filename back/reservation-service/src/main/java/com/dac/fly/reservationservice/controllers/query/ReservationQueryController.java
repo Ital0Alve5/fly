@@ -4,13 +4,17 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import com.dac.fly.reservationservice.dto.response.ApiResponse;
+import com.dac.fly.reservationservice.dto.factory.ReservationResponseFactory;
 import com.dac.fly.reservationservice.dto.response.ReservationResponseDto;
 import com.dac.fly.reservationservice.entity.query.Reserva;
 import com.dac.fly.reservationservice.repository.query.ReservaQueryRepository;
-import com.dac.fly.reservationservice.dto.factory.ReservationResponseFactory;
+import com.dac.fly.shared.dto.response.ApiResponse;
+
 
 @RestController
 @RequestMapping("/reservas")

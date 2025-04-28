@@ -1,4 +1,4 @@
-package com.dac.fly.flyservice.dto.response;
+package com.dac.fly.shared.dto.response;
 
 public class ApiResponse<T> {
     private boolean error;

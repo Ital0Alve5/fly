@@ -1,18 +1,27 @@
 package com.dac.fly.flyservice.controllers;
 
-import com.dac.fly.flyservice.dto.request.CreateNewFlightRequestDto;
-import com.dac.fly.flyservice.dto.request.UpdateFlightStatusRequestDto;
-import com.dac.fly.flyservice.dto.response.ApiResponse;
-import com.dac.fly.flyservice.dto.response.FlightDetailsResponseDto;
-import com.dac.fly.flyservice.dto.response.FlightResponseDto;
-import com.dac.fly.flyservice.service.FlightService;
-import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.dac.fly.flyservice.dto.request.CreateNewFlightRequestDto;
+import com.dac.fly.flyservice.dto.request.UpdateFlightStatusRequestDto;
+import com.dac.fly.flyservice.dto.response.FlightDetailsResponseDto;
+import com.dac.fly.flyservice.dto.response.FlightResponseDto;
+import com.dac.fly.flyservice.service.FlightService;
+import com.dac.fly.shared.dto.response.ApiResponse;
+
 
 @RestController
 @RequestMapping({ "/voos", "/voo" })

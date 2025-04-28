@@ -2,10 +2,9 @@ package com.dac.fly.clientservice.dto.response;
 
 import com.dac.fly.clientservice.entity.Address;
 import com.dac.fly.clientservice.entity.Client;
-import lombok.Getter;
 
-@Getter
 public class ClientResponseDTO {
+
     private final Long codigo;
     private final String cpf;
     private final String email;
@@ -22,8 +21,32 @@ public class ClientResponseDTO {
         this.endereco = client.getEndereco() != null ? new AddressDTO(client.getEndereco()) : null;
     }
 
-    @Getter
+    public Long getCodigo() {
+        return codigo;
+    }
+
+    public String getCpf() {
+        return cpf;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public Integer getSaldoMilhas() {
+        return saldoMilhas;
+    }
+
+    public AddressDTO getEndereco() {
+        return endereco;
+    }
+
     public static class AddressDTO {
+
         private final String cep;
         private final String uf;
         private final String cidade;
@@ -40,6 +63,34 @@ public class ClientResponseDTO {
             this.rua = address.getRua();
             this.numero = address.getNumero();
             this.complemento = address.getComplemento();
+        }
+
+        public String getCep() {
+            return cep;
+        }
+
+        public String getUf() {
+            return uf;
+        }
+
+        public String getCidade() {
+            return cidade;
+        }
+
+        public String getBairro() {
+            return bairro;
+        }
+
+        public String getRua() {
+            return rua;
+        }
+
+        public String getNumero() {
+            return numero;
+        }
+
+        public String getComplemento() {
+            return complemento;
         }
     }
 }

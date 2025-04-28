@@ -1,6 +1,7 @@
 package com.dac.fly.authservice.security;
 
-import com.dac.fly.authservice.dto.response.ApiResponse;
+import com.dac.fly.shared.dto.response.ApiResponse;
+
 import com.dac.fly.authservice.entity.Auth;
 import com.dac.fly.authservice.service.AuthService;
 import jakarta.servlet.FilterChain;

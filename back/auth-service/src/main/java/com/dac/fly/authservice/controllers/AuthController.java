@@ -1,7 +1,8 @@
 package com.dac.fly.authservice.controllers;
 
 import com.dac.fly.authservice.dto.request.LoginRequestDto;
-import com.dac.fly.authservice.dto.response.ApiResponse;
+import com.dac.fly.shared.dto.response.ApiResponse;
+
 import com.dac.fly.authservice.dto.response.LoginResponseDto;
 import com.dac.fly.authservice.dto.response.LogoutResponseDto;
 import com.dac.fly.authservice.entity.Auth;

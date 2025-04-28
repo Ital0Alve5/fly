@@ -6,7 +6,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import com.dac.fly.employeeservice.dto.response.ApiResponse;
+import com.dac.fly.shared.dto.response.ApiResponse;
+
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {

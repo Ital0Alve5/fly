@@ -1,5 +1,11 @@
 package com.dac.fly.clientservice.service;
 
+import java.math.BigDecimal;
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.dac.fly.clientservice.dto.request.AddMilesRequestDTO;
 import com.dac.fly.clientservice.dto.request.CreateClientRequestDTO;
 import com.dac.fly.clientservice.dto.response.ClientResponseDTO;
@@ -11,11 +17,6 @@ import com.dac.fly.clientservice.entity.Transactions;
 import com.dac.fly.clientservice.repository.ClientRepository;
 import com.dac.fly.clientservice.repository.TransactionsRepository;
 import com.dac.fly.clientservice.util.DocumentUtils;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.math.BigDecimal;
-import java.util.List;
 
 @Service
 public class ClientService {
@@ -150,6 +151,26 @@ public class ClientService {
         );
     }
 
+    public boolean deductMiles(Long clientId, Integer miles) {
+        Client client = clientRepository.findById(clientId)
+                .orElseThrow(() -> new RuntimeException("Cliente não encontrado: " + clientId));
+        if (client.getSaldoMilhas() < miles) {
+            return false;
+        }
+        client.setSaldoMilhas(client.getSaldoMilhas() - miles);
+        clientRepository.save(client);
+
+        Transactions tx = Transactions.createDebitTransaction(
+                client,
+                miles,
+                "Reserva ",
+                "Dedução de milhas");
+        tx.setValorReais(calculateRealValue(miles));
+        transactionsRepository.save(tx);
+
+        return true;
+    }
+    
     private BigDecimal calculateRealValue(Integer miles) {
         return BigDecimal.valueOf(miles * 5);
     }
