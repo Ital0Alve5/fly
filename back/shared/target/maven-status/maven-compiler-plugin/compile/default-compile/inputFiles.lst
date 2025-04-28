@@ -1,7 +1,0 @@
-/home/italo/fly/back/shared/src/main/java/com/dac/fly/shared/config/RabbitConfig.java
-/home/italo/fly/back/shared/src/main/java/com/dac/fly/shared/dto/CreateReservationCommand.java
-/home/italo/fly/back/shared/src/main/java/com/dac/fly/shared/dto/DeductMilesCommand.java
-/home/italo/fly/back/shared/src/main/java/com/dac/fly/shared/dto/MilesDeductedEvent.java
-/home/italo/fly/back/shared/src/main/java/com/dac/fly/shared/dto/SeatsUpdatedEvent.java
-/home/italo/fly/back/shared/src/main/java/com/dac/fly/shared/dto/StartReservationDto.java
-/home/italo/fly/back/shared/src/main/java/com/dac/fly/shared/dto/UpdateSeatsCommand.java
