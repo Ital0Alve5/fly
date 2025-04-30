@@ -6,7 +6,6 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.dac.fly.reservationservice.dto.HistoryDto;
-import com.dac.fly.reservationservice.dto.events.ReservationCreatedEventDto;
 import com.dac.fly.reservationservice.dto.factory.ReservationResponseFactory;
 import com.dac.fly.reservationservice.dto.request.ReservationUpdateStatusDto;
 import com.dac.fly.reservationservice.dto.response.ReservationResponseDto;
@@ -72,21 +71,6 @@ public class ReservationCommandService {
                                 createdStatusId);
                 historyRepository.save(historyEntity);
 
-                List<HistoryDto> historico = getReservationHistory(reserva.getCodigo());
-
-                ReservationCreatedEventDto event = ReservationCreatedEventDto.from(
-                                reserva.getCodigo(),
-                                reserva.getCodigoCliente(),
-                                reserva.getDataReserva(),
-                                reserva.getValorPago(),
-                                reserva.getMilhasUtilizadas(),
-                                reserva.getQuantidadePoltronas(),
-                                reserva.getCodigoVoo(),
-                                requestDto.codigo_aeroporto_origem(),
-                                requestDto.codigo_aeroporto_destino(),
-                                historico);
-
-                // Gera o DTO de resposta
                 CreatedReservationResponseDto responseDto = new CreatedReservationResponseDto(
                                 requestDto.codigo(),
                                 now,
@@ -129,7 +113,6 @@ public class ReservationCommandService {
 
                 List<HistoryDto> historyDto = getReservationHistory(codigoReserva);
 
-                // Gera o DTO de cancelamento
                 CanceledReservationResponseDto cancelDto = new CanceledReservationResponseDto(
                                 reservation.getCodigo(),
                                 reservation.getDataReserva(),
@@ -143,7 +126,6 @@ public class ReservationCommandService {
                                 historyDto.isEmpty() ? null : historyDto.get(0).getCodigo_reserva());
 
                 try {
-                        // Publica para a saga
                         publisher.publishCancelledReservationToSaga(cancelDto);
                 } catch (Exception e) {
                         throw new RuntimeException("Erro ao publicar evento de reserva cancelada", e);

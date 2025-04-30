@@ -14,12 +14,17 @@ public class ReservationRabbitConfig {
 
     @Bean
     public Queue resQueue() {
-        return new Queue(RabbitConstants.RES_QUEUE); 
+        return new Queue(RabbitConstants.RES_QUEUE);
     }
 
     @Bean
     public Queue cancelQueue() {
-        return new Queue(RabbitConstants.CANCEL_QUEUE); 
+        return new Queue(RabbitConstants.CANCEL_QUEUE);
+    }
+
+    @Bean
+    public Queue flightReservationsCancelledQueue() {
+        return new Queue(RabbitConstants.FLIGHT_RESERVATIONS_CANCELLED_QUEUE);
     }
 
     @Bean
@@ -41,5 +46,13 @@ public class ReservationRabbitConfig {
                 .bind(cancelQueue())
                 .to(exchange())
                 .with(RabbitConstants.CANCEL_QUEUE);
+    }
+
+    @Bean
+    public Binding bindFlightReservationsCancelled(Queue flightReservationsCancelledQueue, TopicExchange exchange) {
+        return BindingBuilder
+                .bind(flightReservationsCancelledQueue)
+                .to(exchange)
+                .with(RabbitConstants.FLIGHT_RESERVATIONS_CANCELLED_QUEUE);
     }
 }
