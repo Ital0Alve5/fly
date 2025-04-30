@@ -3,8 +3,8 @@ package com.dac.fly.authservice.seeder;
 import java.time.LocalDateTime;
 
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.stereotype.Component;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Component;
 
 import com.dac.fly.authservice.entity.Auth;
 import com.dac.fly.authservice.repository.AuthRepository;
@@ -22,8 +22,6 @@ public class AuthSeeder implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        // repository.deleteAll();
-
         if (repository.findByEmail("heitor@gmail.com").isEmpty()) {
             System.out.println("Inserindo usuários iniciais no MongoDB...");
 

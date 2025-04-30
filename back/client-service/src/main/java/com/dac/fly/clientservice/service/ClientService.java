@@ -25,7 +25,7 @@ public class ClientService {
     private final TransactionsRepository transactionsRepository;
 
     public ClientService(ClientRepository clientRepository,
-                        TransactionsRepository transactionsRepository) {
+            TransactionsRepository transactionsRepository) {
         this.clientRepository = clientRepository;
         this.transactionsRepository = transactionsRepository;
     }
@@ -44,7 +44,7 @@ public class ClientService {
     public ClientResponseDTO findByCodigo(Long codigo) {
         Client client = clientRepository.findByCodigo(codigo)
                 .orElseThrow(() -> new RuntimeException("Cliente não encontrado com código: " + codigo));
-        
+
         return new ClientResponseDTO(client);
     }
 
@@ -59,7 +59,7 @@ public class ClientService {
         transactionsRepository.save(transaction);
 
         updateClientMilesBalance(client, request.quantidade());
-        
+
         return new MilesResponseDTO(client.getCodigo(), client.getSaldoMilhas());
     }
 
@@ -72,19 +72,18 @@ public class ClientService {
         return new MilesStatementResponseDTO(
                 client.getCodigo(),
                 client.getSaldoMilhas(),
-                transactions
-        );
+                transactions);
     }
 
     private void validateClientData(CreateClientRequestDTO request) {
         if (!DocumentUtils.isValidCpf(request.cpf())) {
             throw new RuntimeException("CPF inválido");
         }
-        
+
         if (clientRepository.existsByCpf(DocumentUtils.unformat(request.cpf()))) {
             throw new RuntimeException("CPF já cadastrado");
         }
-        
+
         if (clientRepository.existsByEmail(request.email())) {
             throw new RuntimeException("Email já cadastrado");
         }
@@ -107,7 +106,8 @@ public class ClientService {
         client.setCpf(DocumentUtils.formatCpf(request.cpf()));
         client.setEmail(request.email());
         client.setNome(request.nome());
-        client.setSaldoMilhas(request.saldoMilhas() != null ? request.saldoMilhas() : 0);
+        Integer initialSaldo = request.saldoMilhas();
+        client.setSaldoMilhas(initialSaldo != null ? initialSaldo : 0);
         client.setEndereco(address);
         return client;
     }
@@ -147,27 +147,36 @@ public class ClientService {
                 transaction.getQuantidadeMilhas(),
                 transaction.getDescricao(),
                 transaction.getCodigoReserva(),
-                transaction.getTipo()
-        );
+                transaction.getTipo());
     }
 
-    public boolean deductMiles(Long clientId, Integer miles) {
+    public boolean updateMiles(Long clientId, Integer miles) {
         Client client = clientRepository.findById(clientId)
                 .orElseThrow(() -> new RuntimeException("Cliente não encontrado: " + clientId));
-        if (client.getSaldoMilhas() < miles) {
-            return false;
+    
+        if (miles < 0) {
+            if (client.getSaldoMilhas() < Math.abs(miles)) {
+                return false;
+            }
+            client.setSaldoMilhas(client.getSaldoMilhas() + miles); 
+            clientRepository.save(client);
+    
+            Transactions tx = Transactions.createDebitTransaction(
+                    client,
+                    Math.abs(miles),
+                    "Reserva",
+                    "Uso de milhas");
+            tx.setValorReais(calculateRealValue(Math.abs(miles)));
+            transactionsRepository.save(tx);
+        } else {
+            client.setSaldoMilhas(client.getSaldoMilhas() + miles);
+            clientRepository.save(client);
+    
+            Transactions tx = createCreditTransaction(client, miles);
+            tx.setDescricao("ESTORNO DE MILHAS POR CANCELAMENTO DE VOO");
+            transactionsRepository.save(tx);
         }
-        client.setSaldoMilhas(client.getSaldoMilhas() - miles);
-        clientRepository.save(client);
-
-        Transactions tx = Transactions.createDebitTransaction(
-                client,
-                miles,
-                "Reserva ",
-                "Dedução de milhas");
-        tx.setValorReais(calculateRealValue(miles));
-        transactionsRepository.save(tx);
-
+    
         return true;
     }
     

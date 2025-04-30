@@ -1,43 +1,37 @@
 package com.dac.fly.clientservice.consumer;
 
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Component;
 
+import com.dac.fly.clientservice.publisher.MilesPublisher;
 import com.dac.fly.clientservice.service.ClientService;
-import com.dac.fly.shared.config.RabbitConfig;
-import com.dac.fly.shared.dto.command.DeductMilesCommand;
-import com.dac.fly.shared.dto.events.MilesDeductedEvent;
+import com.dac.fly.shared.config.RabbitConstants;
+import com.dac.fly.shared.dto.command.UpdateMilesCommand;
 
 @Component
 public class MilesCommandListener {
 
     private final ClientService clientService;
-    private final RabbitTemplate rabbit;
-    private final Set<String> processedReservations = ConcurrentHashMap.newKeySet();
+    private final MilesPublisher publisher;
 
-    public MilesCommandListener(ClientService clientService, RabbitTemplate rabbit) {
+    public MilesCommandListener(ClientService clientService, MilesPublisher publisher) {
         this.clientService = clientService;
-        this.rabbit = rabbit;
+        this.publisher = publisher;
     }
 
-    @RabbitListener(queues = RabbitConfig.MILES_QUEUE)
-    public void handleDeductMiles(DeductMilesCommand cmd) {
+    @RabbitListener(queues = RabbitConstants.UPDATE_MILES_CMD_QUEUE)
+    public void handleUpdateMiles(UpdateMilesCommand cmd) {
         boolean success = false;
         try {
-            if (!processedReservations.contains(cmd.reservationId())) {
-                success = clientService.deductMiles(cmd.clientId(), cmd.miles());
-                processedReservations.add(cmd.reservationId());
+            if (cmd.isCompensate()) {
+                success = clientService.updateMiles(cmd.codigoCliente(), +cmd.milhasUtilizadas());
             } else {
-                success = true; 
+                success = clientService.updateMiles(cmd.codigoCliente(), -cmd.milhasUtilizadas());
             }
         } catch (Exception e) {
-            System.err.println("Erro ao deduzir milhas: " + e.getMessage());
+            System.err.println("Erro ao atualizar milhas: " + e.getMessage());
         }
-        MilesDeductedEvent event = new MilesDeductedEvent(cmd.reservationId(), success);
-        rabbit.convertAndSend(RabbitConfig.EXCHANGE, RabbitConfig.MILES_QUEUE, event);
+
+        publisher.publishMilesUpdateResponse(cmd.codigoReserva(), success);
     }
 }

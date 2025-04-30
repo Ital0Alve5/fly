@@ -1,7 +1,6 @@
-package com.dac.fly.shared.dto.command;
+package com.dac.fly.shared.dto.request;
 
-public record CreateReservationCommand(
-        String codigo,
+public record CreateReservationDto(
         Long codigo_cliente,
         Double valor,
         Integer milhas_utilizadas,

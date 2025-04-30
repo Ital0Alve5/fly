@@ -4,40 +4,45 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
+import com.dac.fly.flyservice.publisher.SeatsPublisher;
 import com.dac.fly.flyservice.service.FlightService;
-import com.dac.fly.shared.config.RabbitConfig;
+import com.dac.fly.shared.config.RabbitConstants;
 import com.dac.fly.shared.dto.command.UpdateSeatsCommand;
 import com.dac.fly.shared.dto.events.SeatsUpdatedEvent;
 
-@Component
+@Service
 public class SeatsCommandListener {
 
     private final FlightService flightService;
-    private final RabbitTemplate rabbit;
+    private final SeatsPublisher publisher;
     private final Set<String> processedReservations = ConcurrentHashMap.newKeySet();
 
-    public SeatsCommandListener(FlightService flightService, RabbitTemplate rabbit) {
+    public SeatsCommandListener(FlightService flightService, SeatsPublisher publisher) {
         this.flightService = flightService;
-        this.rabbit = rabbit;
+        this.publisher = publisher;
     }
 
-    @RabbitListener(queues = RabbitConfig.SEATS_QUEUE)
+    @RabbitListener(queues = RabbitConstants.UPDATE_SEATS_CMD_QUEUE)
     public void handleUpdateSeats(UpdateSeatsCommand cmd) {
         boolean success = false;
+
         try {
-            if (!processedReservations.contains(cmd.reservationId())) {
-                success = flightService.updateSeats(cmd.flightCode(), cmd.seatsReserved());
-                processedReservations.add(cmd.reservationId());
+            if (cmd.isCompensate()) {
+                success = flightService.updateSeats(cmd.codigoVoo(), +cmd.quantidadePoltronas());
             } else {
-                success = true; 
+                if (!processedReservations.contains(cmd.codigoReserva())) {
+                    success = flightService.updateSeats(cmd.codigoVoo(), -cmd.quantidadePoltronas());
+                    processedReservations.add(cmd.codigoReserva());
+                } else {
+                    success = true;
+                }
             }
         } catch (Exception e) {
-            System.err.println("Erro ao atualizar assentos: " + e.getMessage());
+            System.err.println("Erro ao processar assentos: " + e.getMessage());
         }
-        SeatsUpdatedEvent event = new SeatsUpdatedEvent(cmd.reservationId(), success);
-        rabbit.convertAndSend(RabbitConfig.EXCHANGE, RabbitConfig.SEATS_QUEUE, event);
+
+        publisher.publishSeatsUpdated(new SeatsUpdatedEvent(cmd.codigoReserva(), success));
     }
 }

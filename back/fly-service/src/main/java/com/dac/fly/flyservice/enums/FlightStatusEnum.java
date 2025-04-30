@@ -1,7 +1,7 @@
 package com.dac.fly.flyservice.enums;
 
 
-public enum ReservationStatusEnum {
+public enum FlightStatusEnum {
     CONFIRMADO,
     CANCELADO,
     REALIZADO,

@@ -10,20 +10,19 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.dac.fly.flyservice.dto.request.CreateNewFlightRequestDto;
-import com.dac.fly.flyservice.dto.request.UpdateFlightStatusRequestDto;
 import com.dac.fly.flyservice.dto.response.FlightDetailsResponseDto;
 import com.dac.fly.flyservice.dto.response.FlightGroupedResponseDto;
 import com.dac.fly.flyservice.dto.response.FlightResponseDto;
 import com.dac.fly.flyservice.entity.Aeroporto;
 import com.dac.fly.flyservice.entity.Estado;
 import com.dac.fly.flyservice.entity.Voo;
-import com.dac.fly.flyservice.enums.ReservationStatusEnum;
+import com.dac.fly.flyservice.enums.FlightStatusEnum;
 import com.dac.fly.flyservice.repository.AeroportoRepository;
 import com.dac.fly.flyservice.repository.EstadoRepository;
 import com.dac.fly.flyservice.repository.VooRepository;
 import com.dac.fly.flyservice.util.FlightCodeGenerator;
 import com.dac.fly.shared.dto.response.ApiResponse;
-
+import com.dac.fly.shared.dto.response.CancelledFlightResponseDto;
 
 @Service
 public class FlightService {
@@ -75,7 +74,7 @@ public class FlightService {
     public ResponseEntity<ApiResponse<FlightResponseDto>> create(CreateNewFlightRequestDto dto) {
         Optional<Aeroporto> origem = aeroportoRepository.findById(dto.codigo_aeroporto_origem());
         Optional<Aeroporto> destino = aeroportoRepository.findById(dto.codigo_aeroporto_destino());
-        Optional<Estado> estado = estadoRepository.findByNome(ReservationStatusEnum.CONFIRMADO);
+        Optional<Estado> estado = estadoRepository.findByNome(FlightStatusEnum.CONFIRMADO);
 
         if (origem.isEmpty() || destino.isEmpty() || estado.isEmpty()) {
             return ResponseEntity.status(400).body(ApiResponse.error("Dados inválidos para criar voo", 400));
@@ -95,24 +94,33 @@ public class FlightService {
         return ResponseEntity.status(201).body(ApiResponse.success(toDto(salvo)));
     }
 
-    public ResponseEntity<ApiResponse<FlightResponseDto>> updateStatus(String codigo,
-            UpdateFlightStatusRequestDto estadoRequest) {
-        Optional<Voo> vooOpt = vooRepository.findById(codigo);
-        Optional<Estado> estado = estadoRepository.findByNome(estadoRequest.estado());
-
+    public CancelledFlightResponseDto updateStatus(String codigo, FlightStatusEnum estadoRequest) {
+        var vooOpt = vooRepository.findById(codigo);
         if (vooOpt.isEmpty()) {
-            return ResponseEntity.status(404).body(ApiResponse.error("Voo não encontrado", 404));
+            return null;
         }
 
-        if (estado.isEmpty()) {
-            return ResponseEntity.status(400).body(ApiResponse.error("Estado inválido", 400));
+        var estadoOpt = estadoRepository.findByNome(estadoRequest);
+        if (estadoOpt.isEmpty()) {
+            return null;
         }
 
         Voo voo = vooOpt.get();
-        voo.setEstado(estado.get());
+        voo.setEstado(estadoOpt.get());
+
         vooRepository.save(voo);
 
-        return ResponseEntity.ok(ApiResponse.success(toDto(voo)));
+        CancelledFlightResponseDto event = new CancelledFlightResponseDto(
+                voo.getCodigo(),
+                voo.getData().toString(),
+                voo.getValorPassagem(),
+                voo.getQuantidadePoltronasTotal(),
+                voo.getQuantidadePoltronasOcupadas(),
+                voo.getEstado().toString(),
+                voo.getAeroportoOrigem().getCodigo(),
+                voo.getAeroportoDestino().getCodigo());
+
+        return event;
     }
 
     private FlightResponseDto toDto(Voo voo) {
