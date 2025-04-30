@@ -13,7 +13,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Configuration
 public class RabbitMQConfig {
 
-    public static final String EXCHANGE_RESERVA = "evento.reserva";
     public static final String QUEUE_RESERVA_CRIADA = "reserva.criada";
     public static final String ROUTING_KEY_RESERVA_CRIADA = "reserva.criada";
 
@@ -22,11 +21,6 @@ public class RabbitMQConfig {
 
     public static final String QUEUE_RESERVA_ATUALIZADA = "reserva.atualizada";
     public static final String ROUTING_KEY_RESERVA_ATUALIZADA = "reserva.atualizada";
-
-    @Bean
-    public DirectExchange reservaExchange() {
-        return new DirectExchange(EXCHANGE_RESERVA);
-    }
 
     @Bean
     public Queue createdReservationQueue() {
