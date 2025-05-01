@@ -8,6 +8,7 @@ import com.dac.fly.shared.dto.response.CancelledFlightResponseDto;
 
 @Component
 public class FlightPublisher {
+
     private final RabbitTemplate rabbit;
 
     public FlightPublisher(RabbitTemplate rabbit) {
@@ -15,6 +16,10 @@ public class FlightPublisher {
     }
 
     public void publishFlightCancelled(CancelledFlightResponseDto dto) {
-        rabbit.convertAndSend(RabbitConstants.EXCHANGE, RabbitConstants.FLIGHT_CANCELLED_QUEUE, dto);
+        rabbit.convertAndSend(
+                RabbitConstants.EXCHANGE,
+                RabbitConstants.FLIGHT_CANCELLED_RESP_QUEUE,
+                dto
+        );
     }
 }

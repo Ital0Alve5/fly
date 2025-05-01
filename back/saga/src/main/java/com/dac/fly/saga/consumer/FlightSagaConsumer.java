@@ -16,7 +16,7 @@ public class FlightSagaConsumer {
 
     private final ConcurrentHashMap<String, CompletableFuture<CancelledFlightResponseDto>> flightCancelResponses;
     private final ConcurrentHashMap<String, CompletableFuture<FlightReservationsCancelledEventDto>> reservationsCancelResponses;
-    private final ConcurrentHashMap<String, CompletableFuture<MilesUpdatedEvent>> milesResponses;
+    // private final ConcurrentHashMap<String, CompletableFuture<MilesUpdatedEvent>> milesResponses;
 
     public FlightSagaConsumer(
             ConcurrentHashMap<String, CompletableFuture<CancelledFlightResponseDto>> flightCancelResponses,
@@ -24,27 +24,22 @@ public class FlightSagaConsumer {
             ConcurrentHashMap<String, CompletableFuture<MilesUpdatedEvent>> milesResponses) {
         this.flightCancelResponses = flightCancelResponses;
         this.reservationsCancelResponses = reservationsCancelResponses;
-        this.milesResponses = milesResponses;
+        // this.milesResponses = milesResponses;
     }
 
-    @RabbitListener(queues = RabbitConstants.FLIGHT_CANCELLED_QUEUE)
+    @RabbitListener(queues = RabbitConstants.FLIGHT_CANCELLED_RESP_QUEUE)
     public void onFlightCancelled(CancelledFlightResponseDto evt) {
-        var f = flightCancelResponses.remove(evt.codigo());
-        if (f != null)
-            f.complete(evt);
+        var future = flightCancelResponses.remove(evt.codigo());
+        if (future != null) {
+            future.complete(evt);
+        }
     }
 
     @RabbitListener(queues = RabbitConstants.FLIGHT_RESERVATIONS_CANCELLED_QUEUE)
     public void onFlightReservationsCancelled(FlightReservationsCancelledEventDto evt) {
-        var f = reservationsCancelResponses.remove(evt.flightCode());
-        if (f != null)
-            f.complete(evt);
-    }
-
-    @RabbitListener(queues = RabbitConstants.UPDATE_MILES_RESP_QUEUE)
-    public void onMilesUpdated(MilesUpdatedEvent evt) {
-        var f = milesResponses.remove(evt.codigo());
-        if (f != null)
-            f.complete(evt);
+        var future = reservationsCancelResponses.remove(evt.flightCode());
+        if (future != null) {
+            future.complete(evt);
+        }
     }
 }

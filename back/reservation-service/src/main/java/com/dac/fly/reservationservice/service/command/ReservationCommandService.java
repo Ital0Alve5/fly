@@ -12,7 +12,6 @@ import com.dac.fly.reservationservice.dto.response.ReservationResponseDto;
 import com.dac.fly.reservationservice.entity.command.Historico;
 import com.dac.fly.reservationservice.entity.command.Reserva;
 import com.dac.fly.reservationservice.enums.ReservationStatusEnum;
-import com.dac.fly.reservationservice.publisher.ReservationPublisher;
 import com.dac.fly.reservationservice.repository.command.EstadoRepository;
 import com.dac.fly.reservationservice.repository.command.HistoryRepository;
 import com.dac.fly.reservationservice.repository.command.ReservaCommandRepository;
@@ -26,7 +25,6 @@ public class ReservationCommandService {
 
         private final ReservaCommandRepository repository;
         private final EstadoRepository estadoRepository;
-        private final ReservationPublisher publisher;
         private final HistoryRepository historyRepository;
         private final ReservationResponseFactory responseFactory;
         private final ReservaQueryRepository reservaQueryRepository;
@@ -34,13 +32,11 @@ public class ReservationCommandService {
         public ReservationCommandService(
                         ReservaCommandRepository repository,
                         EstadoRepository estadoRepository,
-                        ReservationPublisher publisher,
                         HistoryRepository historyRepository,
                         ReservationResponseFactory responseFactory,
                         ReservaQueryRepository reservaQueryRepository) {
                 this.repository = repository;
                 this.estadoRepository = estadoRepository;
-                this.publisher = publisher;
                 this.historyRepository = historyRepository;
                 this.responseFactory = responseFactory;
                 this.reservaQueryRepository = reservaQueryRepository;
@@ -83,12 +79,6 @@ public class ReservationCommandService {
                                 requestDto.codigo_aeroporto_origem(),
                                 requestDto.codigo_aeroporto_destino());
 
-                try {
-                        publisher.publishCreatedReservationToSaga(responseDto);
-                } catch (Exception e) {
-                        throw new RuntimeException("Erro ao publicar evento de reserva", e);
-                }
-
                 return responseDto;
         }
 
@@ -111,7 +101,9 @@ public class ReservationCommandService {
                                 canceledStatusId);
                 historyRepository.save(historyEntity);
 
-                List<HistoryDto> historyDto = getReservationHistory(codigoReserva);
+                com.dac.fly.reservationservice.entity.query.Reserva reservationQuery = reservaQueryRepository
+                                .findById(codigoReserva)
+                                .orElseThrow(() -> new RuntimeException("Reserva não encontrada: " + codigoReserva));
 
                 CanceledReservationResponseDto cancelDto = new CanceledReservationResponseDto(
                                 reservation.getCodigo(),
@@ -122,14 +114,8 @@ public class ReservationCommandService {
                                 reservation.getCodigoCliente(),
                                 ReservationStatusEnum.CANCELADA.toString(),
                                 reservation.getCodigoVoo(),
-                                historyDto.isEmpty() ? null : historyDto.get(0).getCodigo_reserva(),
-                                historyDto.isEmpty() ? null : historyDto.get(0).getCodigo_reserva());
-
-                try {
-                        publisher.publishCancelledReservationToSaga(cancelDto);
-                } catch (Exception e) {
-                        throw new RuntimeException("Erro ao publicar evento de reserva cancelada", e);
-                }
+                                reservationQuery.getAeroportoOrigem(),
+                                reservationQuery.getAeroportoDestino());
 
                 return cancelDto;
         }

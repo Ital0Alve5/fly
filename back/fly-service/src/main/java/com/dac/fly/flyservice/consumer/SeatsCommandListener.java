@@ -26,21 +26,21 @@ public class SeatsCommandListener {
 
     @RabbitListener(queues = RabbitConstants.UPDATE_SEATS_CMD_QUEUE)
     public void handleUpdateSeats(UpdateSeatsCommand cmd) {
-        boolean success = false;
+        boolean success;
 
         try {
             if (cmd.isCompensate()) {
-                success = flightService.updateSeats(cmd.codigoVoo(), +cmd.quantidadePoltronas());
+                success = flightService.updateSeats(cmd.codigoVoo(), cmd.quantidadePoltronas());
             } else {
-                if (!processedReservations.contains(cmd.codigoReserva())) {
+                if (processedReservations.add(cmd.codigoReserva())) {
                     success = flightService.updateSeats(cmd.codigoVoo(), -cmd.quantidadePoltronas());
-                    processedReservations.add(cmd.codigoReserva());
                 } else {
                     success = true;
                 }
             }
         } catch (Exception e) {
             System.err.println("Erro ao processar assentos: " + e.getMessage());
+            success = false;
         }
 
         publisher.publishSeatsUpdated(new SeatsUpdatedEvent(cmd.codigoReserva(), success));

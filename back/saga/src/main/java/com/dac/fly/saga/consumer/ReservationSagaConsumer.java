@@ -33,7 +33,7 @@ public class ReservationSagaConsumer {
 
     @RabbitListener(queues = RabbitConstants.UPDATE_MILES_RESP_QUEUE)
     public void onMilesDeducted(MilesUpdatedEvent evt) {
-        var future = milesResponses.get(evt.codigo());
+        var future = milesResponses.remove(evt.codigo());
         if (future != null) {
             future.complete(evt);
         }
@@ -41,7 +41,7 @@ public class ReservationSagaConsumer {
 
     @RabbitListener(queues = RabbitConstants.UPDATE_SEATS_RESP_QUEUE)
     public void onSeatsUpdated(SeatsUpdatedEvent evt) {
-        var future = seatsResponses.get(evt.codigo());
+        var future = seatsResponses.remove(evt.codigo());
         if (future != null) {
             future.complete(evt);
         }
@@ -49,15 +49,15 @@ public class ReservationSagaConsumer {
 
     @RabbitListener(queues = RabbitConstants.CREATED_QUEUE)
     public void onReservationCreated(CreatedReservationResponseDto evt) {
-        var future = reservationResponses.get(evt.codigo());
+        var future = reservationResponses.remove(evt.codigo());
         if (future != null) {
             future.complete(evt);
         }
     }
 
-    @RabbitListener(queues = RabbitConstants.CANCELED_QUEUE)
+    @RabbitListener(queues = RabbitConstants.CANCELED_RESERVATION_RESP_QUEUE)
     public void onReservationCanceled(CanceledReservationResponseDto evt) {
-        var future = reservationCancelResponses.get(evt.codigo());
+        var future = reservationCancelResponses.remove(evt.codigo());
         if (future != null) {
             future.complete(evt);
         }

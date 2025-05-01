@@ -38,7 +38,7 @@ public class ReservationPublisher {
         try {
             rabbitTemplate.convertAndSend(
                 RabbitConstants.EXCHANGE,
-                RabbitConstants.CANCELED_QUEUE,
+                RabbitConstants.CANCELED_RESERVATION_RESP_QUEUE,
                 dto);
             logger.info("Evento de cancelamento de reserva (saga) publicado: {}", dto.codigo());
         } catch (AmqpException e) {

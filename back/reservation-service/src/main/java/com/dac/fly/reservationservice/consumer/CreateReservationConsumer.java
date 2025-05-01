@@ -1,9 +1,12 @@
 package com.dac.fly.reservationservice.consumer;
 
+import org.springframework.amqp.core.DirectExchange;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
+import com.dac.fly.reservationservice.config.RabbitMQConfig;
 import com.dac.fly.reservationservice.service.command.ReservationCommandService;
 import com.dac.fly.shared.config.RabbitConstants;
 import com.dac.fly.shared.dto.command.CreateReservationCommand;
@@ -13,21 +16,32 @@ import com.dac.fly.shared.dto.response.CreatedReservationResponseDto;
 public class CreateReservationConsumer {
 
     private final RabbitTemplate rabbit;
-    private final ReservationCommandService reservationCommandService;
+    private final DirectExchange internalExchange;
+    private final ReservationCommandService reservationService;
 
     public CreateReservationConsumer(
-            RabbitTemplate rabbit, ReservationCommandService reservationCommandService) {
-        this.reservationCommandService = reservationCommandService;
+            RabbitTemplate rabbit,
+            @Qualifier("internalExchange") DirectExchange internalExchange,
+            ReservationCommandService reservationService) {
         this.rabbit = rabbit;
+        this.internalExchange = internalExchange;
+        this.reservationService = reservationService;
     }
 
-    @RabbitListener(queues = RabbitConstants.RES_QUEUE)
+    @RabbitListener(queues = RabbitConstants.CREATE_RESERVATION_CMD_QUEUE)
     public void handle(CreateReservationCommand cmd) {
-        CreatedReservationResponseDto response = reservationCommandService.createReservation(cmd);
-        
+        CreatedReservationResponseDto response = reservationService.createReservation(cmd);
+
         rabbit.convertAndSend(
                 RabbitConstants.EXCHANGE,
                 RabbitConstants.CREATED_QUEUE,
                 response);
+
+        // cqrs
+        rabbit.convertAndSend(
+                internalExchange.getName(), // "reserva-exchange"
+                RabbitMQConfig.IN_QUEUE_CRIADA, // "reserva.criada"
+                response 
+        );
     }
 }

@@ -7,7 +7,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.dac.fly.reservationservice.entity.command.Reserva;
 import com.dac.fly.reservationservice.publisher.FlightReservationPublisher;
@@ -36,8 +35,7 @@ public class FlightCancelReservationListener {
         this.publisher = publisher;
     }
 
-    @RabbitListener(queues = RabbitConstants.CANCEL_FLIGHT_QUEUE)
-    @Transactional
+    @RabbitListener(queues = RabbitConstants.CANCEL_RESERVATION_BY_FLIGHT_CMD_QUEUE)
     public void onFlightCancelled(CancelFlightDto cmd) {
         if (!processedFlights.add(cmd.codigo())) {
             return;

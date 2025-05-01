@@ -8,6 +8,7 @@ import com.dac.fly.shared.dto.events.SeatsUpdatedEvent;
 
 @Component
 public class SeatsPublisher {
+
     private final RabbitTemplate rabbit;
 
     public SeatsPublisher(RabbitTemplate rabbit) {
@@ -15,6 +16,9 @@ public class SeatsPublisher {
     }
 
     public void publishSeatsUpdated(SeatsUpdatedEvent event) {
-        rabbit.convertAndSend(RabbitConstants.EXCHANGE, RabbitConstants.UPDATE_SEATS_RESP_QUEUE, event);
+        rabbit.convertAndSend(
+                RabbitConstants.EXCHANGE,
+                RabbitConstants.UPDATE_SEATS_RESP_QUEUE,
+                event);
     }
 }

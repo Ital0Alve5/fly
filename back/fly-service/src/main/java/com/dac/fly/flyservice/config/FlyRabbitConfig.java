@@ -4,6 +4,7 @@ import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.core.TopicExchange;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -18,13 +19,13 @@ public class FlyRabbitConfig {
     }
 
     @Bean
-    public Queue flightCancelledResponseQueue() {
-        return new Queue(RabbitConstants.FLIGHT_CANCELLED_QUEUE);
+    public Queue cancelFlightQueue() {
+        return new Queue(RabbitConstants.CANCEL_FLIGHT_CMD_QUEUE);
     }
 
     @Bean
     public Queue flightCancelledQueue() {
-        return new Queue(RabbitConstants.FLIGHT_CANCELLED_QUEUE);
+        return new Queue(RabbitConstants.FLIGHT_CANCELLED_RESP_QUEUE);
     }
 
     @Bean
@@ -33,26 +34,32 @@ public class FlyRabbitConfig {
     }
 
     @Bean
-    public Binding bindUpdateSeatsCommand() {
+    public Binding bindUpdateSeatsCommand(
+            @Qualifier("updateSeatsCommandQueue") Queue updateSeatsCommandQueue,
+            TopicExchange exchange) {
         return BindingBuilder
-                .bind(updateSeatsCommandQueue())
-                .to(exchange())
+                .bind(updateSeatsCommandQueue)
+                .to(exchange)
                 .with(RabbitConstants.UPDATE_SEATS_CMD_QUEUE);
     }
 
     @Bean
-    public Binding bindCancelFlightCommand(Queue cancelFlightCommandQueue, TopicExchange exchange) {
+    public Binding bindCancelFlightCommand(
+            @Qualifier("cancelFlightQueue") Queue cancelFlightQueue,
+            TopicExchange exchange) {
         return BindingBuilder
-                .bind(cancelFlightCommandQueue)
+                .bind(cancelFlightQueue)
                 .to(exchange)
-                .with(RabbitConstants.CANCEL_FLIGHT_QUEUE);
+                .with(RabbitConstants.CANCEL_FLIGHT_CMD_QUEUE);
     }
 
     @Bean
-    public Binding bindFlightCancelledResponse(Queue flightCancelledResponseQueue, TopicExchange exchange) {
+    public Binding bindFlightCancelledResponse(
+            @Qualifier("flightCancelledQueue") Queue flightCancelledQueue,
+            TopicExchange exchange) {
         return BindingBuilder
-                .bind(flightCancelledResponseQueue)
+                .bind(flightCancelledQueue)
                 .to(exchange)
-                .with(RabbitConstants.FLIGHT_CANCELLED_QUEUE);
+                .with(RabbitConstants.FLIGHT_CANCELLED_RESP_QUEUE);
     }
 }

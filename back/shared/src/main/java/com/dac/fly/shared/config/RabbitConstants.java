@@ -4,14 +4,14 @@ public final class RabbitConstants {
     private RabbitConstants() {
     }
 
+    /** Exchange utilizada por todas as sagas */
     public static final String EXCHANGE = "reservation-saga-exchange";
 
-    public static final String RES_QUEUE = "saga.create-reservation";
-
+    /** --- Contexto: Reserva (Reservation Saga) --- */
+    public static final String CREATE_RESERVATION_CMD_QUEUE = "saga.create-reservation";
     public static final String CREATED_QUEUE = "saga.created-reservation";
-
-    public static final String CANCEL_QUEUE = "saga.cancel-reservation";
-    public static final String CANCELED_QUEUE = "saga.reservation-canceled";
+    public static final String CANCEL_RESERVATION_CMD_QUEUE = "saga.cancel-reservation";
+    public static final String CANCELED_RESERVATION_RESP_QUEUE = "saga.reservation-canceled";
 
     public static final String UPDATE_MILES_CMD_QUEUE = "saga.update-miles-cmd";
     public static final String UPDATE_MILES_RESP_QUEUE = "saga.update-miles-resp";
@@ -19,8 +19,9 @@ public final class RabbitConstants {
     public static final String UPDATE_SEATS_CMD_QUEUE = "saga.update-seats-cmd";
     public static final String UPDATE_SEATS_RESP_QUEUE = "saga.update-seats-resp";
 
-    public static final String CANCEL_FLIGHT_QUEUE = "saga.cancel-flight";
-    public static final String FLIGHT_CANCELLED_QUEUE = "saga.flight-cancelled";
-
+    /** --- Contexto: Voo (Flight Saga) --- */
+    public static final String CANCEL_FLIGHT_CMD_QUEUE = "saga.cancel-flight";
+    public static final String FLIGHT_CANCELLED_RESP_QUEUE = "saga.flight-cancelled";
     public static final String FLIGHT_RESERVATIONS_CANCELLED_QUEUE = "saga.flight-reservations-cancelled";
+    public static final String CANCEL_RESERVATION_BY_FLIGHT_CMD_QUEUE = "saga.flight-reservations-cancel";
 }

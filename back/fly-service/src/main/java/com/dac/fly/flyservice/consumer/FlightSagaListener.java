@@ -24,13 +24,11 @@ public class FlightSagaListener {
         this.publisher = publisher;
     }
 
-    @RabbitListener(queues = RabbitConstants.CANCEL_FLIGHT_QUEUE)
+    @RabbitListener(queues = RabbitConstants.CANCEL_FLIGHT_CMD_QUEUE)
     public void handleCancelFlight(CancelFlightDto cmd) {
         try {
-            if (!processedFlights.contains(cmd.codigo())) {
+            if (processedFlights.add(cmd.codigo())) {
                 var flightResponse = service.updateStatus(cmd.codigo(), FlightStatusEnum.CANCELADO);
-                processedFlights.add(cmd.codigo());
-
                 publisher.publishFlightCancelled(flightResponse);
             }
         } catch (Exception e) {

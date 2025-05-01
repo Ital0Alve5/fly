@@ -1,9 +1,12 @@
 package com.dac.fly.reservationservice.consumer;
 
+import org.springframework.amqp.core.DirectExchange;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
+import com.dac.fly.reservationservice.config.RabbitMQConfig;
 import com.dac.fly.reservationservice.service.command.ReservationCommandService;
 import com.dac.fly.shared.config.RabbitConstants;
 import com.dac.fly.shared.dto.command.CancelReservationCommand;
@@ -13,34 +16,31 @@ import com.dac.fly.shared.dto.response.CanceledReservationResponseDto;
 public class CancelReservationConsumer {
 
     private final RabbitTemplate rabbit;
+    private final DirectExchange internalExchange;
     private final ReservationCommandService reservationCommandService;
 
     public CancelReservationConsumer(
             RabbitTemplate rabbit,
+            @Qualifier("internalExchange") DirectExchange internalExchange,
             ReservationCommandService reservationCommandService) {
         this.rabbit = rabbit;
         this.reservationCommandService = reservationCommandService;
+        this.internalExchange = internalExchange;
     }
 
-    @RabbitListener(queues = RabbitConstants.CANCEL_QUEUE)
+    @RabbitListener(queues = RabbitConstants.CANCEL_RESERVATION_CMD_QUEUE)
     public void handle(CancelReservationCommand cmd) {
-        var resp = reservationCommandService.cancelReservationByCode(cmd.codigo());
+        CanceledReservationResponseDto resp = reservationCommandService.cancelReservationByCode(cmd.codigo());
 
-        var canceledDto = new CanceledReservationResponseDto(
-                resp.codigo(),
-                resp.data(),
-                resp.valor(),
-                resp.milhas_utilizadas(),
-                resp.quantidade_poltronas(),
-                resp.codigo_cliente(),
-                resp.estado(),
-                resp.codigo_voo(),
-                resp.codigo_aeroporto_origem(),
-                resp.codigo_aeroporto_destino());
+        rabbit.convertAndSend(
+                internalExchange.getName(),
+                RabbitMQConfig.IN_QUEUE_CANCELADA,
+                resp);
 
         rabbit.convertAndSend(
                 RabbitConstants.EXCHANGE,
-                RabbitConstants.CANCELED_QUEUE,
-                canceledDto);
+                RabbitConstants.CANCELED_RESERVATION_RESP_QUEUE,
+                resp);
+
     }
 }

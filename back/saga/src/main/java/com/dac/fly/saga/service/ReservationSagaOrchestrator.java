@@ -127,7 +127,7 @@ public class ReservationSagaOrchestrator {
     private CreatedReservationResponseDto createReservation(CreateReservationCommand cmd) {
         CompletableFuture<CreatedReservationResponseDto> future = new CompletableFuture<>();
         reservationResponses.put(cmd.codigo(), future);
-        rabbit.convertAndSend(RabbitConstants.EXCHANGE, RabbitConstants.RES_QUEUE, cmd);
+        rabbit.convertAndSend(RabbitConstants.EXCHANGE, RabbitConstants.CREATE_RESERVATION_CMD_QUEUE, cmd);
 
         CreatedReservationResponseDto response;
         try {
@@ -146,7 +146,8 @@ public class ReservationSagaOrchestrator {
             CancelReservationCommand cancelCmd = new CancelReservationCommand(codigo);
             CompletableFuture<CanceledReservationResponseDto> cancelFuture = new CompletableFuture<>();
             reservationCancelResponses.put(codigo, cancelFuture);
-            rabbit.convertAndSend(RabbitConstants.EXCHANGE, RabbitConstants.CANCEL_QUEUE, cancelCmd);
+
+            rabbit.convertAndSend(RabbitConstants.EXCHANGE, RabbitConstants.CANCEL_RESERVATION_CMD_QUEUE, cancelCmd);
 
             CanceledReservationResponseDto cancelResp;
             try {
@@ -165,12 +166,15 @@ public class ReservationSagaOrchestrator {
                     codigo,
                     cancelResp.codigo_cliente(),
                     cancelResp.milhas_utilizadas(), true);
+
             CompletableFuture<MilesUpdatedEvent> milesFuture = new CompletableFuture<>();
             milesResponses.put(codigo, milesFuture);
+
             rabbit.convertAndSend(
                     RabbitConstants.EXCHANGE,
                     RabbitConstants.UPDATE_MILES_CMD_QUEUE,
                     compMiles);
+
             MilesUpdatedEvent milesEvt;
             try {
                 milesEvt = milesFuture.get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
@@ -187,12 +191,15 @@ public class ReservationSagaOrchestrator {
                     codigo,
                     cancelResp.codigo_voo(),
                     cancelResp.quantidade_poltronas(), true);
+
             CompletableFuture<SeatsUpdatedEvent> seatsFuture = new CompletableFuture<>();
             seatsResponses.put(codigo, seatsFuture);
+
             rabbit.convertAndSend(
                     RabbitConstants.EXCHANGE,
                     RabbitConstants.UPDATE_SEATS_CMD_QUEUE,
                     compSeats);
+
             SeatsUpdatedEvent seatsEvt;
             try {
                 seatsEvt = seatsFuture.get(TIMEOUT_SECONDS, TimeUnit.SECONDS);

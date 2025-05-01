@@ -38,21 +38,30 @@ public class FlightSagaOrchestrator {
     }
 
     public CancelledFlightResponseDto cancelFlightSaga(String flightCode) {
-        var flightFuture = new CompletableFuture<CancelledFlightResponseDto>();
+        CompletableFuture<CancelledFlightResponseDto> flightFuture = new CompletableFuture<>();
         flightCancelResponses.put(flightCode, flightFuture);
+
         rabbit.convertAndSend(
                 RabbitConstants.EXCHANGE,
-                RabbitConstants.CANCEL_FLIGHT_QUEUE,
+                RabbitConstants.CANCEL_FLIGHT_CMD_QUEUE,
                 new CancelFlightDto(flightCode));
-        var flightEvt = getWithTimeout(flightFuture, flightCode);
 
-        var resFuture = new CompletableFuture<FlightReservationsCancelledEventDto>();
+        CancelledFlightResponseDto flightEvt = getWithTimeout(flightCancelResponses, flightCode);
+
+        rabbit.convertAndSend(
+                RabbitConstants.EXCHANGE,
+                RabbitConstants.CANCEL_RESERVATION_BY_FLIGHT_CMD_QUEUE,
+                new CancelFlightDto(flightCode)
+        );
+
+        CompletableFuture<FlightReservationsCancelledEventDto> resFuture = new CompletableFuture<>();
         reservationsCancelResponses.put(flightCode, resFuture);
-        var resEvt = getWithTimeout(resFuture, flightCode);
+
+        FlightReservationsCancelledEventDto resEvt = getWithTimeout(reservationsCancelResponses, flightCode);
 
         for (var cm : resEvt.refunds()) {
             String key = flightCode + "-" + cm.codigoCliente();
-            var milesFuture = new CompletableFuture<MilesUpdatedEvent>();
+            CompletableFuture<MilesUpdatedEvent> milesFuture = new CompletableFuture<>();
             milesResponses.put(key, milesFuture);
 
             rabbit.convertAndSend(
@@ -63,21 +72,23 @@ public class FlightSagaOrchestrator {
                             cm.codigoCliente(),
                             cm.milhasUtilizadas(),
                             true));
-            getWithTimeout(milesFuture, key);
+
+            getWithTimeout(milesResponses, key);
         }
 
         return flightEvt;
     }
 
-    private <T> T getWithTimeout(CompletableFuture<T> future, String key) {
+    private <T> T getWithTimeout(
+            ConcurrentHashMap<String, CompletableFuture<T>> map,
+            String key) {
+        CompletableFuture<T> future = map.get(key);
         try {
             return future.get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
         } catch (InterruptedException | ExecutionException | TimeoutException ex) {
             throw new RuntimeException("Erro/timeout na chave " + key, ex);
         } finally {
-            flightCancelResponses.remove(key);
-            reservationsCancelResponses.remove(key);
-            milesResponses.remove(key);
+            map.remove(key);
         }
     }
 }

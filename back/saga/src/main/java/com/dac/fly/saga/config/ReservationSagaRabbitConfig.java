@@ -12,68 +12,104 @@ import com.dac.fly.shared.config.RabbitConstants;
 @Configuration
 public class ReservationSagaRabbitConfig {
 
-    @Bean
-    Queue resQueue() {
-        return new Queue(RabbitConstants.RES_QUEUE);
-    }
-
-    @Bean
-    Queue createdQueue() {
-        return new Queue(RabbitConstants.CREATED_QUEUE);
-    }
-
-    @Bean
-    Queue cancelQueue() {
-        return new Queue(RabbitConstants.CANCEL_QUEUE);
-    }
-
-    @Bean
-    Queue canceledQueue() {
-        return new Queue(RabbitConstants.CANCELED_QUEUE);
-    }
-
-    @Bean
-    Queue milesResponseQueue() {
-        return new Queue(RabbitConstants.UPDATE_MILES_RESP_QUEUE);
-    }
-
-    @Bean
-    Queue seatsResponseQueue() {
-        return new Queue(RabbitConstants.UPDATE_SEATS_RESP_QUEUE);
-    }
-
-    @Bean
-    TopicExchange exchange() {
+    @Bean("reservationSagaExchange")
+    public TopicExchange reservationSagaExchange() {
         return new TopicExchange(RabbitConstants.EXCHANGE);
     }
 
-    @Bean
-    Binding bindRes() {
-        return BindingBuilder.bind(resQueue()).to(exchange()).with(RabbitConstants.RES_QUEUE);
+    @Bean("reservationCreateCmdQueue")
+    public Queue reservationCreateCmdQueue() {
+        return new Queue(RabbitConstants.CREATE_RESERVATION_CMD_QUEUE, true);
+    }
+
+    @Bean("reservationCreatedEventQueue")
+    public Queue reservationCreatedEventQueue() {
+        return new Queue(RabbitConstants.CREATED_QUEUE, true);
+    }
+
+    @Bean("reservationCancelCmdQueue")
+    public Queue reservationCancelCmdQueue() {
+        return new Queue(RabbitConstants.CANCEL_RESERVATION_CMD_QUEUE, true);
+    }
+
+    @Bean("reservationCanceledEventQueue")
+    public Queue reservationCanceledEventQueue() {
+        return new Queue(RabbitConstants.CANCELED_RESERVATION_RESP_QUEUE, true);
+    }
+
+    @Bean("reservationUpdateMilesCmdQueue")
+    public Queue reservationUpdateMilesCmdQueue() {
+        return new Queue(RabbitConstants.UPDATE_MILES_CMD_QUEUE, true);
+    }
+
+    @Bean("reservationUpdateMilesRespQueue")
+    public Queue reservationUpdateMilesRespQueue() {
+        return new Queue(RabbitConstants.UPDATE_MILES_RESP_QUEUE, true);
+    }
+
+    @Bean("reservationUpdateSeatsCmdQueue")
+    public Queue reservationUpdateSeatsCmdQueue() {
+        return new Queue(RabbitConstants.UPDATE_SEATS_CMD_QUEUE, true);
+    }
+
+    @Bean("reservationUpdateSeatsRespQueue")
+    public Queue reservationUpdateSeatsRespQueue() {
+        return new Queue(RabbitConstants.UPDATE_SEATS_RESP_QUEUE, true);
     }
 
     @Bean
-    Binding bindCreated() {
-        return BindingBuilder.bind(createdQueue()).to(exchange()).with(RabbitConstants.CREATED_QUEUE);
+    public Binding bindReservationCreate() {
+        return BindingBuilder.bind(reservationCreateCmdQueue())
+                .to(reservationSagaExchange())
+                .with(RabbitConstants.CREATE_RESERVATION_CMD_QUEUE);
     }
 
     @Bean
-    Binding bindCancel() {
-        return BindingBuilder.bind(cancelQueue()).to(exchange()).with(RabbitConstants.CANCEL_QUEUE);
+    public Binding bindReservationCreated() {
+        return BindingBuilder.bind(reservationCreatedEventQueue())
+                .to(reservationSagaExchange())
+                .with(RabbitConstants.CREATED_QUEUE);
     }
 
     @Bean
-    Binding bindCanceled() {
-        return BindingBuilder.bind(canceledQueue()).to(exchange()).with(RabbitConstants.CANCELED_QUEUE);
+    public Binding bindReservationCancel() {
+        return BindingBuilder.bind(reservationCancelCmdQueue())
+                .to(reservationSagaExchange())
+                .with(RabbitConstants.CANCEL_RESERVATION_CMD_QUEUE);
     }
 
     @Bean
-    Binding bindMilesResponse() {
-        return BindingBuilder.bind(milesResponseQueue()).to(exchange()).with(RabbitConstants.UPDATE_MILES_RESP_QUEUE);
+    public Binding bindReservationCanceled() {
+        return BindingBuilder.bind(reservationCanceledEventQueue())
+                .to(reservationSagaExchange())
+                .with(RabbitConstants.CANCELED_RESERVATION_RESP_QUEUE);
     }
 
     @Bean
-    Binding bindSeatsResponse() {
-        return BindingBuilder.bind(seatsResponseQueue()).to(exchange()).with(RabbitConstants.UPDATE_SEATS_RESP_QUEUE);
+    public Binding bindReservationMilesCmd() {
+        return BindingBuilder.bind(reservationUpdateMilesCmdQueue())
+                .to(reservationSagaExchange())
+                .with(RabbitConstants.UPDATE_MILES_CMD_QUEUE);
+    }
+
+    @Bean
+    public Binding bindReservationMilesResp() {
+        return BindingBuilder.bind(reservationUpdateMilesRespQueue())
+                .to(reservationSagaExchange())
+                .with(RabbitConstants.UPDATE_MILES_RESP_QUEUE);
+    }
+
+    @Bean
+    public Binding bindReservationSeatsCmd() {
+        return BindingBuilder.bind(reservationUpdateSeatsCmdQueue())
+                .to(reservationSagaExchange())
+                .with(RabbitConstants.UPDATE_SEATS_CMD_QUEUE);
+    }
+
+    @Bean
+    public Binding bindReservationSeatsResp() {
+        return BindingBuilder.bind(reservationUpdateSeatsRespQueue())
+                .to(reservationSagaExchange())
+                .with(RabbitConstants.UPDATE_SEATS_RESP_QUEUE);
     }
 }

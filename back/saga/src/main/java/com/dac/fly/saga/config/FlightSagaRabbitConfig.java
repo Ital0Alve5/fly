@@ -4,6 +4,7 @@ import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.core.TopicExchange;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -11,47 +12,70 @@ import com.dac.fly.shared.config.RabbitConstants;
 
 @Configuration
 public class FlightSagaRabbitConfig {
-    @Bean
-    Queue cancelFlightQueue() {
-        return new Queue(RabbitConstants.CANCEL_FLIGHT_QUEUE);
-    }
 
-    @Bean
-    Queue flightCancelledQueue() {
-        return new Queue(RabbitConstants.FLIGHT_CANCELLED_QUEUE);
-    }
-
-    @Bean
-    Queue flightReservationsCancelledQueue() {
-        return new Queue(RabbitConstants.FLIGHT_RESERVATIONS_CANCELLED_QUEUE);
-    }
-
-    @Bean
-    TopicExchange exchange() {
+    @Bean("flightSagaExchange")
+    public TopicExchange flightSagaExchange() {
         return new TopicExchange(RabbitConstants.EXCHANGE);
     }
 
-    @Bean
-    Binding bindCancelFlight() {
-        return BindingBuilder
-                .bind(cancelFlightQueue())
-                .to(exchange())
-                .with(RabbitConstants.CANCEL_FLIGHT_QUEUE);
+    @Bean("flightCancelCmdQueue")
+    public Queue flightCancelCmdQueue() {
+        return new Queue(RabbitConstants.CANCEL_FLIGHT_CMD_QUEUE, true);
+    }
+
+    @Bean("flightCancelledEventQueue")
+    public Queue flightCancelledEventQueue() {
+        return new Queue(RabbitConstants.FLIGHT_CANCELLED_RESP_QUEUE, true);
+    }
+
+    @Bean("flightReservationsCancelledEventQueue")
+    public Queue flightReservationsCancelledEventQueue() {
+        return new Queue(RabbitConstants.FLIGHT_RESERVATIONS_CANCELLED_QUEUE, true);
+    }
+
+    @Bean("flightUpdateMilesRespQueue")
+    public Queue flightUpdateMilesRespQueue() {
+        return new Queue(RabbitConstants.UPDATE_MILES_RESP_QUEUE, true);
     }
 
     @Bean
-    Binding bindFlightCancelled() {
-        return BindingBuilder
-                .bind(flightCancelledQueue())
-                .to(exchange())
-                .with(RabbitConstants.FLIGHT_CANCELLED_QUEUE);
+    public Binding bindFlightCancel() {
+        return BindingBuilder.bind(flightCancelCmdQueue())
+                .to(flightSagaExchange())
+                .with(RabbitConstants.CANCEL_FLIGHT_CMD_QUEUE);
     }
 
     @Bean
-    Binding bindFlightReservationsCancelled() {
-        return BindingBuilder
-                .bind(flightReservationsCancelledQueue())
-                .to(exchange())
+    public Binding bindFlightCancelled() {
+        return BindingBuilder.bind(flightCancelledEventQueue())
+                .to(flightSagaExchange())
+                .with(RabbitConstants.FLIGHT_CANCELLED_RESP_QUEUE);
+    }
+
+    @Bean
+    public Binding bindFlightReservationsCancelled() {
+        return BindingBuilder.bind(flightReservationsCancelledEventQueue())
+                .to(flightSagaExchange())
                 .with(RabbitConstants.FLIGHT_RESERVATIONS_CANCELLED_QUEUE);
+    }
+
+    @Bean
+    public Binding bindFlightMilesResp() {
+        return BindingBuilder.bind(flightUpdateMilesRespQueue())
+                .to(flightSagaExchange())
+                .with(RabbitConstants.UPDATE_MILES_RESP_QUEUE);
+    }
+
+    @Bean("cancelReservationsByFlightCmdQueue")
+    public Queue cancelReservationsByFlightCmdQueue() {
+        return new Queue(RabbitConstants.CANCEL_RESERVATION_BY_FLIGHT_CMD_QUEUE, true);
+    }
+
+    @Bean
+    public Binding bindCancelReservationsByFlightCmd(
+            @Qualifier("cancelReservationsByFlightCmdQueue") Queue q) {
+        return BindingBuilder.bind(q)
+                .to(flightSagaExchange())
+                .with(RabbitConstants.CANCEL_RESERVATION_BY_FLIGHT_CMD_QUEUE);
     }
 }
