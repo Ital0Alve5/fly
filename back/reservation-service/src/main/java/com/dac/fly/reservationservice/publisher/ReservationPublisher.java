@@ -1,16 +1,14 @@
 package com.dac.fly.reservationservice.publisher;
 
-import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.amqp.AmqpException;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Component;
 
-import com.dac.fly.reservationservice.config.RabbitMQConfig;
-import com.dac.fly.reservationservice.dto.HistoryDto;
-import com.dac.fly.reservationservice.dto.events.ReservationCreatedEventDto;
-import com.dac.fly.reservationservice.dto.events.ReservationUpdatedEventDto;
+import com.dac.fly.shared.config.RabbitConstants;
+import com.dac.fly.shared.dto.response.CanceledReservationResponseDto;
+import com.dac.fly.shared.dto.response.CreatedReservationResponseDto;
 
 @Component
 public class ReservationPublisher {
@@ -23,42 +21,29 @@ public class ReservationPublisher {
         this.rabbitTemplate = rabbitTemplate;
     }
 
-    public void publishCreatedReservation(ReservationCreatedEventDto event) {
+    public void publishCreatedReservationToSaga(CreatedReservationResponseDto dto) {
         try {
             rabbitTemplate.convertAndSend(
-                    RabbitMQConfig.EXCHANGE_RESERVA,
-                    RabbitMQConfig.ROUTING_KEY_RESERVA_CRIADA,
-                    event);
-            logger.info("Evento de criação de reserva publicado: {}", event.codigo());
-        } catch (Exception e) {
-            logger.error("Erro ao publicar evento de criação de reserva", e);
-            throw new RuntimeException("Falha ao publicar evento de reserva criada", e);
+                RabbitConstants.EXCHANGE,
+                RabbitConstants.CREATED_QUEUE,
+                dto);
+            logger.info("Evento de criação de reserva (saga) publicado: {}", dto.codigo());
+        } catch (AmqpException e) {
+            logger.error("Erro ao publicar evento de criação de reserva (saga)", e);
+            throw new RuntimeException("Falha ao publicar evento de reserva criada (saga)", e);
         }
     }
 
-    public void publishReservationCancelled(List<HistoryDto> history) {
+    public void publishCancelledReservationToSaga(CanceledReservationResponseDto dto) {
         try {
             rabbitTemplate.convertAndSend(
-                    RabbitMQConfig.EXCHANGE_RESERVA,
-                    RabbitMQConfig.ROUTING_KEY_RESERVA_CANCELADA,
-                    history);
-            logger.info("Evento de cancelamento de reserva publicado: {}", history.get(0).getCodigo_reserva());
-        } catch (Exception e) {
-            logger.error("Erro ao publicar evento de cancelamento de reserva", e);
-            throw new RuntimeException("Falha ao publicar evento de reserva cancelada", e);
-        }
-    }
-
-    public void publishReservationUpdated(ReservationUpdatedEventDto event) {
-        try {
-            rabbitTemplate.convertAndSend(
-                    RabbitMQConfig.EXCHANGE_RESERVA,
-                    RabbitMQConfig.ROUTING_KEY_RESERVA_ATUALIZADA,
-                    event);
-            logger.info("Evento de atualização de reserva publicado: {}", event.codigo());
-        } catch (Exception e) {
-            logger.error("Erro ao publicar evento de atualização de reserva", e);
-            throw new RuntimeException("Falha ao publicar evento de reserva atualizada", e);
+                RabbitConstants.EXCHANGE,
+                RabbitConstants.CANCELED_RESERVATION_RESP_QUEUE,
+                dto);
+            logger.info("Evento de cancelamento de reserva (saga) publicado: {}", dto.codigo());
+        } catch (AmqpException e) {
+            logger.error("Erro ao publicar evento de cancelamento de reserva (saga)", e);
+            throw new RuntimeException("Falha ao publicar evento de reserva cancelada (saga)", e);
         }
     }
 }

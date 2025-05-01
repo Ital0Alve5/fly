@@ -1,12 +1,15 @@
 package com.dac.fly.flyservice.controllers;
 
-import com.dac.fly.flyservice.dto.response.ApiResponse;
+import java.util.List;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.dac.fly.flyservice.entity.Aeroporto;
 import com.dac.fly.flyservice.service.AirportService;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import com.dac.fly.shared.dto.response.ApiResponse;
 
 @RestController
 @RequestMapping("/aeroportos")

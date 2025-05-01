@@ -15,11 +15,21 @@ public enum ReservationStatusEnum {
 
     @JsonCreator
     public static ReservationStatusEnum fromValue(String value) {
-        return ReservationStatusEnum.valueOf(value.replace("-", "_"));
+        return switch (value.trim().toUpperCase()) {
+            case "CHECK-IN" -> CHECK_IN;
+            case "CANCELADA VOO", "CANCELADA-VOO" -> CANCELADA_VOO;
+            case "NAO REALIZADA", "NAO-REALIZADA" -> NAO_REALIZADA;
+            default -> valueOf(value.replace("-", "_").replace(" ", "_"));
+        };
     }
 
     @Override
     public String toString() {
-        return this.name().replace("_", "-");
+        return switch (this) {
+            case CHECK_IN -> "CHECK-IN";
+            case CANCELADA_VOO -> "CANCELADA VOO";
+            case NAO_REALIZADA -> "NAO REALIZADA";
+            default -> name();
+        };
     }
 }

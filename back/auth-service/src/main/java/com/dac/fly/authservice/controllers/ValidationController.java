@@ -1,6 +1,7 @@
 package com.dac.fly.authservice.controllers;
 
-import com.dac.fly.authservice.dto.response.ApiResponse;
+import com.dac.fly.shared.dto.response.ApiResponse;
+
 import com.dac.fly.authservice.entity.Auth;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;

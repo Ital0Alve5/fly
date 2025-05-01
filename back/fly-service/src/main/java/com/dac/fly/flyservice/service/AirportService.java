@@ -1,12 +1,14 @@
 package com.dac.fly.flyservice.service;
 
-import com.dac.fly.flyservice.dto.response.ApiResponse;
-import com.dac.fly.flyservice.entity.Aeroporto;
-import com.dac.fly.flyservice.repository.AeroportoRepository;
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import com.dac.fly.flyservice.entity.Aeroporto;
+import com.dac.fly.flyservice.repository.AeroportoRepository;
+import com.dac.fly.shared.dto.response.ApiResponse;
+
 
 @Service
 public class AirportService {

@@ -1,8 +1,15 @@
 package com.dac.fly.flyservice.entity;
 
-import com.dac.fly.flyservice.enums.ReservationStatusEnum;
+import com.dac.fly.flyservice.enums.FlightStatusEnum;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "estado")
@@ -14,12 +21,12 @@ public class Estado {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 30, unique = true)
-    private ReservationStatusEnum nome;
+    private FlightStatusEnum nome;
 
     public Estado() {
     }
 
-    public Estado(Long codigo, ReservationStatusEnum nome) {
+    public Estado(Long codigo, FlightStatusEnum nome) {
         this.codigo = codigo;
         this.nome = nome;
     }
@@ -32,11 +39,11 @@ public class Estado {
         this.codigo = codigo;
     }
 
-    public ReservationStatusEnum getNome() {
+    public FlightStatusEnum getNome() {
         return nome;
     }
 
-    public void setNome(ReservationStatusEnum nome) {
+    public void setNome(FlightStatusEnum nome) {
         this.nome = nome;
     }
 }

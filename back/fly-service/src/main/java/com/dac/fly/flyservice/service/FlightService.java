@@ -1,23 +1,28 @@
 package com.dac.fly.flyservice.service;
 
-import com.dac.fly.flyservice.dto.request.CreateNewFlightRequestDto;
-import com.dac.fly.flyservice.dto.request.UpdateFlightStatusRequestDto;
-import com.dac.fly.flyservice.dto.response.ApiResponse;
-import com.dac.fly.flyservice.dto.response.FlightDetailsResponseDto;
-import com.dac.fly.flyservice.dto.response.FlightResponseDto;
-import com.dac.fly.flyservice.dto.response.FlightGroupedResponseDto;
-import com.dac.fly.flyservice.entity.*;
-import com.dac.fly.flyservice.enums.ReservationStatusEnum;
-import com.dac.fly.flyservice.repository.*;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
-
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+
+import com.dac.fly.flyservice.dto.request.CreateNewFlightRequestDto;
+import com.dac.fly.flyservice.dto.response.FlightDetailsResponseDto;
+import com.dac.fly.flyservice.dto.response.FlightGroupedResponseDto;
+import com.dac.fly.flyservice.dto.response.FlightResponseDto;
+import com.dac.fly.flyservice.entity.Aeroporto;
+import com.dac.fly.flyservice.entity.Estado;
+import com.dac.fly.flyservice.entity.Voo;
+import com.dac.fly.flyservice.enums.FlightStatusEnum;
+import com.dac.fly.flyservice.repository.AeroportoRepository;
+import com.dac.fly.flyservice.repository.EstadoRepository;
+import com.dac.fly.flyservice.repository.VooRepository;
 import com.dac.fly.flyservice.util.FlightCodeGenerator;
+import com.dac.fly.shared.dto.response.ApiResponse;
+import com.dac.fly.shared.dto.response.CancelledFlightResponseDto;
 
 @Service
 public class FlightService {
@@ -26,7 +31,8 @@ public class FlightService {
     private final EstadoRepository estadoRepository;
     private final AeroportoRepository aeroportoRepository;
 
-    public FlightService(VooRepository vooRepository, EstadoRepository estadoRepository,
+    public FlightService(VooRepository vooRepository,
+            EstadoRepository estadoRepository,
             AeroportoRepository aeroportoRepository) {
         this.vooRepository = vooRepository;
         this.estadoRepository = estadoRepository;
@@ -40,13 +46,11 @@ public class FlightService {
             String destino) {
 
         List<Voo> voos;
-
         if (data != null && dataFim != null) {
             voos = vooRepository.findByDataBetween(data, dataFim);
         } else if (data != null && origem != null && destino != null) {
             OffsetDateTime inicio = data.toLocalDate().atStartOfDay().atOffset(ZoneOffset.UTC);
             OffsetDateTime fim = inicio.plusDays(1);
-
             voos = vooRepository.findByDataBetweenAndAeroportoOrigemCodigoAndAeroportoDestinoCodigo(
                     inicio, fim, origem, destino);
         } else {
@@ -56,23 +60,24 @@ public class FlightService {
         List<FlightDetailsResponseDto> dtos = voos.stream()
                 .map(FlightDetailsResponseDto::fromEntity)
                 .collect(Collectors.toList());
-
         return ResponseEntity.ok(ApiResponse.success(dtos));
     }
 
     public ResponseEntity<ApiResponse<FlightDetailsResponseDto>> findByCode(String codigo) {
         return vooRepository.findById(codigo)
-                .map(voo -> ResponseEntity.ok(ApiResponse.success(FlightDetailsResponseDto.fromEntity(voo))))
-                .orElse(ResponseEntity.status(404).body(ApiResponse.error("Voo não encontrado", 404)));
+                .map(v -> ResponseEntity.ok(ApiResponse.success(FlightDetailsResponseDto.fromEntity(v))))
+                .orElseGet(() -> ResponseEntity.status(404)
+                        .body(ApiResponse.error("Voo não encontrado", 404)));
     }
 
     public ResponseEntity<ApiResponse<FlightResponseDto>> create(CreateNewFlightRequestDto dto) {
         Optional<Aeroporto> origem = aeroportoRepository.findById(dto.codigo_aeroporto_origem());
         Optional<Aeroporto> destino = aeroportoRepository.findById(dto.codigo_aeroporto_destino());
-        Optional<Estado> estado = estadoRepository.findByNome(ReservationStatusEnum.CONFIRMADO);
+        Optional<Estado> estado = estadoRepository.findByNome(FlightStatusEnum.CONFIRMADO);
 
         if (origem.isEmpty() || destino.isEmpty() || estado.isEmpty()) {
-            return ResponseEntity.status(400).body(ApiResponse.error("Dados inválidos para criar voo", 400));
+            return ResponseEntity.badRequest()
+                    .body(ApiResponse.error("Dados inválidos para criar voo", 400));
         }
 
         Voo voo = new Voo();
@@ -86,27 +91,29 @@ public class FlightService {
         voo.setEstado(estado.get());
 
         Voo salvo = vooRepository.save(voo);
-        return ResponseEntity.status(201).body(ApiResponse.success(toDto(salvo)));
+        return ResponseEntity.status(201)
+                .body(ApiResponse.success(toDto(salvo)));
     }
 
-    public ResponseEntity<ApiResponse<FlightResponseDto>> updateStatus(String codigo,
-            UpdateFlightStatusRequestDto estadoRequest) {
-        Optional<Voo> vooOpt = vooRepository.findById(codigo);
-        Optional<Estado> estado = estadoRepository.findByNome(estadoRequest.estado());
+    public CancelledFlightResponseDto updateStatus(String codigo, FlightStatusEnum novoStatus) {
+        Voo voo = vooRepository.findById(codigo)
+                .orElseThrow(() -> new RuntimeException("Voo não encontrado: " + codigo));
 
-        if (vooOpt.isEmpty()) {
-            return ResponseEntity.status(404).body(ApiResponse.error("Voo não encontrado", 404));
-        }
+        Estado estado = estadoRepository.findByNome(novoStatus)
+                .orElseThrow(() -> new RuntimeException("Estado não encontrado: " + novoStatus));
 
-        if (estado.isEmpty()) {
-            return ResponseEntity.status(400).body(ApiResponse.error("Estado inválido", 400));
-        }
-
-        Voo voo = vooOpt.get();
-        voo.setEstado(estado.get());
+        voo.setEstado(estado);
         vooRepository.save(voo);
 
-        return ResponseEntity.ok(ApiResponse.success(toDto(voo)));
+        return new CancelledFlightResponseDto(
+                voo.getCodigo(),
+                voo.getData().toString(),
+                voo.getValorPassagem(),
+                voo.getQuantidadePoltronasTotal(),
+                voo.getQuantidadePoltronasOcupadas(),
+                voo.getEstado().getNome().toString(),
+                voo.getAeroportoOrigem().getCodigo(),
+                voo.getAeroportoDestino().getCodigo());
     }
 
     private FlightResponseDto toDto(Voo voo) {
@@ -121,8 +128,22 @@ public class FlightService {
                 voo.getAeroportoDestino().getCodigo());
     }
 
-    public ResponseEntity<ApiResponse<FlightGroupedResponseDto>> findByAirport(OffsetDateTime data, String origem,
-            String destino) {
+    public boolean updateSeats(String flightCode, int delta) {
+        Voo voo = vooRepository.findById(flightCode)
+                .orElseThrow(() -> new RuntimeException("Voo não encontrado: " + flightCode));
+
+        int ocupadas = voo.getQuantidadePoltronasOcupadas() + delta;
+        if (ocupadas < 0 || ocupadas > voo.getQuantidadePoltronasTotal()) {
+            return false;
+        }
+
+        voo.setQuantidadePoltronasOcupadas(ocupadas);
+        vooRepository.save(voo);
+        return true;
+    }
+
+    public ResponseEntity<ApiResponse<FlightGroupedResponseDto>> findByAirport(
+            OffsetDateTime data, String origem, String destino) {
         OffsetDateTime inicio = data.toLocalDate().atStartOfDay().atOffset(ZoneOffset.UTC);
         OffsetDateTime fim = inicio.plusDays(1);
 
@@ -130,15 +151,10 @@ public class FlightService {
                 inicio, fim, origem, destino);
         List<FlightDetailsResponseDto> detalhes = voos.stream()
                 .map(FlightDetailsResponseDto::fromEntity)
-                .toList();
+                .collect(Collectors.toList());
 
         FlightGroupedResponseDto resposta = FlightGroupedResponseDto.of(
-                data.toString(),
-                origem,
-                destino,
-                detalhes);
-
+                data.toString(), origem, destino, detalhes);
         return ResponseEntity.ok(ApiResponse.success(resposta));
     }
-
 }
