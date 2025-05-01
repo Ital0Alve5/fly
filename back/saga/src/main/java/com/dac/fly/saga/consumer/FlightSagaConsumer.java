@@ -16,8 +16,6 @@ public class FlightSagaConsumer {
 
     private final ConcurrentHashMap<String, CompletableFuture<CancelledFlightResponseDto>> flightCancelResponses;
     private final ConcurrentHashMap<String, CompletableFuture<FlightReservationsCancelledEventDto>> reservationsCancelResponses;
-    // private final ConcurrentHashMap<String, CompletableFuture<MilesUpdatedEvent>>
-    // milesResponses;
 
     public FlightSagaConsumer(
             ConcurrentHashMap<String, CompletableFuture<CancelledFlightResponseDto>> flightCancelResponses,
@@ -25,7 +23,6 @@ public class FlightSagaConsumer {
             ConcurrentHashMap<String, CompletableFuture<MilesUpdatedEvent>> milesResponses) {
         this.flightCancelResponses = flightCancelResponses;
         this.reservationsCancelResponses = reservationsCancelResponses;
-        // this.milesResponses = milesResponses;
     }
 
     @RabbitListener(queues = RabbitConstants.FLIGHT_CANCELLED_RESP_QUEUE)

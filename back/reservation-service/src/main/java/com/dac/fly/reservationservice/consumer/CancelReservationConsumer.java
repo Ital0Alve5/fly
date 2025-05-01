@@ -20,7 +20,7 @@ public class CancelReservationConsumer {
 
     public CancelReservationConsumer(
             RabbitTemplate rabbit,
-            DirectExchange internalExchange,      // esse bean vem do seu unico RabbitMQConfig
+            DirectExchange internalExchange,
             ReservationCommandService reservationCommandService) {
         this.rabbit = rabbit;
         this.reservationCommandService = reservationCommandService;
