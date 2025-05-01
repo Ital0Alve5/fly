@@ -30,10 +30,10 @@ public class SeatsCommandListener {
 
         try {
             if (cmd.isCompensate()) {
-                success = flightService.updateSeats(cmd.codigoVoo(), cmd.quantidadePoltronas());
+                success = flightService.updateSeats(cmd.codigoVoo(), -cmd.quantidadePoltronas());
             } else {
                 if (processedReservations.add(cmd.codigoReserva())) {
-                    success = flightService.updateSeats(cmd.codigoVoo(), -cmd.quantidadePoltronas());
+                    success = flightService.updateSeats(cmd.codigoVoo(), +cmd.quantidadePoltronas());
                 } else {
                     success = true;
                 }

@@ -22,6 +22,7 @@ public class MilesCommandListener {
     @RabbitListener(queues = RabbitConstants.UPDATE_MILES_CMD_QUEUE)
     public void handleUpdateMiles(UpdateMilesCommand cmd) {
         boolean success = false;
+
         try {
             if (cmd.isCompensate()) {
                 success = clientService.updateMiles(cmd.codigoCliente(), +cmd.milhasUtilizadas());
