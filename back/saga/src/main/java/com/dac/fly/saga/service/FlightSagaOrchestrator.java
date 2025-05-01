@@ -19,7 +19,7 @@ import com.dac.fly.shared.dto.response.CancelledFlightResponseDto;
 @Service
 public class FlightSagaOrchestrator {
 
-    private static final long TIMEOUT_SECONDS = 5;
+    private static final long TIMEOUT_SECONDS = 10;
 
     private final RabbitTemplate rabbit;
     private final ConcurrentHashMap<String, CompletableFuture<CancelledFlightResponseDto>> flightCancelResponses;
@@ -41,18 +41,20 @@ public class FlightSagaOrchestrator {
         CompletableFuture<CancelledFlightResponseDto> flightFuture = new CompletableFuture<>();
         flightCancelResponses.put(flightCode, flightFuture);
 
+        System.err.println("1");
         rabbit.convertAndSend(
                 RabbitConstants.EXCHANGE,
                 RabbitConstants.CANCEL_FLIGHT_CMD_QUEUE,
                 new CancelFlightDto(flightCode));
+        System.err.println("6");
 
         CancelledFlightResponseDto flightEvt = getWithTimeout(flightCancelResponses, flightCode);
+        System.err.println("7");
 
         rabbit.convertAndSend(
                 RabbitConstants.EXCHANGE,
                 RabbitConstants.CANCEL_RESERVATION_BY_FLIGHT_CMD_QUEUE,
-                new CancelFlightDto(flightCode)
-        );
+                new CancelFlightDto(flightCode));
 
         CompletableFuture<FlightReservationsCancelledEventDto> resFuture = new CompletableFuture<>();
         reservationsCancelResponses.put(flightCode, resFuture);

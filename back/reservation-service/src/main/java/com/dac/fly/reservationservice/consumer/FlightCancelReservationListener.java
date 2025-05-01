@@ -2,8 +2,6 @@ package com.dac.fly.reservationservice.consumer;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Service;
@@ -24,7 +22,6 @@ public class FlightCancelReservationListener {
     private final ReservaCommandRepository commandRepo;
     private final ReservationCommandService reservationService;
     private final FlightReservationPublisher publisher;
-    private final Set<String> processedFlights = ConcurrentHashMap.newKeySet();
 
     public FlightCancelReservationListener(
             ReservaCommandRepository commandRepo,
@@ -37,10 +34,7 @@ public class FlightCancelReservationListener {
 
     @RabbitListener(queues = RabbitConstants.CANCEL_RESERVATION_BY_FLIGHT_CMD_QUEUE)
     public void onFlightCancelled(CancelFlightDto cmd) {
-        if (!processedFlights.add(cmd.codigo())) {
-            return;
-        }
-
+        System.err.println("8");
         List<String> reservationIds = commandRepo
                 .findByCodigoVoo(cmd.codigo())
                 .stream()
@@ -48,15 +42,22 @@ public class FlightCancelReservationListener {
                 .toList();
 
         List<ClientMilesDto> refunds = new ArrayList<>(reservationIds.size());
+
         for (String resId : reservationIds) {
-            CanceledReservationResponseDto cancelDto = reservationService.cancelReservationByCode(resId);
+            CanceledReservationResponseDto cancelDto = reservationService.cancelReservationByFlight(resId);
 
             refunds.add(new ClientMilesDto(
+                    cancelDto.codigo(),
                     cancelDto.codigo_cliente(),
                     cancelDto.milhas_utilizadas()));
         }
 
         var evt = new FlightReservationsCancelledEventDto(cmd.codigo(), refunds);
+        System.err.println("9");
+
+        publisher.publishFlightReservationsCancelledForCqrs(evt);
+        System.err.println("10");
+
         publisher.publishCancelledFlightReservations(evt);
     }
 }

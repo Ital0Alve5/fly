@@ -1,8 +1,5 @@
 package com.dac.fly.flyservice.consumer;
 
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +14,6 @@ public class SeatsCommandListener {
 
     private final FlightService flightService;
     private final SeatsPublisher publisher;
-    private final Set<String> processedReservations = ConcurrentHashMap.newKeySet();
 
     public SeatsCommandListener(FlightService flightService, SeatsPublisher publisher) {
         this.flightService = flightService;
@@ -32,11 +28,7 @@ public class SeatsCommandListener {
             if (cmd.isCompensate()) {
                 success = flightService.updateSeats(cmd.codigoVoo(), -cmd.quantidadePoltronas());
             } else {
-                if (processedReservations.add(cmd.codigoReserva())) {
                     success = flightService.updateSeats(cmd.codigoVoo(), +cmd.quantidadePoltronas());
-                } else {
-                    success = true;
-                }
             }
         } catch (Exception e) {
             System.err.println("Erro ao processar assentos: " + e.getMessage());

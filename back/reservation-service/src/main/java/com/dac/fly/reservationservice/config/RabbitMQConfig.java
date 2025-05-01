@@ -5,8 +5,10 @@ import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.DirectExchange;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.core.TopicExchange;
+import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
+import org.springframework.amqp.rabbit.connection.ConnectionFactory;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -16,112 +18,116 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Configuration
 public class RabbitMQConfig {
 
+    public static final String INTERNAL_EXCHANGE_NAME = "reserva-exchange";
+    public static final String INTERNAL_CREATED_KEY = "reserva.criada";
+    public static final String INTERNAL_CANCELLED_KEY = "reserva.cancelada";
+    public static final String INTERNAL_UPDATED_KEY = "reserva.atualizada";
+    public static final String INTERNAL_CANCEL_FLIGHT_KEY = "reserva.flight-reservations-cancel";
+
     @Bean
     public TopicExchange sagaExchange() {
         return new TopicExchange(RabbitConstants.EXCHANGE);
     }
 
     @Bean
-    public Queue sagaCancelledQueue() {
-        return new Queue(RabbitConstants.CANCELED_RESERVATION_RESP_QUEUE, true);
-    }
-
-    @Bean
-    public Queue sagaCreatedQueue() {
-        return new Queue(RabbitConstants.CREATED_QUEUE, true);
-    }
-
-    @Bean
-    public Binding bindSagaCancelled(
-            @Qualifier("sagaCancelledQueue") Queue sagaCancelledQueue,
-            TopicExchange sagaExchange) {
-        return BindingBuilder
-                .bind(sagaCancelledQueue)
-                .to(sagaExchange)
-                .with(RabbitConstants.CANCELED_RESERVATION_RESP_QUEUE);
-    }
-
-    @Bean
-    public Binding bindSagaCreated(
-            @Qualifier("sagaCreatedQueue") Queue sagaCreatedQueue,
-            TopicExchange sagaExchange) {
-        return BindingBuilder
-                .bind(sagaCreatedQueue)
-                .to(sagaExchange)
-                .with(RabbitConstants.CREATED_QUEUE);
-    }
-
-    @Bean
     public DirectExchange internalExchange() {
-        return new DirectExchange("reserva-exchange");
-    }
-
-    // 4) Queues internas + Bindings
-    public static final String IN_QUEUE_CRIADA = "reserva.criada";
-    public static final String IN_QUEUE_CANCELADA = "reserva.cancelada";
-    public static final String IN_QUEUE_ATUALIZADA = "reserva.atualizada";
-
-    @Bean
-    public Queue internalCreatedQueue() {
-        return new Queue(IN_QUEUE_CRIADA, true);
+        return new DirectExchange(RabbitMQConfig.INTERNAL_EXCHANGE_NAME);
     }
 
     @Bean
-    public Binding bindInternalCreated(
-            @Qualifier("internalCreatedQueue") Queue q,
-            DirectExchange internalExchange) {
-        return BindingBuilder
-                .bind(q)
-                .to(internalExchange)
-                .with(IN_QUEUE_CRIADA);
-    }
-
-    @Bean
-    public Queue internalCancelledQueue() {
-        return new Queue(IN_QUEUE_CANCELADA, true);
-    }
-
-    @Bean
-    public Binding bindInternalCancelled(
-            @Qualifier("internalCancelledQueue") Queue q,
-            DirectExchange internalExchange) {
-        return BindingBuilder
-                .bind(q)
-                .to(internalExchange)
-                .with(IN_QUEUE_CANCELADA);
-    }
-
-    @Bean
-    public Queue internalUpdatedQueue() {
-        return new Queue(IN_QUEUE_ATUALIZADA, true);
-    }
-
-    @Bean
-    public Binding bindInternalUpdated(
-            @Qualifier("internalUpdatedQueue") Queue q,
-            DirectExchange internalExchange) {
-        return BindingBuilder
-                .bind(q)
-                .to(internalExchange)
-                .with(IN_QUEUE_ATUALIZADA);
-    }
-
-    @Bean
-    public Queue cancelReservationsByFlightCmdQueue() {
-        return new Queue(RabbitConstants.CANCEL_RESERVATION_BY_FLIGHT_CMD_QUEUE, true);
-    }
-
-    @Bean
-    public Binding bindCancelReservationsByFlightCmd(
-            @Qualifier("cancelReservationsByFlightCmdQueue") Queue q,
-            TopicExchange sagaExchange) {
-        return BindingBuilder.bind(q)
-                .to(sagaExchange)
-                .with(RabbitConstants.CANCEL_RESERVATION_BY_FLIGHT_CMD_QUEUE);
-    }
-
-    @Bean
-    public Jackson2JsonMessageConverter messageConverter(ObjectMapper mapper) {
+    public Jackson2JsonMessageConverter jacksonConverter(ObjectMapper mapper) {
         return new Jackson2JsonMessageConverter(mapper);
+    }
+
+    @Bean
+    public RabbitTemplate rabbitTemplate(
+            ConnectionFactory cf, Jackson2JsonMessageConverter conv) {
+        RabbitTemplate tpl = new RabbitTemplate(cf);
+        tpl.setMessageConverter(conv);
+        return tpl;
+    }
+
+    @Bean
+    public SimpleRabbitListenerContainerFactory rabbitListenerContainerFactory(
+            ConnectionFactory cf, Jackson2JsonMessageConverter conv) {
+        var f = new SimpleRabbitListenerContainerFactory();
+        f.setConnectionFactory(cf);
+        f.setMessageConverter(conv);
+        return f;
+    }
+
+    // filas "externas" (saga commands / responses)
+    @Bean
+    public Queue createReservationCmd() {
+        return new Queue(RabbitConstants.CREATE_RESERVATION_CMD_QUEUE, true);
+    }
+
+    @Bean
+    public Queue cancelReservationCmd() {
+        return new Queue(RabbitConstants.CANCEL_RESERVATION_CMD_QUEUE, true);
+    }
+
+    @Bean
+    public Queue flightReservationsCancelled() {
+        return new Queue(RabbitConstants.FLIGHT_RESERVATIONS_CANCELLED_QUEUE, true);
+    }
+
+    // filas "internas" CQRS
+    @Bean
+    public Queue internalCreated() {
+        return new Queue(RabbitMQConfig.INTERNAL_CREATED_KEY, true);
+    }
+
+    @Bean
+    public Queue internalCanceled() {
+        return new Queue(RabbitMQConfig.INTERNAL_CANCELLED_KEY, true);
+    }
+
+    @Bean
+    public Queue internalFlightResCancel() {
+        return new Queue(RabbitMQConfig.INTERNAL_CANCEL_FLIGHT_KEY, true);
+    }
+
+    // binds
+    @Bean
+    public Binding bindCreate() {
+        return BindingBuilder.bind(createReservationCmd())
+                .to(sagaExchange())
+                .with(RabbitConstants.CREATE_RESERVATION_CMD_QUEUE);
+    }
+
+    @Bean
+    public Binding bindCancelCmd() {
+        return BindingBuilder.bind(cancelReservationCmd())
+                .to(sagaExchange())
+                .with(RabbitConstants.CANCEL_RESERVATION_CMD_QUEUE);
+    }
+
+    @Bean
+    public Binding bindFlightResCancelled() {
+        return BindingBuilder.bind(flightReservationsCancelled())
+                .to(sagaExchange())
+                .with(RabbitConstants.FLIGHT_RESERVATIONS_CANCELLED_QUEUE);
+    }
+
+    @Bean
+    public Binding bindInternalCreated() {
+        return BindingBuilder.bind(internalCreated())
+                .to(internalExchange())
+                .with(RabbitMQConfig.INTERNAL_CREATED_KEY);
+    }
+
+    @Bean
+    public Binding bindInternalCanceled() {
+        return BindingBuilder.bind(internalCanceled())
+                .to(internalExchange())
+                .with(RabbitMQConfig.INTERNAL_CANCELLED_KEY);
+    }
+
+    @Bean
+    public Binding bindInternalFlightResCancelled() {
+        return BindingBuilder.bind(internalFlightResCancel())
+                .to(internalExchange())
+                .with(RabbitMQConfig.INTERNAL_CANCEL_FLIGHT_KEY);
     }
 }

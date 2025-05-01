@@ -23,7 +23,7 @@ public record FlightDetailsResponseDto(
                 voo.getValorPassagem(),
                 voo.getQuantidadePoltronasTotal(),
                 voo.getQuantidadePoltronasOcupadas(),
-                voo.getEstado().getNome().name(),
+                voo.getEstado().getNome().toString(),
                 new AeroportoResponseDto(origem.getCodigo(), origem.getNome(), origem.getCidade(), origem.getUf()),
                 new AeroportoResponseDto(destino.getCodigo(), destino.getNome(), destino.getCidade(), destino.getUf()));
     }

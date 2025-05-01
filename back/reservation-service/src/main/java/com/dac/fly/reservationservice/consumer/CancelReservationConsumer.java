@@ -3,7 +3,6 @@ package com.dac.fly.reservationservice.consumer;
 import org.springframework.amqp.core.DirectExchange;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import com.dac.fly.reservationservice.config.RabbitMQConfig;
@@ -21,7 +20,7 @@ public class CancelReservationConsumer {
 
     public CancelReservationConsumer(
             RabbitTemplate rabbit,
-            @Qualifier("internalExchange") DirectExchange internalExchange,
+            DirectExchange internalExchange,      // esse bean vem do seu unico RabbitMQConfig
             ReservationCommandService reservationCommandService) {
         this.rabbit = rabbit;
         this.reservationCommandService = reservationCommandService;
@@ -34,7 +33,7 @@ public class CancelReservationConsumer {
 
         rabbit.convertAndSend(
                 internalExchange.getName(),
-                RabbitMQConfig.IN_QUEUE_CANCELADA,
+                RabbitMQConfig.INTERNAL_CANCELLED_KEY,
                 resp);
 
         rabbit.convertAndSend(

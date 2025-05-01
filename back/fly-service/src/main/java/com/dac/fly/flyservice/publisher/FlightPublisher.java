@@ -16,6 +16,7 @@ public class FlightPublisher {
     }
 
     public void publishFlightCancelled(CancelledFlightResponseDto dto) {
+        System.err.println("4");
         rabbit.convertAndSend(
                 RabbitConstants.EXCHANGE,
                 RabbitConstants.FLIGHT_CANCELLED_RESP_QUEUE,

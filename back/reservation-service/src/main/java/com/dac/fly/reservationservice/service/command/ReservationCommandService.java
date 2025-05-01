@@ -83,22 +83,31 @@ public class ReservationCommandService {
         }
 
         public CanceledReservationResponseDto cancelReservationByCode(String codigoReserva) {
+                return doCancel(codigoReserva, ReservationStatusEnum.CANCELADA);
+        }
+
+        public CanceledReservationResponseDto cancelReservationByFlight(String codigoReserva) {
+                return doCancel(codigoReserva, ReservationStatusEnum.CANCELADA_VOO);
+        }
+
+        public CanceledReservationResponseDto doCancel(String codigoReserva,
+                        ReservationStatusEnum targetStatus) {
                 Reserva reservation = repository.findById(codigoReserva)
                                 .orElseThrow(() -> new RuntimeException("Reserva não encontrada: " + codigoReserva));
 
-                Long currentStatus = reservation.getEstado();
-                Long canceledStatusId = estadoRepository.findByNome(ReservationStatusEnum.CANCELADA.toString())
-                                .orElseThrow(() -> new RuntimeException("Estado 'CANCELADA' não encontrado"))
+                Long oldStatus = reservation.getEstado();
+                Long newStatusId = estadoRepository.findByNome(targetStatus.toString())
+                                .orElseThrow(() -> new RuntimeException("Estado '" + targetStatus + "' não encontrado"))
                                 .getCodigo();
 
-                reservation.setEstado(canceledStatusId);
+                reservation.setEstado(newStatusId);
                 repository.save(reservation);
 
                 Historico historyEntity = new Historico(
                                 reservation.getCodigo(),
                                 LocalDateTime.now(),
-                                currentStatus,
-                                canceledStatusId);
+                                oldStatus,
+                                newStatusId);
                 historyRepository.save(historyEntity);
 
                 com.dac.fly.reservationservice.entity.query.Reserva reservationQuery = reservaQueryRepository
@@ -126,7 +135,7 @@ public class ReservationCommandService {
                                 .orElseThrow(() -> new RuntimeException("Reserva não encontrada"));
 
                 String estadoAtual = resolveEstadoNome(reserva.getEstado());
-                if ("CANCELADA".equals(estadoAtual) || "CANCELADA-VOO".equals(estadoAtual)) {
+                if ("CANCELADA".equals(estadoAtual) || "CANCELADA VOO".equals(estadoAtual)) {
                         throw new RuntimeException("Não é permitido alterar o estado de uma reserva cancelada.");
                 }
 

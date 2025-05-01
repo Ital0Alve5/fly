@@ -111,7 +111,7 @@ public class FlightService {
                 voo.getValorPassagem(),
                 voo.getQuantidadePoltronasTotal(),
                 voo.getQuantidadePoltronasOcupadas(),
-                voo.getEstado().toString(),
+                voo.getEstado().getNome().toString(),
                 voo.getAeroportoOrigem().getCodigo(),
                 voo.getAeroportoDestino().getCodigo());
     }

@@ -1,8 +1,5 @@
 package com.dac.fly.flyservice.consumer;
 
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +14,6 @@ public class FlightSagaListener {
 
     private final FlightService service;
     private final FlightPublisher publisher;
-    private final Set<String> processedFlights = ConcurrentHashMap.newKeySet();
 
     public FlightSagaListener(FlightService service, FlightPublisher publisher) {
         this.service = service;
@@ -27,10 +23,10 @@ public class FlightSagaListener {
     @RabbitListener(queues = RabbitConstants.CANCEL_FLIGHT_CMD_QUEUE)
     public void handleCancelFlight(CancelFlightDto cmd) {
         try {
-            if (processedFlights.add(cmd.codigo())) {
-                var flightResponse = service.updateStatus(cmd.codigo(), FlightStatusEnum.CANCELADO);
-                publisher.publishFlightCancelled(flightResponse);
-            }
+            System.err.println("2");
+            var flightResponse = service.updateStatus(cmd.codigo(), FlightStatusEnum.CANCELADO);
+            System.err.println("3");
+            publisher.publishFlightCancelled(flightResponse);
         } catch (Exception e) {
             System.err.println("Erro ao cancelar voo " + cmd.codigo() + ": " + e.getMessage());
         }

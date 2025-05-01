@@ -40,7 +40,7 @@ public class CreateReservationConsumer {
         // cqrs
         rabbit.convertAndSend(
                 internalExchange.getName(), // "reserva-exchange"
-                RabbitMQConfig.IN_QUEUE_CRIADA, // "reserva.criada"
+                RabbitMQConfig.INTERNAL_CREATED_KEY, // "reserva.criada"
                 response 
         );
     }

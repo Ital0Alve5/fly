@@ -12,6 +12,8 @@ import com.dac.fly.reservationservice.entity.query.Reserva;
 import com.dac.fly.reservationservice.repository.command.EstadoRepository;
 import com.dac.fly.reservationservice.repository.command.HistoryRepository;
 import com.dac.fly.reservationservice.repository.query.ReservaQueryRepository;
+import com.dac.fly.shared.dto.events.ClientMilesDto;
+import com.dac.fly.shared.dto.events.FlightReservationsCancelledEventDto;
 import com.dac.fly.shared.dto.response.CanceledReservationResponseDto;
 import com.dac.fly.shared.dto.response.CreatedReservationResponseDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -85,6 +87,27 @@ public class ReservationQueryService {
             view.setHistorico(buildHistoryJson(evt.codigo()));
 
             reservaQueryRepository.save(view);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public boolean handleFlightReservationsCancelled(FlightReservationsCancelledEventDto evt) {
+        try {
+            for (ClientMilesDto cm : evt.refunds()) {
+                String reservaCodigo = cm.codigoReserva();
+
+                Reserva view = reservaQueryRepository.findById(reservaCodigo)
+                        .orElseThrow(() -> new RuntimeException(
+                                "Projeção de reserva não encontrada: " + reservaCodigo));
+
+                view.setEstado("CANCELADA VOO");
+
+                view.setHistorico(buildHistoryJson(reservaCodigo));
+
+                reservaQueryRepository.save(view);
+            }
             return true;
         } catch (Exception e) {
             return false;
