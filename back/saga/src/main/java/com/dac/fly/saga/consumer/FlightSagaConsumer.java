@@ -30,23 +30,18 @@ public class FlightSagaConsumer {
 
     @RabbitListener(queues = RabbitConstants.FLIGHT_CANCELLED_RESP_QUEUE)
     public void onFlightCancelled(CancelledFlightResponseDto evt) {
-        System.err.println("4");
         var future = flightCancelResponses.remove(evt.codigo());
         if (future != null) {
             future.complete(evt);
-            System.err.println("5");
         }
     }
 
     @RabbitListener(queues = RabbitConstants.FLIGHT_RESERVATIONS_CANCELLED_QUEUE)
     public void onFlightReservationsCancelled(FlightReservationsCancelledEventDto evt) {
-        System.err.println("RECEBIDO NO LISTENER: " + evt);
-        System.err.println("flightCode: " + evt.flightCode());
 
         var future = reservationsCancelResponses.remove(evt.flightCode());
 
         if (future != null) {
-            System.err.println("COMPLETANDO FUTURE");
             future.complete(evt);
         } else {
             System.err.println("FUTURE NULO: nada foi completado");

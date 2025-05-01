@@ -23,9 +23,7 @@ public class FlightSagaListener {
     @RabbitListener(queues = RabbitConstants.CANCEL_FLIGHT_CMD_QUEUE)
     public void handleCancelFlight(CancelFlightDto cmd) {
         try {
-            System.err.println("2");
             var flightResponse = service.updateStatus(cmd.codigo(), FlightStatusEnum.CANCELADO);
-            System.err.println("3");
             publisher.publishFlightCancelled(flightResponse);
         } catch (Exception e) {
             System.err.println("Erro ao cancelar voo " + cmd.codigo() + ": " + e.getMessage());

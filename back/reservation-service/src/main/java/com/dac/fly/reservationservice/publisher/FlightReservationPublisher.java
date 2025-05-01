@@ -22,7 +22,6 @@ public class FlightReservationPublisher {
     }
 
     public void publishCancelledFlightReservations(FlightReservationsCancelledEventDto evt) {
-        System.err.println("11");
 
         rabbit.convertAndSend(
                 RabbitConstants.EXCHANGE,
@@ -31,7 +30,6 @@ public class FlightReservationPublisher {
     }
 
     public void publishFlightReservationsCancelledForCqrs(FlightReservationsCancelledEventDto evt) {
-        System.err.println("9.1");
         rabbit.convertAndSend(
             internalExchange.getName(),
             RabbitMQConfig.INTERNAL_CANCEL_FLIGHT_KEY,

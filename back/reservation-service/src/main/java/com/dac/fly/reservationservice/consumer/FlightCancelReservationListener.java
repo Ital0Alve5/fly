@@ -34,7 +34,6 @@ public class FlightCancelReservationListener {
 
     @RabbitListener(queues = RabbitConstants.CANCEL_RESERVATION_BY_FLIGHT_CMD_QUEUE)
     public void onFlightCancelled(CancelFlightDto cmd) {
-        System.err.println("8");
         List<String> reservationIds = commandRepo
                 .findByCodigoVoo(cmd.codigo())
                 .stream()
@@ -53,10 +52,8 @@ public class FlightCancelReservationListener {
         }
 
         var evt = new FlightReservationsCancelledEventDto(cmd.codigo(), refunds);
-        System.err.println("9");
 
         publisher.publishFlightReservationsCancelledForCqrs(evt);
-        System.err.println("10");
 
         publisher.publishCancelledFlightReservations(evt);
     }

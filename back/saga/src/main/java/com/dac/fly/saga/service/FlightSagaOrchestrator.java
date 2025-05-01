@@ -41,15 +41,12 @@ public class FlightSagaOrchestrator {
         CompletableFuture<CancelledFlightResponseDto> flightFuture = new CompletableFuture<>();
         flightCancelResponses.put(flightCode, flightFuture);
 
-        System.err.println("1");
         rabbit.convertAndSend(
                 RabbitConstants.EXCHANGE,
                 RabbitConstants.CANCEL_FLIGHT_CMD_QUEUE,
                 new CancelFlightDto(flightCode));
-        System.err.println("6");
 
         CancelledFlightResponseDto flightEvt = getWithTimeout(flightCancelResponses, flightCode);
-        System.err.println("7");
 
         rabbit.convertAndSend(
                 RabbitConstants.EXCHANGE,
