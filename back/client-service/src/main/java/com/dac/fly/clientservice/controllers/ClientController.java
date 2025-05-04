@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.dac.fly.clientservice.dto.request.AddMilesRequestDTO;
-import com.dac.fly.clientservice.dto.request.CreateClientRequestDTO;
 import com.dac.fly.clientservice.dto.response.ApiResponse;
 import com.dac.fly.clientservice.dto.response.ClientResponseDTO;
 import com.dac.fly.clientservice.dto.response.MilesResponseDTO;
@@ -26,18 +25,6 @@ public class ClientController {
 
     public ClientController(ClientService clientService) {
         this.clientService = clientService;
-    }
-
-    @PostMapping
-    public ResponseEntity<ApiResponse<ClientResponseDTO>> createClient(@RequestBody CreateClientRequestDTO request) {
-        try {
-            ClientResponseDTO createdClient = clientService.createClient(request);
-            return ResponseEntity.status(HttpStatus.CREATED)
-                    .body(ApiResponse.success(createdClient));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest()
-                    .body(ApiResponse.error(e.getMessage(), 400));
-        }
     }
 
     @GetMapping("/{codigoCliente}")

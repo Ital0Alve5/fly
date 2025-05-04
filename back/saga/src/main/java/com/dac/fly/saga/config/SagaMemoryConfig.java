@@ -3,6 +3,8 @@ package com.dac.fly.saga.config;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.dac.fly.shared.dto.events.UserCreatedEventDto;
+import com.dac.fly.shared.dto.response.ClientCreatedResponseDto;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -64,6 +66,22 @@ public class SagaMemoryConfig {
      */
     @Bean
     public ConcurrentHashMap<String, CompletableFuture<FlightReservationsCancelledEventDto>> reservationsCancelResponses() {
+        return new ConcurrentHashMap<>();
+    }
+
+    /**
+     * Futuro para o evento de criar cliente para a resposta de criar cliente na saga.
+     */
+    @Bean
+    ConcurrentHashMap<String, CompletableFuture<ClientCreatedResponseDto>> clientCreateResponses() {
+        return new ConcurrentHashMap<>();
+    }
+
+    /**
+     * Futuro para o evento de criar usuário para a resposta de criar usuário no auth-service.
+     */
+    @Bean
+    ConcurrentHashMap<String, CompletableFuture<UserCreatedEventDto>> userCreateResponses() {
         return new ConcurrentHashMap<>();
     }
 }

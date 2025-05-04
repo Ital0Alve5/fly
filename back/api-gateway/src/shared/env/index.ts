@@ -20,4 +20,8 @@ export class Env {
   static get EMPLOYEE_SERVICE_URL(): string {
     return process.env.EMPLOYEE_SERVICE_URL
   }
+
+  static get SAGA_URL(): string {
+    return process.env.SAGA_URL
+  }
 }
