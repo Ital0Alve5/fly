@@ -27,6 +27,7 @@ public class SecurityConfig {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeHttpRequests()
+                .requestMatchers("/").permitAll()
                 .requestMatchers("/login").permitAll()
                 .requestMatchers("/cliente").hasAuthority("CLIENTE")
                 .requestMatchers("/funcionario").hasAuthority("FUNCIONARIO")

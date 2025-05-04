@@ -1,9 +1,9 @@
 package com.dac.fly.saga.service;
 
 import com.dac.fly.shared.config.RabbitConstants;
+import com.dac.fly.shared.dto.command.CreateUserCommandDto;
 import com.dac.fly.shared.dto.events.UserCreatedEventDto;
 import com.dac.fly.shared.dto.request.CreateClientRequestDto;
-import com.dac.fly.shared.dto.request.CreateUserRequestDto;
 import com.dac.fly.shared.dto.response.ClientCreatedResponseDto;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
@@ -45,7 +45,7 @@ public class ClientSagaOrchestrator {
         rabbit.convertAndSend(
                 RabbitConstants.EXCHANGE,
                 RabbitConstants.CREATE_USER_CMD_QUEUE,
-                new CreateUserRequestDto(dto.email(), "CLIENTE"));
+                new CreateUserCommandDto(dto.nome(), dto.email(), "CLIENTE"));
 
         getWithTimeout(userCreateResponses, dto.email());
         System.out.println("Getted auth service timeout");

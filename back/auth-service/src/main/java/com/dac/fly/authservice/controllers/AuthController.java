@@ -1,6 +1,7 @@
 package com.dac.fly.authservice.controllers;
 
 import com.dac.fly.authservice.dto.request.LoginRequestDto;
+import com.dac.fly.shared.dto.command.CreateUserCommandDto;
 import com.dac.fly.shared.dto.response.ApiResponse;
 
 import com.dac.fly.authservice.dto.response.LoginResponseDto;
@@ -19,6 +20,13 @@ public class AuthController {
 
     public AuthController(AuthService authService) {
         this.authService = authService;
+    }
+
+    @PostMapping()
+    public ResponseEntity<ApiResponse<Boolean>> register() {
+        System.out.println("Request!");
+        authService.registerUser(new CreateUserCommandDto("Tomaz", "tomazcx06@gmail.com", "CLIENTE"));
+        return ResponseEntity.ok(ApiResponse.success(true));
     }
 
     @PostMapping("/login")

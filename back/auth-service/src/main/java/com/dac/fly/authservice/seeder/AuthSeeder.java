@@ -26,22 +26,23 @@ public class AuthSeeder implements CommandLineRunner {
             System.out.println("Inserindo usuários iniciais no MongoDB...");
 
             repository.save(new Auth(
-                    1L,
                     "heitor@gmail.com",
                     passwordEncoder.encode("123456"),
                     "Heitor",
                     "CLIENTE",
                     LocalDateTime.now(),
-                    LocalDateTime.now()));
+                    LocalDateTime.now()
+            ));
 
             repository.save(new Auth(
-                    2L,
                     "func_pre@gmail.com",
                     passwordEncoder.encode("123456"),
                     "Razer",
                     "FUNCIONARIO",
                     LocalDateTime.now(),
-                    LocalDateTime.now()));
+                    LocalDateTime.now()
+            ));
         }
     }
 }
+

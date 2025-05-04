@@ -6,6 +6,6 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 import com.dac.fly.authservice.entity.Auth;
 
-public interface AuthRepository extends MongoRepository<Auth, Long> {
+public interface AuthRepository extends MongoRepository<Auth, String> {
     Optional<Auth> findByEmail(String email);
 }
