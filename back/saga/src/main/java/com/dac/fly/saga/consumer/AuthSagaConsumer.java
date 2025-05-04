@@ -30,7 +30,6 @@ public class AuthSagaConsumer {
 
     @RabbitListener(queues = RabbitConstants.CREATE_USER_RESP_QUEUE)
     public void onUserCreated(UserCreatedEventDto evt) {
-        System.out.println("Received user created resp on saga" + evt.email());
         var future = userCreateResponses.get(evt.email());
         if (future != null) {
             future.complete(evt);
@@ -39,7 +38,6 @@ public class AuthSagaConsumer {
 
     @RabbitListener(queues = RabbitConstants.UPDATE_USER_RESP_QUEUE)
     public void onUserCreated(UserUpdatedEventDto evt) {
-        System.out.println("Received user updated resp on saga" + evt.email());
         var future = userUpdateResponses.get(evt.email());
         if (future != null) {
             future.complete(evt);
@@ -48,7 +46,6 @@ public class AuthSagaConsumer {
 
     @RabbitListener(queues = RabbitConstants.DELETE_USER_RESP_QUEUE)
     public void onUserCreated(UserDeletedEventDto evt) {
-        System.out.println("Received user deleted resp on saga" + evt.email());
         var future = userDeleteResponses.get(evt.email());
         if (future != null) {
             future.complete(evt);

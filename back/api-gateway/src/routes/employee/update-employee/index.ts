@@ -17,7 +17,7 @@ export async function updateEmployeeRoute(app: FastifyTypedInstance) {
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
         const { codigoFuncionario } = request.params as { codigoFuncionario: string }
-	    console.log(`${Env.SAGA_URL}/funcionarios/${codigoFuncionario}`,)
+
         const response = await axios.put(
           `${Env.SAGA_URL}/funcionarios/${codigoFuncionario}`,
           request.body,

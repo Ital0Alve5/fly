@@ -16,7 +16,6 @@ public class AuthPublisher {
     }
 
     public void publishUserCreatedResponse(String email, boolean success) {
-        System.out.println("Publishing create user response");
         rabbit.convertAndSend(
                 RabbitConstants.EXCHANGE,
                 RabbitConstants.CREATE_USER_RESP_QUEUE,
@@ -25,7 +24,6 @@ public class AuthPublisher {
     }
 
     public void publishUserUpdatedResponse(String email, boolean success) {
-        System.out.println("Publishing update user response");
         rabbit.convertAndSend(
                 RabbitConstants.EXCHANGE,
                 RabbitConstants.UPDATE_USER_RESP_QUEUE,
@@ -34,7 +32,6 @@ public class AuthPublisher {
     }
 
     public void publishUserDeleteResponse(String email, boolean success) {
-        System.out.println("Publishing create delete response");
         rabbit.convertAndSend(
                 RabbitConstants.EXCHANGE,
                 RabbitConstants.DELETE_USER_RESP_QUEUE,

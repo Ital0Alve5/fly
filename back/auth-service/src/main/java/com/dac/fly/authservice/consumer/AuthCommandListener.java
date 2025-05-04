@@ -22,7 +22,6 @@ public class AuthCommandListener {
 
     @RabbitListener(queues = RabbitConstants.CREATE_USER_CMD_QUEUE)
     public void handleCreateUser(CreateUserCommandDto cmd) {
-        System.out.println("Received create user command on auth");
         boolean success = true;
         authService.registerUser(cmd);
         publisher.publishUserCreatedResponse(cmd.email(), success);
@@ -31,7 +30,6 @@ public class AuthCommandListener {
 
     @RabbitListener(queues = RabbitConstants.UPDATE_USER_CMD_QUEUE)
     public void handleCreateUser(UpdateUserCommandDto cmd) {
-        System.out.println("Received update user command on auth");
         boolean success = true;
         authService.updateUser(cmd);
         publisher.publishUserUpdatedResponse(cmd.email(), success);
@@ -39,7 +37,6 @@ public class AuthCommandListener {
 
     @RabbitListener(queues = RabbitConstants.DELETE_USER_CMD_QUEUE)
     public void handleCreateUser(DeleteUserCommandDto cmd) {
-        System.out.println("Received delete user command on auth");
         boolean success = true;
         authService.deleteUser(cmd.email());
         publisher.publishUserDeleteResponse(cmd.email(), success);

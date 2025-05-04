@@ -23,12 +23,10 @@ public class EmployeeSagaController {
             @RequestBody CreateNewEmployeeDto dto
     ){
        try {
-           System.out.println("Received create employee request");
            EmployeeDto employee = orchestrator.createEmployeeSaga(dto);
            return ResponseEntity
                    .ok(ApiResponse.success(employee));
        }catch (RuntimeException e){
-           System.out.println("Erro ao criar funcionario: " + e.getMessage());
            return ResponseEntity
                    .status(HttpStatus.NOT_FOUND)
                    .body(ApiResponse.error(e.getMessage(), HttpStatus.NOT_FOUND.value()));
@@ -41,12 +39,10 @@ public class EmployeeSagaController {
             @RequestBody UpdateEmployeeDto dto
     ){
         try {
-            System.out.println("Received update employee request");
             EmployeeDto employee = orchestrator.updateEmployeeSaga(dto);
             return ResponseEntity
                     .ok(ApiResponse.success(employee));
         }catch (RuntimeException e){
-            System.out.println("Erro ao criar funcionario: " + e.getMessage());
             return ResponseEntity
                     .status(HttpStatus.NOT_FOUND)
                     .body(ApiResponse.error(e.getMessage(), HttpStatus.NOT_FOUND.value()));
@@ -58,9 +54,7 @@ public class EmployeeSagaController {
     public ResponseEntity<ApiResponse<EmployeeDto>> deleteEmployee(
             @PathVariable String codigoFuncionario){
         try {
-            System.out.println("Received delete employee request");
             EmployeeDto employee = orchestrator.deleteEmployeeSaga(Long.parseLong(codigoFuncionario));
-            System.out.println(employee);
             return ResponseEntity
                     .ok(ApiResponse.success(employee));
         }catch (RuntimeException e){

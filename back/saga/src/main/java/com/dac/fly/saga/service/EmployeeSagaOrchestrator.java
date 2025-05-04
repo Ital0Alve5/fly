@@ -80,7 +80,6 @@ public class EmployeeSagaOrchestrator {
         CompletableFuture<EmployeeUpdatedEventDto> employeeFuture = new CompletableFuture<>();
         employeeUpdatedResponses.put(dto.email(), employeeFuture);
 
-        System.out.println("Publishing update employee");
         rabbit.convertAndSend(
                 RabbitConstants.EXCHANGE,
                 RabbitConstants.UPDATE_EMPLOYEE_CMD_QUEUE,
@@ -95,7 +94,6 @@ public class EmployeeSagaOrchestrator {
         );
 
         getWithTimeout(employeeUpdatedResponses, dto.email());
-        System.out.println("Received employee updated");
 
         CompletableFuture<UserUpdatedEventDto> userFuture = new CompletableFuture<>();
         userUpdateResponses.put(dto.email(), userFuture);
@@ -104,8 +102,6 @@ public class EmployeeSagaOrchestrator {
                 RabbitConstants.EXCHANGE,
                 RabbitConstants.UPDATE_USER_CMD_QUEUE,
                 new UpdateUserCommandDto(dto.nome(), dto.email(), dto.senha()));
-
-        System.out.println("Publishing updating user");
 
         getWithTimeout(userUpdateResponses, dto.email());
 
@@ -121,7 +117,6 @@ public class EmployeeSagaOrchestrator {
         CompletableFuture<EmployeeDeletedEventDto> employeeFuture = new CompletableFuture<>();
         employeeDeleteResponses.put(codigo.toString(), employeeFuture);
 
-        System.out.println("Publishing delete employee");
         rabbit.convertAndSend(
                 RabbitConstants.EXCHANGE,
                 RabbitConstants.DELETE_EMPLOYEE_CMD_QUEUE,
@@ -129,7 +124,6 @@ public class EmployeeSagaOrchestrator {
         );
 
         EmployeeDeletedEventDto employeeDeleted = getWithTimeout(employeeDeleteResponses, codigo.toString());
-        System.out.println("Received employee deleted");
 
         CompletableFuture<UserDeletedEventDto> userFuture = new CompletableFuture<>();
         userDeleteResponses.put(employeeDeleted.email(), userFuture);
@@ -139,7 +133,6 @@ public class EmployeeSagaOrchestrator {
                 RabbitConstants.DELETE_USER_CMD_QUEUE,
                 new DeleteUserCommandDto(employeeDeleted.email()));
 
-        System.out.println("Publishing deleting user");
 
         getWithTimeout(userDeleteResponses, employeeDeleted.email());
 

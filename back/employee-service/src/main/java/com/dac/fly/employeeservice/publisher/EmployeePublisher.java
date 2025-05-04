@@ -18,7 +18,7 @@ public class EmployeePublisher {
     }
 
     public void publishEmployeeCreatedResponse(String email, Long codigo, boolean success) {
-        System.out.println("On employee service: Publishing created event for " + email);
+
         rabbit.convertAndSend(
                 RabbitConstants.EXCHANGE,
                 RabbitConstants.CREATE_EMPLOYEE_RESP_QUEUE,
@@ -27,7 +27,6 @@ public class EmployeePublisher {
     }
 
     public void publishEmployeeUpdatedResponse(String email, Long codigo, boolean success) {
-        System.out.println("On employee service: Publishing updated event for " + email);
         rabbit.convertAndSend(
                 RabbitConstants.EXCHANGE,
                 RabbitConstants.UPDATE_EMPLOYEE_RESP_QUEUE,
@@ -36,7 +35,6 @@ public class EmployeePublisher {
     }
 
     public void publishEmployeeDeletedResponse(EmployeeDto dto, boolean success) {
-        System.out.println("On employee service: Publishing deleted event for " + dto.email());
         rabbit.convertAndSend(
                 RabbitConstants.EXCHANGE,
                 RabbitConstants.DELETE_EMPLOYEE_RESP_QUEUE,

@@ -66,13 +66,11 @@ public class ClientSagaOrchestrator {
         getWithTimeout(userCreateResponses, dto.email());
     }
 
+
     private <T> T getWithTimeout(
             ConcurrentHashMap<String, CompletableFuture<T>> map,
             String key) {
         CompletableFuture<T> future = map.get(key);
-        if (future == null) {
-            throw new RuntimeException("Nenhum futuro para a chave " + key);
-        }
         try {
             return future.get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
         } catch (InterruptedException | ExecutionException | TimeoutException ex) {
@@ -81,5 +79,4 @@ public class ClientSagaOrchestrator {
             map.remove(key);
         }
     }
-
 }
