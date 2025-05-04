@@ -20,6 +20,7 @@ public class AuthCommandListener {
 
     @RabbitListener(queues = RabbitConstants.CREATE_USER_CMD_QUEUE)
     public void handleCreateUser(CreateUserCommandDto cmd) {
+        System.out.println("Received create user command on auth");
         boolean success = true;
         authService.registerUser(cmd);
         publisher.publishUserCreatedResponse(cmd.email(), success);

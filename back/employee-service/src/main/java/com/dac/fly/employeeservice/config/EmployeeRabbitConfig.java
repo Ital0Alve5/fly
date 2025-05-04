@@ -1,4 +1,4 @@
-package com.dac.fly.saga.config;
+package com.dac.fly.employeeservice.config;
 
 import com.dac.fly.shared.config.RabbitConstants;
 import org.springframework.amqp.core.Binding;
@@ -9,10 +9,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class EmployeeSagaRabbitConfig {
+public class EmployeeRabbitConfig {
 
-    @Bean("employeeSagaExchange")
-    public TopicExchange employeeSagaExchange() {
+    @Bean
+    public TopicExchange exchange() {
         return new TopicExchange(RabbitConstants.EXCHANGE);
     }
 
@@ -49,42 +49,42 @@ public class EmployeeSagaRabbitConfig {
     @Bean
     public Binding bindEmployeeCreate() {
         return BindingBuilder.bind(employeeCreateCmdQueue())
-                .to(employeeSagaExchange())
+                .to(exchange())
                 .with(RabbitConstants.CREATE_EMPLOYEE_CMD_QUEUE);
     }
 
     @Bean
     public Binding onEmployeeCreate() {
         return BindingBuilder.bind(employeeCreateRespQueue())
-                .to(employeeSagaExchange())
-                .with(RabbitConstants.CREATE_EMPLOYEE_RESP_QUEUE);
+                .to(exchange())
+                .with(RabbitConstants.CREATE_CLIENT_RESP_QUEUE);
     }
 
     @Bean
     public Binding bindEmployeeUpdate() {
         return BindingBuilder.bind(employeeUpdateCmdQueue())
-                .to(employeeSagaExchange())
+                .to(exchange())
                 .with(RabbitConstants.UPDATE_EMPLOYEE_CMD_QUEUE);
     }
 
     @Bean
     public Binding onEmployeeUpdate() {
         return BindingBuilder.bind(employeeUpdateRespQueue())
-                .to(employeeSagaExchange())
+                .to(exchange())
                 .with(RabbitConstants.UPDATE_EMPLOYEE_RESP_QUEUE);
     }
 
     @Bean
     public Binding bindEmployeeDelete() {
         return BindingBuilder.bind(employeeDeleteCmdQueue())
-                .to(employeeSagaExchange())
+                .to(exchange())
                 .with(RabbitConstants.DELETE_EMPLOYEE_CMD_QUEUE);
     }
 
     @Bean
     public Binding onEmployeeDelete() {
         return BindingBuilder.bind(employeeDeleteRespQueue())
-                .to(employeeSagaExchange())
+                .to(exchange())
                 .with(RabbitConstants.DELETE_EMPLOYEE_RESP_QUEUE);
     }
 }

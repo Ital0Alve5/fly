@@ -61,7 +61,7 @@ public class ClientSagaOrchestrator {
         rabbit.convertAndSend(
                 RabbitConstants.EXCHANGE,
                 RabbitConstants.CREATE_USER_CMD_QUEUE,
-                new CreateUserCommandDto(dto.nome(), dto.email(), "CLIENTE"));
+                new CreateUserCommandDto(dto.nome(), dto.email(), "CLIENTE", null));
 
         getWithTimeout(userCreateResponses, dto.email());
     }

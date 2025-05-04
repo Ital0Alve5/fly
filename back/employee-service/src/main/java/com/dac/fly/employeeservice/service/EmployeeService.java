@@ -1,5 +1,6 @@
 package com.dac.fly.employeeservice.service;
 
+import com.dac.fly.shared.dto.command.CreateEmployeeCommandDto;
 import org.springframework.stereotype.Service;
 
 import com.dac.fly.employeeservice.dto.request.CreateNewEmployeeDto;
@@ -26,7 +27,7 @@ public class EmployeeService {
         return employees.stream().map(e -> EmployeeDto.fromEntity(e)).toList();
     }
 
-    public EmployeeDto createNewEmployee(CreateNewEmployeeDto newEmployeeDto) {
+    public EmployeeDto createNewEmployee(CreateEmployeeCommandDto newEmployeeDto) {
         Funcionario employee = new Funcionario();
 
         employee.setCpf(formatCpf(newEmployeeDto.cpf()));

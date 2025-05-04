@@ -5,7 +5,7 @@ import { Env } from 'src/shared/env'
 import { registerSchema } from './schema'
 
 export async function registerClientRoute(app: FastifyTypedInstance) {
-  const path = '/sagas/clientes'
+  const path = '/clientes'
 
   app.post(
     path,

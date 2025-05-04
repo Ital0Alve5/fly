@@ -15,8 +15,9 @@ export async function registerEmployeeRoute(app: FastifyTypedInstance) {
       preHandler: employeeAuthMiddleware,
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
+	console.log("api request: ", Env.SAGA_URL + path)
       try {
-        const response = await axios.post(Env.EMPLOYEE_SERVICE_URL + path, request.body, {
+        const response = await axios.post(Env.SAGA_URL + path, request.body, {
           headers: {
             Authorization: `Bearer ${request.user?.token}`,
           },

@@ -14,6 +14,7 @@ public class AuthPublisher {
     }
 
     public void publishUserCreatedResponse(String email, boolean success) {
+        System.out.println("Publishing create user response");
         rabbit.convertAndSend(
                 RabbitConstants.EXCHANGE,
                 RabbitConstants.CREATE_USER_RESP_QUEUE,

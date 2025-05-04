@@ -6,7 +6,9 @@ import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.core.TopicExchange;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
+@Configuration
 public class AuthRabbitConfig {
     @Bean("authSagaExchange")
     public TopicExchange exchange() {
@@ -27,13 +29,13 @@ public class AuthRabbitConfig {
     public Binding bindUserCreate() {
         return BindingBuilder.bind(userCreateCmdQueue())
                 .to(exchange())
-                .with(RabbitConstants.CREATE_CLIENT_CMD_QUEUE);
+                .with(RabbitConstants.CREATE_USER_CMD_QUEUE);
     }
 
     @Bean
     public Binding onUserCreate() {
         return BindingBuilder.bind(userCreateRespQueue())
                 .to(exchange())
-                .with(RabbitConstants.CREATE_CLIENT_RESP_QUEUE);
+                .with(RabbitConstants.CREATE_USER_RESP_QUEUE);
     }
 }

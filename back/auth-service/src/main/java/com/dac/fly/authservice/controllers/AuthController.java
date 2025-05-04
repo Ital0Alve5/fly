@@ -22,13 +22,6 @@ public class AuthController {
         this.authService = authService;
     }
 
-    @PostMapping()
-    public ResponseEntity<ApiResponse<Boolean>> register() {
-        System.out.println("Request!");
-        authService.registerUser(new CreateUserCommandDto("Tomaz", "tomazcx06@gmail.com", "CLIENTE"));
-        return ResponseEntity.ok(ApiResponse.success(true));
-    }
-
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<LoginResponseDto>> login(
             @RequestBody LoginRequestDto dto) {

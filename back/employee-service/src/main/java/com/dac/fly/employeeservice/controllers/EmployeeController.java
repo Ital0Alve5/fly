@@ -29,17 +29,6 @@ public class EmployeeController {
         this.service = service;
     }
 
-    @PostMapping
-    public ResponseEntity<ApiResponse<EmployeeDto>> create(@RequestBody CreateNewEmployeeDto request) {
-        try {
-            EmployeeDto employees = service.createNewEmployee(request);
-
-            return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(employees));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage(), 400));
-        }
-    }
-
     @GetMapping
     public ResponseEntity<ApiResponse<List<EmployeeDto>>> findAll() {
         try {

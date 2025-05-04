@@ -52,8 +52,12 @@ public class AuthService {
             throw new IllegalArgumentException("E-mail já cadastrado.");
         }
 
-        String rawPassword = generateRandomPassword();
-        String encoded = passwordEncoder.encode(rawPassword);
+        String password = dto.password();
+        if (dto.password() == null) {
+            password = generateRandomPassword();
+        }
+
+        String encoded = passwordEncoder.encode(password);
 
         Auth user = new Auth(
                 dto.email(),
@@ -66,10 +70,11 @@ public class AuthService {
         Auth saved = authRepository.save(user);
 
         try {
-            emailService.sendPasswordEmail(new EmailDto(user.getNome(), user.getEmail(), rawPassword));
-        }catch (Exception e) {
+            emailService.sendPasswordEmail(new EmailDto(user.getNome(), user.getEmail(), password));
+        } catch (Exception e) {
             System.out.println("Error sending password email " + e.getMessage());
         }
+
 
         return saved;
     }
