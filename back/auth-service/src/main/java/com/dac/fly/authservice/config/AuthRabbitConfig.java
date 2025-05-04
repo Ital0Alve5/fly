@@ -25,6 +25,26 @@ public class AuthRabbitConfig {
         return new Queue(RabbitConstants.CREATE_USER_RESP_QUEUE, true);
     }
 
+    @Bean("userUpdateCmdQueue")
+    public Queue userUpdateCmdQueue() {
+        return new Queue(RabbitConstants.UPDATE_USER_CMD_QUEUE, true);
+    }
+
+    @Bean("userUpdateRespQueue")
+    public Queue userUpdateRespQueue() {
+        return new Queue(RabbitConstants.UPDATE_USER_RESP_QUEUE, true);
+    }
+
+    @Bean("userDeleteCmdQueue")
+    public Queue userDeleteCmdQueue() {
+        return new Queue(RabbitConstants.DELETE_USER_CMD_QUEUE, true);
+    }
+
+    @Bean("userDeleteRespQueue")
+    public Queue userDeleteRespQueue() {
+        return new Queue(RabbitConstants.DELETE_USER_RESP_QUEUE, true);
+    }
+
     @Bean
     public Binding bindUserCreate() {
         return BindingBuilder.bind(userCreateCmdQueue())
@@ -37,5 +57,33 @@ public class AuthRabbitConfig {
         return BindingBuilder.bind(userCreateRespQueue())
                 .to(exchange())
                 .with(RabbitConstants.CREATE_USER_RESP_QUEUE);
+    }
+
+    @Bean
+    public Binding bindUserUpdate() {
+        return BindingBuilder.bind(userUpdateCmdQueue())
+                .to(exchange())
+                .with(RabbitConstants.UPDATE_USER_CMD_QUEUE);
+    }
+
+    @Bean
+    public Binding onUserUpdate() {
+        return BindingBuilder.bind(userUpdateRespQueue())
+                .to(exchange())
+                .with(RabbitConstants.UPDATE_USER_RESP_QUEUE);
+    }
+
+    @Bean
+    public Binding bindUserDelete() {
+        return BindingBuilder.bind(userDeleteCmdQueue())
+                .to(exchange())
+                .with(RabbitConstants.DELETE_USER_CMD_QUEUE);
+    }
+
+    @Bean
+    public Binding onUserDelete() {
+        return BindingBuilder.bind(userDeleteRespQueue())
+                .to(exchange())
+                .with(RabbitConstants.DELETE_USER_RESP_QUEUE);
     }
 }

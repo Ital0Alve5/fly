@@ -1,13 +1,10 @@
 package com.dac.fly.saga.service;
 
 import com.dac.fly.shared.config.RabbitConstants;
-import com.dac.fly.shared.dto.command.CreateClientCommandDto;
-import com.dac.fly.shared.dto.command.CreateEmployeeCommandDto;
-import com.dac.fly.shared.dto.command.CreateUserCommandDto;
+import com.dac.fly.shared.dto.command.*;
 import com.dac.fly.shared.dto.events.*;
-import com.dac.fly.shared.dto.request.CreateClientRequestDto;
 import com.dac.fly.shared.dto.request.CreateNewEmployeeDto;
-import com.dac.fly.shared.dto.response.ClientCreatedResponseDto;
+import com.dac.fly.shared.dto.request.UpdateEmployeeDto;
 import com.dac.fly.shared.dto.response.EmployeeDto;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
@@ -49,7 +46,7 @@ public class EmployeeSagaOrchestrator {
         CompletableFuture<EmployeeCreatedEventDto> employeeFuture = new CompletableFuture<>();
         employeeCreateResponses.put(dto.email(), employeeFuture);
 
-        System.out.println("Publiishin create employee");
+        System.out.println("Publishing create employee");
         rabbit.convertAndSend(
                 RabbitConstants.EXCHANGE,
                 RabbitConstants.CREATE_EMPLOYEE_CMD_QUEUE,
@@ -79,13 +76,86 @@ public class EmployeeSagaOrchestrator {
         return new EmployeeDto(employeeCreated.codigo(), dto.cpf(), dto.email(), dto.nome(), dto.telefone());
     }
 
+    public EmployeeDto updateEmployeeSaga(UpdateEmployeeDto dto) {
+        CompletableFuture<EmployeeUpdatedEventDto> employeeFuture = new CompletableFuture<>();
+        employeeUpdatedResponses.put(dto.email(), employeeFuture);
+
+        System.out.println("Publishing update employee");
+        rabbit.convertAndSend(
+                RabbitConstants.EXCHANGE,
+                RabbitConstants.UPDATE_EMPLOYEE_CMD_QUEUE,
+                new UpdateEmployeeCommandDto(
+                        dto.codigo(),
+                        dto.cpf(),
+                        dto.email(),
+                        dto.nome(),
+                        dto.telefone(),
+                        dto.senha()
+                )
+        );
+
+        getWithTimeout(employeeUpdatedResponses, dto.email());
+        System.out.println("Received employee updated");
+
+        CompletableFuture<UserUpdatedEventDto> userFuture = new CompletableFuture<>();
+        userUpdateResponses.put(dto.email(), userFuture);
+
+        rabbit.convertAndSend(
+                RabbitConstants.EXCHANGE,
+                RabbitConstants.UPDATE_USER_CMD_QUEUE,
+                new UpdateUserCommandDto(dto.nome(), dto.email(), dto.senha()));
+
+        System.out.println("Publishing updating user");
+
+        getWithTimeout(userUpdateResponses, dto.email());
+
+        return new EmployeeDto(
+                dto.codigo(),
+                dto.cpf(),
+                dto.email(),
+                dto.nome(),
+                dto.telefone());
+    }
+
+    public EmployeeDto deleteEmployeeSaga(Long codigo) {
+        CompletableFuture<EmployeeDeletedEventDto> employeeFuture = new CompletableFuture<>();
+        employeeDeleteResponses.put(codigo.toString(), employeeFuture);
+
+        System.out.println("Publishing delete employee");
+        rabbit.convertAndSend(
+                RabbitConstants.EXCHANGE,
+                RabbitConstants.DELETE_EMPLOYEE_CMD_QUEUE,
+                new DeleteEmployeeCommandDto(codigo)
+        );
+
+        EmployeeDeletedEventDto employeeDeleted = getWithTimeout(employeeDeleteResponses, codigo.toString());
+        System.out.println("Received employee deleted");
+
+        CompletableFuture<UserDeletedEventDto> userFuture = new CompletableFuture<>();
+        userDeleteResponses.put(employeeDeleted.email(), userFuture);
+
+        rabbit.convertAndSend(
+                RabbitConstants.EXCHANGE,
+                RabbitConstants.DELETE_USER_CMD_QUEUE,
+                new DeleteUserCommandDto(employeeDeleted.email()));
+
+        System.out.println("Publishing deleting user");
+
+        getWithTimeout(userDeleteResponses, employeeDeleted.email());
+
+        return new EmployeeDto(
+                employeeDeleted.codigo(),
+                employeeDeleted.cpf(),
+                employeeDeleted.email(),
+                employeeDeleted.nome(),
+                employeeDeleted.telefone());
+    }
+
+
     private <T> T getWithTimeout(
             ConcurrentHashMap<String, CompletableFuture<T>> map,
             String key) {
         CompletableFuture<T> future = map.get(key);
-        if (future == null) {
-            throw new RuntimeException("Nenhum futuro para a chave " + key);
-        }
         try {
             return future.get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
         } catch (InterruptedException | ExecutionException | TimeoutException ex) {
@@ -94,5 +164,4 @@ public class EmployeeSagaOrchestrator {
             map.remove(key);
         }
     }
-
 }

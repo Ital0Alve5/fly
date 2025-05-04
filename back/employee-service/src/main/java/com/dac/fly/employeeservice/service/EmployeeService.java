@@ -1,6 +1,7 @@
 package com.dac.fly.employeeservice.service;
 
 import com.dac.fly.shared.dto.command.CreateEmployeeCommandDto;
+import com.dac.fly.shared.dto.command.UpdateEmployeeCommandDto;
 import org.springframework.stereotype.Service;
 
 import com.dac.fly.employeeservice.dto.request.CreateNewEmployeeDto;
@@ -48,7 +49,7 @@ public class EmployeeService {
         return EmployeeDto.fromEntity(optionalFuncionario.get());
     }
 
-    public EmployeeDto updateEmployee(Long employeeCode, UpdateEmployeeDto employeeDto) {
+    public EmployeeDto updateEmployee(Long employeeCode, UpdateEmployeeCommandDto employeeDto) {
         Optional<Funcionario> optionalFuncionario = repository.findById(employeeCode);
 
         return optionalFuncionario

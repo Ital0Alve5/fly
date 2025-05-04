@@ -12,7 +12,7 @@ export const deleteEmployeeSchema: FastifySchema = {
     },
   ],
   params: z.object({
-    codigoFuncionario: z.number(),
+    codigoFuncionario: z.string(),
   }),
   response: {
     [HttpStatusCode.Ok]: z.object({

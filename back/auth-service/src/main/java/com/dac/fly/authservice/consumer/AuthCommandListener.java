@@ -4,6 +4,8 @@ import com.dac.fly.authservice.publisher.AuthPublisher;
 import com.dac.fly.authservice.service.AuthService;
 import com.dac.fly.shared.config.RabbitConstants;
 import com.dac.fly.shared.dto.command.CreateUserCommandDto;
+import com.dac.fly.shared.dto.command.DeleteUserCommandDto;
+import com.dac.fly.shared.dto.command.UpdateUserCommandDto;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.context.annotation.Configuration;
 
@@ -24,5 +26,22 @@ public class AuthCommandListener {
         boolean success = true;
         authService.registerUser(cmd);
         publisher.publishUserCreatedResponse(cmd.email(), success);
+    }
+
+
+    @RabbitListener(queues = RabbitConstants.UPDATE_USER_CMD_QUEUE)
+    public void handleCreateUser(UpdateUserCommandDto cmd) {
+        System.out.println("Received update user command on auth");
+        boolean success = true;
+        authService.updateUser(cmd);
+        publisher.publishUserUpdatedResponse(cmd.email(), success);
+    }
+
+    @RabbitListener(queues = RabbitConstants.DELETE_USER_CMD_QUEUE)
+    public void handleCreateUser(DeleteUserCommandDto cmd) {
+        System.out.println("Received delete user command on auth");
+        boolean success = true;
+        authService.deleteUser(cmd.email());
+        publisher.publishUserDeleteResponse(cmd.email(), success);
     }
 }

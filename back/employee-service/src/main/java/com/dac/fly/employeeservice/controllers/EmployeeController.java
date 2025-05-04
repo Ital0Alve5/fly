@@ -39,27 +39,4 @@ public class EmployeeController {
             return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage(), 400));
         }
     }
-
-    @DeleteMapping("/{codigoFuncionario}")
-    public ResponseEntity<ApiResponse<EmployeeDto>> delete(@PathVariable Long codigoFuncionario) {
-        try {
-            EmployeeDto employee = service.deleteEmployee(codigoFuncionario);
-
-            return ResponseEntity.ok(ApiResponse.success(employee));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage(), 400));
-        }
-    }
-
-    @PutMapping("/{codigoFuncionario}")
-    public ResponseEntity<ApiResponse<EmployeeDto>> update(@PathVariable Long codigoFuncionario,
-            @RequestBody UpdateEmployeeDto request) {
-        try {
-            EmployeeDto employee = service.updateEmployee(codigoFuncionario, request);
-
-            return ResponseEntity.ok(ApiResponse.success(employee));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage(), 400));
-        }
-    }
 }

@@ -1,6 +1,7 @@
 package com.dac.fly.authservice.service;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -8,6 +9,7 @@ import java.security.SecureRandom;
 
 import com.dac.fly.authservice.dto.email.EmailDto;
 import com.dac.fly.shared.dto.command.CreateUserCommandDto;
+import com.dac.fly.shared.dto.command.UpdateUserCommandDto;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -78,6 +80,42 @@ public class AuthService {
 
         return saved;
     }
+
+    public Auth updateUser(UpdateUserCommandDto dto) {
+        Auth user = authRepository
+                .findByEmail(dto.email())
+                .orElseThrow(() ->
+                        new IllegalArgumentException("Não existe usuário com e-mail: " + dto.email())
+                );
+
+        if (dto.nome() != null && !dto.nome().isBlank()) {
+            user.setNome(dto.nome());
+        }
+
+        if (dto.senha() != null && !dto.senha().isBlank()) {
+            String encoded = passwordEncoder.encode(dto.senha());
+            user.setSenha(encoded);
+        }
+
+        user.setAtualizadoEm(LocalDateTime.now());
+
+        Auth updated = authRepository.save(user);
+
+        return updated;
+    }
+
+    public void deleteUser(String email) {
+        Optional<Auth> optionalUser = authRepository.findByEmail(email);
+
+        if (optionalUser.isPresent()) {
+            Auth user = optionalUser.get();
+            authRepository.delete(user);
+            System.out.println("Usuário com e-mail " + email + " removido com sucesso.");
+        } else {
+            throw new IllegalArgumentException("Não existe usuário cadastrado com o e-mail: " + email);
+        }
+    }
+
 
     public void logout(String token) {
         tokenBlacklist.add(token);

@@ -17,13 +17,14 @@ export async function deleteEmployeeRoute(app: FastifyTypedInstance) {
       try {
         const { codigoFuncionario } = request.params as { codigoFuncionario: string }
         const response = await axios.delete(
-          `${Env.EMPLOYEE_SERVICE_URL}/funcionarios/${codigoFuncionario}`,
+          `${Env.SAGA_URL}/funcionarios/${codigoFuncionario}`,
           {
             headers: {
               Authorization: `Bearer ${request.user?.token}`,
             },
           },
         )
+	console.log(response.data.data)
         return reply.send(response.data.data)
       } catch (err: any) {
         if (axios.isAxiosError(err) && err.response) {
