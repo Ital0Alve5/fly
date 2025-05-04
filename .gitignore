@@ -1,3 +1,4 @@
 .docker/pgdb/data/
 .docker/mongodb/*
 **/target
+**/.idea

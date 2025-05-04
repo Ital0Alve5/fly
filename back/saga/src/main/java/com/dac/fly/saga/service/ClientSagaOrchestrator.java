@@ -1,6 +1,7 @@
 package com.dac.fly.saga.service;
 
 import com.dac.fly.shared.config.RabbitConstants;
+import com.dac.fly.shared.dto.command.CreateClientCommandDto;
 import com.dac.fly.shared.dto.command.CreateUserCommandDto;
 import com.dac.fly.shared.dto.events.UserCreatedEventDto;
 import com.dac.fly.shared.dto.request.CreateClientRequestDto;
@@ -35,7 +36,22 @@ public class ClientSagaOrchestrator {
         rabbit.convertAndSend(
                 RabbitConstants.EXCHANGE,
                 RabbitConstants.CREATE_CLIENT_CMD_QUEUE,
-                dto);
+                new CreateClientCommandDto(
+                        dto.cpf(),
+                        dto.email(),
+                        dto.nome(),
+                        dto.saldoMilhas(),
+                        new CreateClientCommandDto.AddressDTO(
+                                dto.endereco().cep(),
+                                dto.endereco().uf(),
+                                dto.endereco().cidade(),
+                                dto.endereco().bairro(),
+                                dto.endereco().rua(),
+                                dto.endereco().numero(),
+                                dto.endereco().complemento()
+                        )
+                )
+        );
 
         getWithTimeout(clientCreateResponses, dto.email());
 
@@ -48,7 +64,6 @@ public class ClientSagaOrchestrator {
                 new CreateUserCommandDto(dto.nome(), dto.email(), "CLIENTE"));
 
         getWithTimeout(userCreateResponses, dto.email());
-        System.out.println("Getted auth service timeout");
     }
 
     private <T> T getWithTimeout(
@@ -60,9 +75,9 @@ public class ClientSagaOrchestrator {
         }
         try {
             return future.get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
-        } catch (InterruptedException|ExecutionException|TimeoutException ex) {
+        } catch (InterruptedException | ExecutionException | TimeoutException ex) {
             throw new RuntimeException("Erro/timeout na chave " + key, ex);
-        }finally {
+        } finally {
             map.remove(key);
         }
     }

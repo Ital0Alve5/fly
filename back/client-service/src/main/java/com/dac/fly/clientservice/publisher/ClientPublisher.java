@@ -16,7 +16,6 @@ public class ClientPublisher {
     }
 
     public void publishClientCreatedResponse(String email, boolean success) {
-        System.out.println("Publishing client resp");
         rabbit.convertAndSend(
                 RabbitConstants.EXCHANGE,
                 RabbitConstants.CREATE_CLIENT_RESP_QUEUE,

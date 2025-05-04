@@ -4,7 +4,7 @@ import com.dac.fly.clientservice.dto.response.ClientResponseDTO;
 import com.dac.fly.clientservice.publisher.ClientPublisher;
 import com.dac.fly.clientservice.service.ClientService;
 import com.dac.fly.shared.config.RabbitConstants;
-import com.dac.fly.shared.dto.request.CreateClientRequestDto;
+import com.dac.fly.shared.dto.command.CreateClientCommandDto;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
@@ -21,15 +21,14 @@ public class ClientCommandListener {
     }
 
     @RabbitListener(queues = RabbitConstants.CREATE_CLIENT_CMD_QUEUE)
-    public void handleUpdateMiles(CreateClientRequestDto cmd) {
+    public void handleUpdateMiles(CreateClientCommandDto cmd) {
         boolean success = false;
 
-        System.out.println(cmd);
         try {
             ClientResponseDTO response = clientService.createClient(cmd);
             success = Objects.nonNull(response);
         } catch (Exception e) {
-            System.err.println("Erro ao atualizar milhas: " + e.getMessage());
+            System.err.println("Erro ao criar cliente: " + e.getMessage());
         }
 
         publisher.publishClientCreatedResponse(cmd.email(), success);

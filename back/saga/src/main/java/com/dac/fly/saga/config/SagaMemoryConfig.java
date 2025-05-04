@@ -84,4 +84,20 @@ public class SagaMemoryConfig {
     ConcurrentHashMap<String, CompletableFuture<UserCreatedEventDto>> userCreateResponses() {
         return new ConcurrentHashMap<>();
     }
+
+    /**
+     * Futuro para o evento de criar funcionario para a resposta de criar funcionario na saga.
+     */
+    @Bean
+    ConcurrentHashMap<String, CompletableFuture<ClientCreatedResponseDto>> clientCreateResponses() {
+        return new ConcurrentHashMap<>();
+    }
+
+    /**
+     * Futuro para o evento de criar usuário para a resposta de criar usuário no auth-service.
+     */
+    @Bean
+    ConcurrentHashMap<String, CompletableFuture<UserCreatedEventDto>> userCreateResponses() {
+        return new ConcurrentHashMap<>();
+    }
 }
