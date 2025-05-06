@@ -32,7 +32,7 @@ public class ClientSagaOrchestrator {
     public void createClientSaga(CreateClientRequestDto dto) {
         CompletableFuture<ClientCreatedResponseDto> clientFuture = new CompletableFuture<>();
         clientCreateResponses.put(dto.email(), clientFuture);
-
+        
         rabbit.convertAndSend(
                 RabbitConstants.EXCHANGE,
                 RabbitConstants.CREATE_CLIENT_CMD_QUEUE,
@@ -57,7 +57,6 @@ public class ClientSagaOrchestrator {
 
         CompletableFuture<UserCreatedEventDto> userFuture = new CompletableFuture<>();
         userCreateResponses.put(dto.email(), userFuture);
-
         rabbit.convertAndSend(
                 RabbitConstants.EXCHANGE,
                 RabbitConstants.CREATE_USER_CMD_QUEUE,

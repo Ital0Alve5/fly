@@ -51,7 +51,8 @@ public class AuthService {
 
     public Auth registerUser(CreateUserCommandDto dto) {
         if (authRepository.findByEmail(dto.email()).isPresent()) {
-            throw new IllegalArgumentException("E-mail já cadastrado.");
+            System.out.println("Erro: email já cadatrado");
+            return null;
         }
 
         String password = dto.password();

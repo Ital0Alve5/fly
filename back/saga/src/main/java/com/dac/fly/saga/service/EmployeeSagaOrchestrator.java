@@ -46,7 +46,6 @@ public class EmployeeSagaOrchestrator {
         CompletableFuture<EmployeeCreatedEventDto> employeeFuture = new CompletableFuture<>();
         employeeCreateResponses.put(dto.email(), employeeFuture);
 
-        System.out.println("Publishing create employee");
         rabbit.convertAndSend(
                 RabbitConstants.EXCHANGE,
                 RabbitConstants.CREATE_EMPLOYEE_CMD_QUEUE,
@@ -59,7 +58,6 @@ public class EmployeeSagaOrchestrator {
         );
 
         EmployeeCreatedEventDto employeeCreated = getWithTimeout(employeeCreateResponses, dto.email());
-        System.out.println("Received employee created");
 
         CompletableFuture<UserCreatedEventDto> userFuture = new CompletableFuture<>();
         userCreateResponses.put(dto.email(), userFuture);
@@ -68,8 +66,6 @@ public class EmployeeSagaOrchestrator {
                 RabbitConstants.EXCHANGE,
                 RabbitConstants.CREATE_USER_CMD_QUEUE,
                 new CreateUserCommandDto(dto.nome(), dto.email(), "FUNCIONARIO", dto.senha()));
-
-        System.out.println("Publishing creating user");
 
         getWithTimeout(userCreateResponses, dto.email());
 

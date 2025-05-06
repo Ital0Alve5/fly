@@ -50,14 +50,14 @@ public class AuthSagaRabbitConfig {
     public Binding bindUserCreate() {
         return BindingBuilder.bind(userCreateCmdQueue())
                 .to(authSagaExchange())
-                .with(RabbitConstants.CREATE_CLIENT_CMD_QUEUE);
+                .with(RabbitConstants.CREATE_USER_CMD_QUEUE);
     }
 
     @Bean
     public Binding onUserCreate() {
         return BindingBuilder.bind(userCreateRespQueue())
                 .to(authSagaExchange())
-                .with(RabbitConstants.CREATE_CLIENT_RESP_QUEUE);
+                .with(RabbitConstants.CREATE_USER_RESP_QUEUE);
     }
 
     @Bean
