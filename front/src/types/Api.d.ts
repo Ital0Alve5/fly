@@ -129,11 +129,3 @@ export type ApiError = {
 }
 
 export type ApiResponse<T> = ApiSuccess<T> | ApiError
-
-export type PaginatedResponse<T> = {
-  content: T[]
-  totalElements: number
-  totalPages: number
-  size: number
-  number: number
-}
