@@ -28,7 +28,6 @@ const handleConfirmPerformance = async () => {
     isLoading.value = true
 
     const flightPerformed = await performFlight(props.selectedFlightCode)
-    console.log(flightPerformed)
     if (flightPerformed === null || flightPerformed === undefined || flightPerformed === false) {
       throw new Error('Falha ao atualizar status do voo')
     }
