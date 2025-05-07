@@ -2,6 +2,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import type { Flight } from '@/types/Flight'
 import { useRouter } from 'vue-router'
+import { formatDateTime } from '@/utils/date/formatDateTime';
 
 const props = defineProps<{
   flight: Flight
@@ -31,7 +32,7 @@ function handleClickCard() {
         <ul class="space-y-2">
           <li class="flex gap-2">
             <b>Data:</b>
-            <p>{{ flight.data }}</p>
+            <p>{{ formatDateTime(flight.data) }}</p>
           </li>
           <li class="flex gap-2">
             <b>Código:</b>

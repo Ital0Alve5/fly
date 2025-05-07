@@ -20,7 +20,6 @@ import { useToast } from '@/components/ui/toast'
 import { Button } from '@/components/ui/button'
 import PerformFlightDialog from './components/PerformFlightDialog.vue'
 import RegisterFlightDialog from './components/RegisterFlightDialog.vue'
-import { getFlightsInNext48Hours, cancelFlight } from '@/mock/flight'
 import { cancelReservationByFlightCode } from '@/mock/booking'
 import formatDateTime from '@/utils/date/formatDateTime'
 import ConfirmBoardingDialog from '@/views/Manager/NextFlightListing/components/ConfirmBoardingDialog.vue'
@@ -63,25 +62,41 @@ function handlePerformFlight(selectedFlightCode: string) {
   isPerformDialogOpen.value = true
 }
 
-function handleFlightRegistered(code: string) {
-  flights.value = getFlightsInNext48Hours()
+async function handleFlightRegistered(code: string) {
+  // await loadFlights()
   generatedCode.value = code
   createdFlight.value = true
 }
 
-function handelCancelFlight() {
-  cancelFlight(selectedFlight.value)
-  cancelReservationByFlightCode(selectedFlight.value)
-  flights.value = getFlightsInNext48Hours()
-  isCancelDialogOpen.value = false
 
-  toast({
-    title: 'Voo cancelado com sucesso',
-    description: 'Todas as reservas deste voo foram canceladas.',
-    variant: 'default',
-    duration: 1000,
-  })
+async function handelCancelFlight() {
+  try {
+    cancelReservationByFlightCode(selectedFlight.value) // mudar para API
+    // const success = await cancelFlight(selectedFlight.value)
+    // if (success) {
+      // cancelFlight(selectedFlight.value)
+      // await loadFlights()
+      isCancelDialogOpen.value = false
+
+      toast({
+        title: 'Voo cancelado com sucesso',
+        description: 'Todas as reservas deste voo foram canceladas.',
+        variant: 'default',
+        duration: 1000,
+      })
+    // } else {
+    //   throw new Error('Erro ao cancelar voo')
+    // }
+  } catch (error) {
+    toast({
+      title: 'Erro ao cancelar voo',
+      description: error instanceof Error ? error.message : 'Erro ao cancelar voo',
+      variant: 'destructive',
+      duration: 2500,
+    })
+  }
 }
+
 </script>
 
 <template>

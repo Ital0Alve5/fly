@@ -2,11 +2,11 @@
 import FlightCard from './components/FlightCard.vue'
 import FlightCardsGrid from './components/FlightCardsGrid.vue'
 import SearchFlightForm from './components/SearchFlightForm.vue'
-import { searchFlights } from '@/mock/flight'
 import { useAuthStore } from '@/stores/auth'
 import { useGlobalStore } from '@/stores/global'
 import type { Flight } from '@/types/Flight'
 import { ref } from 'vue'
+import { fetchAllFlights } from '@/views/Client/FlightListing/sercvices/FlightListingService.ts'
 
 const authStore = useAuthStore()
 const globalStore = useGlobalStore()
@@ -23,7 +23,7 @@ async function handleSearch(originAipoirt: string, destinationAirpoirt: string) 
 
     loading.value = true
 
-    const flights = await searchFlights(originAipoirt, destinationAirpoirt)
+    const flights = await fetchAllFlights(originAipoirt, destinationAirpoirt)
     flightsList.value = flights
     fetchedFlights.value = true
   } catch (error) {
@@ -50,11 +50,11 @@ async function handleSearch(originAipoirt: string, destinationAirpoirt: string) 
           Insira o aeroporto de origem e destino e descubra sua próxima aventura!
         </p>
       </div>
-      <SearchFlightForm :loading @on-search="handleSearch" />
+      <SearchFlightForm :loading="loading" @on-search="handleSearch" />
     </section>
     <FlightCardsGrid
       :fetched-flights="fetchedFlights"
-      :loading
+      :loading="loading"
       :flights="flightsList"
       v-slot="{ flight }"
     >
