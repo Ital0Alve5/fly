@@ -1,4 +1,3 @@
-import { HttpStatusCode } from 'axios'
 import { FastifySchema } from 'fastify'
 import { z } from 'zod'
 
@@ -20,30 +19,4 @@ export const createReservationSchema: FastifySchema = {
     codigo_aeroporto_origem: z.string().describe('Código do aeroporto de origem'),
     codigo_aeroporto_destino: z.string().describe('Código do aeroporto de destino'),
   }),
-  response: {
-    [HttpStatusCode.Created]: z.object({
-      codigo: z.string(),
-      data: z.string(),
-      valor: z.number(),
-      milhas_utilizadas: z.number(),
-      quantidade_poltronas: z.number(),
-      codigo_cliente: z.number(),
-      estado: z.enum(['CONFIRMADA', 'CANCELADA', 'PENDENTE']),
-      codigo_voo: z.string(),
-      codigo_aeroporto_origem: z.string(),
-      codigo_aeroporto_destino: z.string(),
-    }),
-    [HttpStatusCode.Unauthorized]: z.object({
-      error: z.string(),
-    }),
-    [HttpStatusCode.Forbidden]: z.object({
-      error: z.string(),
-    }),
-    [HttpStatusCode.Conflict]: z.object({
-      error: z.string(),
-    }),
-    [HttpStatusCode.BadRequest]: z.object({
-      error: z.string(),
-    }),
-  },
 } 

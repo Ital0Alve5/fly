@@ -1,4 +1,3 @@
-import { HttpStatusCode } from 'axios'
 import { FastifySchema } from 'fastify'
 import { z } from 'zod'
 
@@ -28,9 +27,4 @@ export const registerSchema: FastifySchema = {
         complemento: z.string().nonempty('Complemento é obrigatório'),
       }),
   }),
-  response: {
-    [HttpStatusCode.Created]: z.null(),
-    [HttpStatusCode.Conflict]: z.null(),
-    [HttpStatusCode.BadRequest]: z.null(),
-  },
 }
