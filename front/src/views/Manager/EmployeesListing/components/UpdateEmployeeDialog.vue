@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch, computed } from 'vue'
+import { ref, watch } from 'vue'
 import { useToast } from '@/components/ui/toast'
 import { useForm } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
@@ -8,17 +8,17 @@ import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/comp
 import { Input } from '@/components/ui/input'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import employeeService from '@/mock/employees'
 import type { Employee } from '@/types/Auth/AuthenticatedUserData'
-import { updateEmail } from '@/mock/auth'
 
 const { toast } = useToast()
 
 const formSchema = toTypedSchema(
   z.object({
-    name: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres'),
+    nome: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres'),
     email: z.string().email('E-mail inválido'),
-    phone: z.string().min(14, 'Telefone inválido').max(15, 'Telefone inválido'),
+    telefone: z.string().min(14, 'Telefone inválido').max(15, 'Telefone inválido'),
+    cpf: z.string().min(11, 'CPF inválido'),
+    senha: z.string().regex(/^\d{1,6}$/, 'Senha deve conter até 6 dígitos numéricos'),
   }),
 )
 
@@ -33,12 +33,18 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: 'update:open', value: boolean): void
-  (e: 'refresh'): void
+  (
+    e: 'updated',
+    data: {
+      codigo: number
+      nome: string
+      email: string
+      telefone: string
+      cpf: string
+      senha: string
+    },
+  ): void
 }>()
-
-const employees = computed(() =>
-  employeeService.registeredEmployees.value.slice().sort((a, b) => a.nome.localeCompare(b.nome)),
-)
 
 const openDialog = ref(props.open)
 
@@ -46,13 +52,12 @@ watch(
   () => props.open,
   (newVal) => {
     openDialog.value = newVal
-    if (newVal && props.employee?.codigo) {
-      const employee = employees.value.find((e) => e.codigo === props.employee?.codigo)
-      if (employee) {
-        setFieldValue('name', employee.nome)
-        setFieldValue('email', employee.email)
-        setFieldValue('phone', employee.telefone)
-      }
+    if (newVal && props.employee) {
+      setFieldValue('nome', props.employee.nome)
+      setFieldValue('email', props.employee.email)
+      setFieldValue('telefone', props.employee.telefone)
+      setFieldValue('cpf', props.employee.cpf)
+      setFieldValue('senha', props.employee.senha ?? '')
     } else {
       resetForm()
     }
@@ -63,49 +68,27 @@ watch(openDialog, (newVal) => {
   emit('update:open', newVal)
 })
 
-const onSubmit = handleSubmit(async (values) => {
-  if (!props.employee?.codigo) return
+const onSubmit = handleSubmit((values) => {
+  if (!props.employee) return
 
-  try {
-    const index = employeeService.registeredEmployees.value.findIndex(
-      (e) => e.codigo === props.employee?.codigo,
-    )
+  emit('updated', {
+    codigo: props.employee.codigo,
+    nome: values.nome,
+    email: values.email,
+    telefone: values.telefone,
+    cpf: values.cpf,
+    senha: values.senha,
+  })
 
-    if (index !== -1) {
-      const oldEmail = employeeService.registeredEmployees.value[index].email
+  toast({
+    title: 'Funcionário atualizado',
+    description: 'Os dados foram enviados para atualização.',
+    variant: 'default',
+    duration: 400,
+  })
 
-      updateEmail(oldEmail, values.email, 'employee')
-
-      employeeService.registeredEmployees.value[index] = {
-        ...employeeService.registeredEmployees.value[index],
-        nome: values.name,
-        email: values.email,
-        telefone: values.phone,
-      }
-
-      toast({
-        title: 'Funcionário atualizado',
-        description: 'Os dados do funcionário foram atualizados com sucesso.',
-        variant: 'default',
-        duration: 400,
-      })
-
-      emit('refresh')
-      openDialog.value = false
-    }
-  } catch {
-    toast({
-      title: 'Erro ao atualizar',
-      description: 'Ocorreu um erro ao tentar atualizar os dados do funcionário.',
-      variant: 'destructive',
-      duration: 400,
-    })
-  }
-})
-
-const cancelEdit = () => {
   openDialog.value = false
-}
+})
 </script>
 
 <template>
@@ -116,7 +99,7 @@ const cancelEdit = () => {
       </DialogHeader>
 
       <form @submit.prevent="onSubmit" class="flex flex-col gap-4">
-        <FormField v-slot="{ componentField }" name="name">
+        <FormField v-slot="{ componentField }" name="nome">
           <FormItem>
             <FormLabel>Nome</FormLabel>
             <FormControl>
@@ -136,7 +119,17 @@ const cancelEdit = () => {
           </FormItem>
         </FormField>
 
-        <FormField v-slot="{ componentField }" name="phone">
+        <FormField v-slot="{ componentField }" name="cpf">
+          <FormItem>
+            <FormLabel>CPF</FormLabel>
+            <FormControl>
+              <Input v-bind="componentField" type="text" v-mask="'###.###.###-##'" />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        </FormField>
+
+        <FormField v-slot="{ componentField }" name="telefone">
           <FormItem>
             <FormLabel>Telefone</FormLabel>
             <FormControl>
@@ -146,9 +139,19 @@ const cancelEdit = () => {
           </FormItem>
         </FormField>
 
+        <FormField v-slot="{ componentField }" name="senha">
+          <FormItem>
+            <FormLabel>Senha</FormLabel>
+            <FormControl>
+              <Input v-bind="componentField" type="password" maxlength="6" inputmode="numeric" />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        </FormField>
+
         <div class="flex justify-end gap-2 mt-4">
-          <Button variant="destructive" type="button" @click="cancelEdit"> Cancelar </Button>
-          <Button type="submit"> Salvar </Button>
+          <Button variant="destructive" type="button" @click="openDialog = false">Cancelar</Button>
+          <Button type="submit">Salvar</Button>
         </div>
       </form>
     </DialogContent>
