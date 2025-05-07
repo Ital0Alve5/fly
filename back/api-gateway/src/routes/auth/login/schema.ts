@@ -1,4 +1,3 @@
-import { HttpStatusCode } from 'axios'
 import { FastifySchema } from 'fastify'
 import { z } from 'zod'
 
@@ -10,11 +9,5 @@ export const loginSchema: FastifySchema = {
     login: z.string().email('E-mail inválido'),
     senha: z.string(),
   }),
-  response: {
-    [HttpStatusCode.Ok]: z.object({ 
-      token: z.string(),
-    }),
-    [HttpStatusCode.Unauthorized]: z.object({
-    }),
-  },
+  response: {}
 }

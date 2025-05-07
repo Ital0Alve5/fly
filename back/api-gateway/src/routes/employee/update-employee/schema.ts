@@ -1,4 +1,3 @@
-import { HttpStatusCode } from 'axios'
 import { FastifySchema } from 'fastify'
 import { z } from 'zod'
 
@@ -29,16 +28,4 @@ export const updateEmployeeSchema: FastifySchema = {
     telefone: z.string().regex(/^\d{10,11}$/, 'Telefone deve conter 10 ou 11 dígitos'),
     senha: z.string().min(4, 'A senha deve ter no mínimo 4 caracteres'),
   }),
-  response: {
-    [HttpStatusCode.Ok]: z.object({
-      codigo: z.number(),
-      cpf: z.string(),
-      email: z.string().email(),
-      nome: z.string(),
-      telefone: z.string(),
-    }),
-    [HttpStatusCode.Unauthorized]: z.null(),
-    [HttpStatusCode.Forbidden]: z.null(),
-    [HttpStatusCode.NotFound]: z.null(),
-  },
 } 
