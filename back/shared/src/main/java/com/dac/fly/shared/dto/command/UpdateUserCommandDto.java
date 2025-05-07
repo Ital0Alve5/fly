@@ -1,4 +1,4 @@
 package com.dac.fly.shared.dto.command;
 
-public record UpdateUserCommandDto(String nome, String email, String senha) {
+public record UpdateUserCommandDto(Long codigoExterno, String nome, String email, String role, String senha) {
 }

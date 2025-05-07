@@ -23,11 +23,11 @@ public class AuthPublisher {
         );
     }
 
-    public void publishUserUpdatedResponse(String email, boolean success) {
+    public void publishUserUpdatedResponse(Long codigoExterno, String email, boolean success) {
         rabbit.convertAndSend(
                 RabbitConstants.EXCHANGE,
                 RabbitConstants.UPDATE_USER_RESP_QUEUE,
-                new UserUpdatedEventDto(email, success)
+                new UserUpdatedEventDto(codigoExterno, email, success)
         );
     }
 

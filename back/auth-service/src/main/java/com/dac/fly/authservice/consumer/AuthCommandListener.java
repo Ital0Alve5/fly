@@ -33,7 +33,7 @@ public class AuthCommandListener {
     public void handleCreateUser(UpdateUserCommandDto cmd) {
         boolean success = true;
         authService.updateUser(cmd);
-        publisher.publishUserUpdatedResponse(cmd.email(), success);
+        publisher.publishUserUpdatedResponse(cmd.codigoExterno(), cmd.email(), success);
     }
 
     @RabbitListener(queues = RabbitConstants.DELETE_USER_CMD_QUEUE)

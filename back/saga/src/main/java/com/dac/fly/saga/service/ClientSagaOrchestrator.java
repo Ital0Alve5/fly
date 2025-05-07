@@ -53,14 +53,14 @@ public class ClientSagaOrchestrator {
                 )
         );
 
-        getWithTimeout(clientCreateResponses, dto.email());
+        ClientCreatedResponseDto response = getWithTimeout(clientCreateResponses, dto.email());
 
         CompletableFuture<UserCreatedEventDto> userFuture = new CompletableFuture<>();
         userCreateResponses.put(dto.email(), userFuture);
         rabbit.convertAndSend(
                 RabbitConstants.EXCHANGE,
                 RabbitConstants.CREATE_USER_CMD_QUEUE,
-                new CreateUserCommandDto(dto.nome(), dto.email(), "CLIENTE", null));
+                new CreateUserCommandDto(dto.nome(), dto.email(), response.codigo(), "CLIENTE", null));
 
         getWithTimeout(userCreateResponses, dto.email());
     }

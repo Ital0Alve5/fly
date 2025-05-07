@@ -57,7 +57,7 @@ public class EmployeeRabbitConfig {
     public Binding onEmployeeCreate() {
         return BindingBuilder.bind(employeeCreateRespQueue())
                 .to(exchange())
-                .with(RabbitConstants.CREATE_CLIENT_RESP_QUEUE);
+                .with(RabbitConstants.CREATE_EMPLOYEE_RESP_QUEUE);
     }
 
     @Bean
