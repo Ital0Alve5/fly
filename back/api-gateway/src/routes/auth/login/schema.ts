@@ -9,5 +9,4 @@ export const loginSchema: FastifySchema = {
     login: z.string().email('E-mail inválido'),
     senha: z.string(),
   }),
-  response: {}
 }
