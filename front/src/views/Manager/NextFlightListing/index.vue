@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import {
   Table,
   TableBody,
@@ -20,8 +20,8 @@ import { useToast } from '@/components/ui/toast'
 import { Button } from '@/components/ui/button'
 import PerformFlightDialog from './components/PerformFlightDialog.vue'
 import RegisterFlightDialog from './components/RegisterFlightDialog.vue'
-import { getFlightsInNext48Hours, cancelFlight } from '@/mock/flight'
 import { cancelReservationByFlightCode } from '@/mock/booking'
+import { fetchFlightsNext48Hours, cancelFlight } from '@/views/Manager/NextFlightListing/services/NextFlightListingService.ts'
 
 import ConfirmBoardingDialog from '@/views/Manager/NextFlightListing/components/ConfirmBoardingDialog.vue'
 import CancelFlightDialog from './components/CancelFlightDialog.vue'
@@ -33,12 +33,34 @@ const isRegisterFlightFormOpen = ref(false)
 const selectedFlight = ref<string>('')
 const generatedCode = ref('')
 const createdFlight = ref(false)
-const flights = ref(getFlightsInNext48Hours())
+const flights = ref()
+const loading = ref(false)
 const { toast } = useToast()
 
-watch([isCancelDialogOpen, isPerformDialogOpen], ([newCancelVal, newPerformVal]) => {
+onMounted(async () => {
+  await loadFlights()
+})
+
+async function loadFlights() {
+  try {
+    loading.value = true
+    flights.value = await fetchFlightsNext48Hours()
+  } catch (error) {
+    console.error('Error loading flights:', error)
+    toast({
+      title: 'Erro ao carregar voos',
+      description: 'Não foi possível carregar os voos das próximas 48 horas',
+      variant: 'destructive',
+    })
+  } finally {
+    loading.value = false
+  }
+}
+
+
+watch([isCancelDialogOpen, isPerformDialogOpen], async ([newCancelVal, newPerformVal]) => {
   if (!newCancelVal || !newPerformVal) {
-    flights.value = getFlightsInNext48Hours()
+    await loadFlights()
   }
 })
 
@@ -57,25 +79,41 @@ function handlePerformFlight(selectedFlightCode: string) {
   isPerformDialogOpen.value = true
 }
 
-function handleFlightRegistered(code: string) {
-  flights.value = getFlightsInNext48Hours()
+async function handleFlightRegistered(code: string) {
+  await loadFlights()
   generatedCode.value = code
   createdFlight.value = true
 }
 
-function handelCancelFlight() {
-  cancelFlight(selectedFlight.value)
-  cancelReservationByFlightCode(selectedFlight.value)
-  flights.value = getFlightsInNext48Hours()
-  isCancelDialogOpen.value = false
 
-  toast({
-    title: 'Voo cancelado com sucesso',
-    description: 'Todas as reservas deste voo foram canceladas.',
-    variant: 'default',
-    duration: 1000,
-  })
+async function handelCancelFlight() {
+  try {
+    cancelReservationByFlightCode(selectedFlight.value) // mudar para API
+    const success = await cancelFlight(selectedFlight.value)
+    if (success) {
+      cancelFlight(selectedFlight.value)
+      await loadFlights()
+      isCancelDialogOpen.value = false
+
+      toast({
+        title: 'Voo cancelado com sucesso',
+        description: 'Todas as reservas deste voo foram canceladas.',
+        variant: 'default',
+        duration: 1000,
+      })
+    } else {
+      throw new Error('Erro ao cancelar voo')
+    }
+  } catch (error) {
+    toast({
+      title: 'Erro ao cancelar voo',
+      description: error instanceof Error ? error.message : 'Erro ao cancelar voo',
+      variant: 'destructive',
+      duration: 2500,
+    })
+  }
 }
+
 </script>
 
 <template>
