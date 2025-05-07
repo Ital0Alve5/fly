@@ -36,7 +36,7 @@ public class EmployeeSagaConsumer {
 
     @RabbitListener(queues = RabbitConstants.UPDATE_EMPLOYEE_RESP_QUEUE)
     public void onEmployeeUpdated(EmployeeUpdatedEventDto evt) {
-        var future = updateEmployeeResponses.remove(evt.email());
+        var future = updateEmployeeResponses.remove(evt.codigo().toString());
         if (future != null) {
             future.complete(evt);
         }

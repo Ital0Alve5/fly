@@ -67,6 +67,7 @@ public class AuthService {
                 encoded,
                 dto.nome(),
                 dto.role(),
+                dto.codigoExterno(),
                 LocalDateTime.now(),
                 LocalDateTime.now()
         );
@@ -83,10 +84,11 @@ public class AuthService {
     }
 
     public Auth updateUser(UpdateUserCommandDto dto) {
-        Auth user = authRepository
-                .findByEmail(dto.email())
+        Auth user = authRepository.findByCodigoExterno(dto.codigoExterno())
+                .filter(u -> u.getRole().equals(dto.role()))
                 .orElseThrow(() ->
-                        new IllegalArgumentException("Não existe usuário com e-mail: " + dto.email())
+                        new IllegalArgumentException("Não existe usuário com código externo: "
+                                + dto.codigoExterno() + " e role: " + dto.role())
                 );
 
         if (dto.nome() != null && !dto.nome().isBlank()) {
@@ -98,13 +100,14 @@ public class AuthService {
             user.setSenha(encoded);
         }
 
+        if (dto.email() != null && !dto.email().isBlank()) {
+            user.setEmail(dto.email());
+        }
+
         user.setAtualizadoEm(LocalDateTime.now());
 
-        Auth updated = authRepository.save(user);
-
-        return updated;
+        return authRepository.save(user);
     }
-
     public void deleteUser(String email) {
         Optional<Auth> optionalUser = authRepository.findByEmail(email);
 

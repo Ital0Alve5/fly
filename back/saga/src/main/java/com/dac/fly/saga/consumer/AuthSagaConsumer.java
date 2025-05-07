@@ -38,7 +38,7 @@ public class AuthSagaConsumer {
 
     @RabbitListener(queues = RabbitConstants.UPDATE_USER_RESP_QUEUE)
     public void onUserCreated(UserUpdatedEventDto evt) {
-        var future = userUpdateResponses.get(evt.email());
+        var future = userUpdateResponses.get(evt.codigoFuncionario().toString());
         if (future != null) {
             future.complete(evt);
         }

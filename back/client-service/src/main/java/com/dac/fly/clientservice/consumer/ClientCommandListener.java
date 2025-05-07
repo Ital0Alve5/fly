@@ -23,14 +23,16 @@ public class ClientCommandListener {
     @RabbitListener(queues = RabbitConstants.CREATE_CLIENT_CMD_QUEUE)
     public void handleUpdateMiles(CreateClientCommandDto cmd) {
         boolean success = false;
+        ClientResponseDTO response  = null;
 
         try {
-            ClientResponseDTO response = clientService.createClient(cmd);
+            response = clientService.createClient(cmd);
             success = Objects.nonNull(response);
         } catch (Exception e) {
             System.err.println("Erro ao criar cliente: " + e.getMessage());
+            return;
         }
 
-        publisher.publishClientCreatedResponse(cmd.email(), success);
+        publisher.publishClientCreatedResponse(response.getCodigo(), cmd.email(), success);
     }
 }

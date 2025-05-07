@@ -34,8 +34,8 @@ public final class RabbitConstants {
     public static final String CREATE_EMPLOYEE_RESP_QUEUE = "saga.create-employee-resp";
     public static final String UPDATE_EMPLOYEE_CMD_QUEUE = "saga.update-employee-cmd";
     public static final String UPDATE_EMPLOYEE_RESP_QUEUE = "saga.update-employee-resp";
-    public static final String DELETE_EMPLOYEE_CMD_QUEUE = "saga.update-employee-cmd";
-    public static final String DELETE_EMPLOYEE_RESP_QUEUE = "saga.update-employee-resp";
+    public static final String DELETE_EMPLOYEE_CMD_QUEUE = "saga.delete-employee-cmd";
+    public static final String DELETE_EMPLOYEE_RESP_QUEUE = "saga.delete-employee-resp";
 
     /** --- Contexto: Autenticação (Auth Saga) --- */
     public static final String CREATE_USER_CMD_QUEUE = "saga.create-user-cmd";
