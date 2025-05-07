@@ -30,6 +30,7 @@ public class AuthSeeder implements CommandLineRunner {
                     passwordEncoder.encode("123456"),
                     "Heitor",
                     "CLIENTE",
+                    1L,
                     LocalDateTime.now(),
                     LocalDateTime.now()
             ));
@@ -39,6 +40,7 @@ public class AuthSeeder implements CommandLineRunner {
                     passwordEncoder.encode("123456"),
                     "Razer",
                     "FUNCIONARIO",
+                    1L,
                     LocalDateTime.now(),
                     LocalDateTime.now()
             ));

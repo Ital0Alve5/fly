@@ -15,11 +15,11 @@ public class ClientPublisher {
         this.rabbit = rabbit;
     }
 
-    public void publishClientCreatedResponse(String email, boolean success) {
+    public void publishClientCreatedResponse(Long codigo, String email, boolean success) {
         rabbit.convertAndSend(
                 RabbitConstants.EXCHANGE,
                 RabbitConstants.CREATE_CLIENT_RESP_QUEUE,
-                new ClientCreatedResponseDto(email, success)
+                new ClientCreatedResponseDto(codigo, email, success)
         );
     }
 }

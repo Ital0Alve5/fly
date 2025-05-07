@@ -65,7 +65,7 @@ public class EmployeeSagaOrchestrator {
         rabbit.convertAndSend(
                 RabbitConstants.EXCHANGE,
                 RabbitConstants.CREATE_USER_CMD_QUEUE,
-                new CreateUserCommandDto(dto.nome(), dto.email(), "FUNCIONARIO", dto.senha()));
+                new CreateUserCommandDto(dto.nome(), dto.email(), employeeCreated.codigo(), "FUNCIONARIO", dto.senha()));
 
         getWithTimeout(userCreateResponses, dto.email());
 
@@ -74,7 +74,7 @@ public class EmployeeSagaOrchestrator {
 
     public EmployeeDto updateEmployeeSaga(UpdateEmployeeDto dto) {
         CompletableFuture<EmployeeUpdatedEventDto> employeeFuture = new CompletableFuture<>();
-        employeeUpdatedResponses.put(dto.email(), employeeFuture);
+        employeeUpdatedResponses.put(dto.codigo().toString(), employeeFuture);
 
         rabbit.convertAndSend(
                 RabbitConstants.EXCHANGE,
@@ -89,17 +89,17 @@ public class EmployeeSagaOrchestrator {
                 )
         );
 
-        getWithTimeout(employeeUpdatedResponses, dto.email());
+        getWithTimeout(employeeUpdatedResponses, dto.codigo().toString());
 
         CompletableFuture<UserUpdatedEventDto> userFuture = new CompletableFuture<>();
-        userUpdateResponses.put(dto.email(), userFuture);
+        userUpdateResponses.put(dto.codigo().toString(), userFuture);
 
         rabbit.convertAndSend(
                 RabbitConstants.EXCHANGE,
                 RabbitConstants.UPDATE_USER_CMD_QUEUE,
-                new UpdateUserCommandDto(dto.nome(), dto.email(), dto.senha()));
+                new UpdateUserCommandDto(dto.codigo(), dto.nome(), dto.email(), "FUNCIONARIO", dto.senha()));
 
-        getWithTimeout(userUpdateResponses, dto.email());
+        getWithTimeout(userUpdateResponses, dto.codigo().toString());
 
         return new EmployeeDto(
                 dto.codigo(),
@@ -128,7 +128,6 @@ public class EmployeeSagaOrchestrator {
                 RabbitConstants.EXCHANGE,
                 RabbitConstants.DELETE_USER_CMD_QUEUE,
                 new DeleteUserCommandDto(employeeDeleted.email()));
-
 
         getWithTimeout(userDeleteResponses, employeeDeleted.email());
 

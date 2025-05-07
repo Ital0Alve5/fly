@@ -32,6 +32,7 @@ public class EmployeeCommandListener {
             success = Objects.nonNull(response);
         } catch (Exception e) {
             System.err.println("Erro ao criar funcionário: " + e.getMessage());
+            return;
         }
 
         Long codigo = (response != null) ? response.codigo() : null;
@@ -40,6 +41,7 @@ public class EmployeeCommandListener {
 
     @RabbitListener(queues = RabbitConstants.UPDATE_EMPLOYEE_CMD_QUEUE)
     public void handleUpdateEmployee(UpdateEmployeeCommandDto cmd) {
+        System.out.println("Received on update");
         boolean success = false;
         EmployeeDto response = null;
 
@@ -48,6 +50,7 @@ public class EmployeeCommandListener {
             success = Objects.nonNull(response);
         } catch (Exception e) {
             System.err.println("Erro ao atualizar funcionário: " + e.getMessage());
+            return;
         }
 
         Long codigo = (response != null) ? response.codigo() : null;
@@ -56,6 +59,7 @@ public class EmployeeCommandListener {
 
     @RabbitListener(queues = RabbitConstants.DELETE_EMPLOYEE_CMD_QUEUE)
     public void handleDeleteEmployee(DeleteEmployeeCommandDto cmd) {
+        System.out.println("Received on delete");
         boolean success = false;
         EmployeeDto response = null;
 
@@ -64,8 +68,9 @@ public class EmployeeCommandListener {
             success = Objects.nonNull(response);
         } catch (Exception e) {
             System.err.println("Erro ao deletar funcionário: " + e.getMessage());
+            return;
         }
 
-        publisher.publishEmployeeDeletedResponse(response, success );
+        publisher.publishEmployeeDeletedResponse(response, success);
     }
 }

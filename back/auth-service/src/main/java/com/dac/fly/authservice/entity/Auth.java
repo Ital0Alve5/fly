@@ -14,18 +14,20 @@ public class Auth {
     private String senha;
     private String nome;
     private String role;
+    private Long codigoExterno;
     private LocalDateTime criadoEm;
     private LocalDateTime atualizadoEm;
 
     public Auth() {
     }
 
-    public Auth(String email, String senha, String nome, String role, LocalDateTime criadoEm,
+    public Auth(String email, String senha, String nome, String role, Long codigoExterno, LocalDateTime criadoEm,
             LocalDateTime atualizadoEm) {
         this.email = email;
         this.senha = senha;
         this.nome = nome;
         this.role = role;
+        this.codigoExterno = codigoExterno;
         this.criadoEm = criadoEm;
         this.atualizadoEm = atualizadoEm;
     }
