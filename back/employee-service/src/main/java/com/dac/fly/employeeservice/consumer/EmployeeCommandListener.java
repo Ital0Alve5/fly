@@ -41,7 +41,6 @@ public class EmployeeCommandListener {
 
     @RabbitListener(queues = RabbitConstants.UPDATE_EMPLOYEE_CMD_QUEUE)
     public void handleUpdateEmployee(UpdateEmployeeCommandDto cmd) {
-        System.out.println("Received on update");
         boolean success = false;
         EmployeeDto response = null;
 
