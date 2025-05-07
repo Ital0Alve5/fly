@@ -30,4 +30,27 @@ public class ClientRabbitConfig {
                 .with(RabbitConstants.UPDATE_MILES_CMD_QUEUE);
     }
 
+    @Bean("clientCreateCmdQueue")
+    public Queue clientCreateCmdQueue() {
+        return new Queue(RabbitConstants.CREATE_CLIENT_CMD_QUEUE, true);
+    }
+
+    @Bean("clientCreateRespQueue")
+    public Queue clientCreateRespQueue() {
+        return new Queue(RabbitConstants.CREATE_CLIENT_RESP_QUEUE, true);
+    }
+
+    @Bean
+    public Binding bindClientCreate() {
+        return BindingBuilder.bind(clientCreateCmdQueue())
+                .to(exchange())
+                .with(RabbitConstants.CREATE_CLIENT_CMD_QUEUE);
+    }
+
+    @Bean
+    public Binding onClientCreate() {
+        return BindingBuilder.bind(clientCreateRespQueue())
+                .to(exchange())
+                .with(RabbitConstants.CREATE_CLIENT_RESP_QUEUE);
+    }
 }

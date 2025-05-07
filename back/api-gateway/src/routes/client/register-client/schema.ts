@@ -1,21 +1,12 @@
 import { HttpStatusCode } from 'axios'
 import { FastifySchema } from 'fastify'
 import { z } from 'zod'
-import { apiErrorResponseSchema, createApiResponseSchema } from 'src/shared/api-response'
-
-const registerDataSchema = z.object({
-  codigo: z.number(),
-  cpf: z.string(),
-  email: z.string().email(),
-  nome: z.string(),
-})
 
 export const registerSchema: FastifySchema = {
   tags: ['Clientes'],
   summary: 'Se cadastrar como um cliente',
   description: 'Rota para se cadastrar como um cliente',
   body: z.object({
-    login: z.object({
       cpf: z.string().refine(
         (value) => {
           const digitsRegex = /^\d{11}$/
@@ -36,11 +27,10 @@ export const registerSchema: FastifySchema = {
         numero: z.string().nonempty('Número é obrigatório'),
         complemento: z.string().nonempty('Complemento é obrigatório'),
       }),
-    }),
   }),
   response: {
-    [HttpStatusCode.Created]: createApiResponseSchema(registerDataSchema),
-    [HttpStatusCode.Conflict]: apiErrorResponseSchema,
-    [HttpStatusCode.BadRequest]: apiErrorResponseSchema,
+    [HttpStatusCode.Created]: z.null(),
+    [HttpStatusCode.Conflict]: z.null(),
+    [HttpStatusCode.BadRequest]: z.null(),
   },
 }

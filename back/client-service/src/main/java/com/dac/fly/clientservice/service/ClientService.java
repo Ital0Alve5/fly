@@ -3,11 +3,11 @@ package com.dac.fly.clientservice.service;
 import java.math.BigDecimal;
 import java.util.List;
 
+import com.dac.fly.shared.dto.command.CreateClientCommandDto;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.dac.fly.clientservice.dto.request.AddMilesRequestDTO;
-import com.dac.fly.clientservice.dto.request.CreateClientRequestDTO;
 import com.dac.fly.clientservice.dto.response.ClientResponseDTO;
 import com.dac.fly.clientservice.dto.response.MilesResponseDTO;
 import com.dac.fly.clientservice.dto.response.MilesStatementResponseDTO;
@@ -31,7 +31,7 @@ public class ClientService {
     }
 
     @Transactional
-    public ClientResponseDTO createClient(CreateClientRequestDTO request) {
+    public ClientResponseDTO createClient(CreateClientCommandDto request) {
         validateClientData(request);
 
         Address address = createAddress(request);
@@ -75,7 +75,7 @@ public class ClientService {
                 transactions);
     }
 
-    private void validateClientData(CreateClientRequestDTO request) {
+    private void validateClientData(CreateClientCommandDto request) {
         if (!DocumentUtils.isValidCpf(request.cpf())) {
             throw new RuntimeException("CPF inválido");
         }
@@ -89,7 +89,7 @@ public class ClientService {
         }
     }
 
-    private Address createAddress(CreateClientRequestDTO request) {
+    private Address createAddress(CreateClientCommandDto request) {
         Address address = new Address();
         address.setCep(DocumentUtils.formatCep(request.endereco().cep()));
         address.setUf(request.endereco().uf());
@@ -101,7 +101,7 @@ public class ClientService {
         return address;
     }
 
-    private Client createClientEntity(CreateClientRequestDTO request, Address address) {
+    private Client createClientEntity(CreateClientCommandDto request, Address address) {
         Client client = new Client();
         client.setCpf(DocumentUtils.formatCpf(request.cpf()));
         client.setEmail(request.email());

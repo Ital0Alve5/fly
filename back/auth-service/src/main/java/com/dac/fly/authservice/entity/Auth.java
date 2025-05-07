@@ -9,7 +9,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class Auth {
 
     @Id
-    private Long codigoUsuario;
+    private String id;
     private String email;
     private String senha;
     private String nome;
@@ -20,9 +20,8 @@ public class Auth {
     public Auth() {
     }
 
-    public Auth(Long codigoUsuario, String email, String senha, String nome, String role, LocalDateTime criadoEm,
+    public Auth(String email, String senha, String nome, String role, LocalDateTime criadoEm,
             LocalDateTime atualizadoEm) {
-        this.codigoUsuario = codigoUsuario;
         this.email = email;
         this.senha = senha;
         this.nome = nome;
@@ -31,13 +30,9 @@ public class Auth {
         this.atualizadoEm = atualizadoEm;
     }
 
-    public Long getCodigoUsuario() {
-        return codigoUsuario;
-    }
+    public String getId() { return id; }
 
-    public void setCodigoUsuario(Long codigoUsuario) {
-        this.codigoUsuario = codigoUsuario;
-    }
+    public void setId(String id) { this.id = id; }
 
     public String getEmail() {
         return email;

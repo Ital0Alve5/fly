@@ -3,12 +3,11 @@ package com.dac.fly.saga.config;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.dac.fly.shared.dto.events.*;
+import com.dac.fly.shared.dto.response.ClientCreatedResponseDto;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.dac.fly.shared.dto.events.FlightReservationsCancelledEventDto;
-import com.dac.fly.shared.dto.events.MilesUpdatedEvent;
-import com.dac.fly.shared.dto.events.SeatsUpdatedEvent;
 import com.dac.fly.shared.dto.response.CanceledReservationResponseDto;
 import com.dac.fly.shared.dto.response.CancelledFlightResponseDto;
 import com.dac.fly.shared.dto.response.CreatedReservationResponseDto;
@@ -64,6 +63,62 @@ public class SagaMemoryConfig {
      */
     @Bean
     public ConcurrentHashMap<String, CompletableFuture<FlightReservationsCancelledEventDto>> reservationsCancelResponses() {
+        return new ConcurrentHashMap<>();
+    }
+
+    /**
+     * Futuro para o evento de criar cliente para a resposta de criar cliente na saga.
+     */
+    @Bean
+    ConcurrentHashMap<String, CompletableFuture<ClientCreatedResponseDto>> clientCreateResponses() {
+        return new ConcurrentHashMap<>();
+    }
+
+    /**
+     * Futuro para o evento de criar usuário para a resposta de criar usuário no auth-service.
+     */
+    @Bean
+    ConcurrentHashMap<String, CompletableFuture<UserCreatedEventDto>> userCreateResponses() {
+        return new ConcurrentHashMap<>();
+    }
+
+    /**
+     * Futuro para o evento de criar funcionario para a resposta de criar funcionario na saga.
+     */
+    @Bean
+    ConcurrentHashMap<String, CompletableFuture<EmployeeCreatedEventDto>> employeeCreateResponses() {
+        return new ConcurrentHashMap<>();
+    }
+
+    /**
+     * Futuro para o evento de atualizar funcionário para a resposta de criar funcionário na saga.
+     */
+    @Bean
+    ConcurrentHashMap<String, CompletableFuture<EmployeeUpdatedEventDto>> employeeUpdateResponses() {
+        return new ConcurrentHashMap<>();
+    }
+
+    /**
+     * Futuro para o evento de deletar funcionário para a resposta de criar funcionário na saga.
+     */
+    @Bean
+    ConcurrentHashMap<String, CompletableFuture<EmployeeDeletedEventDto>> employeeDeleteResponses() {
+        return new ConcurrentHashMap<>();
+    }
+
+    /**
+     * Futuro para o evento de atualizar usuário para a resposta de atualizar usuário no auth-service.
+     */
+    @Bean
+    ConcurrentHashMap<String, CompletableFuture<UserUpdatedEventDto>> userUpdateResponses() {
+        return new ConcurrentHashMap<>();
+    }
+
+    /**
+     * Futuro para o evento de deletar usuário para a resposta de deletar usuário no auth-service.
+     */
+    @Bean
+    ConcurrentHashMap<String, CompletableFuture<UserDeletedEventDto>> userDeleteResponses() {
         return new ConcurrentHashMap<>();
     }
 }

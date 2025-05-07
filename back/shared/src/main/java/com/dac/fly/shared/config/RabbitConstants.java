@@ -24,4 +24,25 @@ public final class RabbitConstants {
     public static final String FLIGHT_CANCELLED_RESP_QUEUE = "saga.flight-cancelled";
     public static final String FLIGHT_RESERVATIONS_CANCELLED_QUEUE = "saga.flight-reservations-cancelled";
     public static final String CANCEL_RESERVATION_BY_FLIGHT_CMD_QUEUE = "saga.flight-reservations-cancel";
+
+    /** --- Contexto: Cliente (Client Saga) --- */
+    public static final String CREATE_CLIENT_CMD_QUEUE = "saga.create-client-cmd";
+    public static final String CREATE_CLIENT_RESP_QUEUE = "saga.create-client-resp";
+
+    /** --- Contexto: Funcionário (Employee Saga) --- */
+    public static final String CREATE_EMPLOYEE_CMD_QUEUE = "saga.create-employee-cmd";
+    public static final String CREATE_EMPLOYEE_RESP_QUEUE = "saga.create-employee-resp";
+    public static final String UPDATE_EMPLOYEE_CMD_QUEUE = "saga.update-employee-cmd";
+    public static final String UPDATE_EMPLOYEE_RESP_QUEUE = "saga.update-employee-resp";
+    public static final String DELETE_EMPLOYEE_CMD_QUEUE = "saga.update-employee-cmd";
+    public static final String DELETE_EMPLOYEE_RESP_QUEUE = "saga.update-employee-resp";
+
+    /** --- Contexto: Autenticação (Auth Saga) --- */
+    public static final String CREATE_USER_CMD_QUEUE = "saga.create-user-cmd";
+    public static final String CREATE_USER_RESP_QUEUE = "saga.create-user-resp";
+    public static final String UPDATE_USER_CMD_QUEUE = "saga.update-user-cmd";
+    public static final String UPDATE_USER_RESP_QUEUE = "saga.update-user-resp";
+    public static final String DELETE_USER_CMD_QUEUE = "saga.delete-user-cmd";
+    public static final String DELETE_USER_RESP_QUEUE = "saga.delete-user-resp";
+
 }

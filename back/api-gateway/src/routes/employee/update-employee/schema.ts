@@ -12,7 +12,7 @@ export const updateEmployeeSchema: FastifySchema = {
     },
   ],
   params: z.object({
-    codigoFuncionario: z.number(),
+    codigoFuncionario: z.string(),
   }),
   body: z.object({
     codigo: z.number(),
