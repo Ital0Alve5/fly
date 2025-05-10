@@ -1,13 +1,11 @@
 <script setup lang="ts">
-import { computed, watchEffect } from 'vue'
+import { h, computed, onMounted, ref } from 'vue'
 import type {
   ColumnDef,
   ColumnFiltersState,
   ExpandedState,
   VisibilityState,
 } from '@tanstack/vue-table'
-import { Button } from '../../../components/ui/button'
-import { valueUpdater } from '../../../lib/utils'
 import {
   Table,
   TableBody,
@@ -15,7 +13,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '../../../components/ui/table'
+} from '@/components/ui/table'
 import {
   FlexRender,
   getCoreRowModel,
@@ -26,25 +24,59 @@ import {
   useVueTable,
 } from '@tanstack/vue-table'
 import { ArrowUpDown } from 'lucide-vue-next'
-import { h, ref } from 'vue'
+import { Button } from '@/components/ui/button'
 import { useAuthStore } from '@/stores/auth'
-import { getExtractByUserCode, type ExtractItem } from '@/mock/extract'
+import { MilesService } from '@/services/milesService'
+import { useToast } from '@/components/ui/toast'
+import type { MilesExtractItem } from '@/types/Api'
+import { valueUpdater } from '@/lib/utils'
 
-const authtore = useAuthStore()
+const { toast } = useToast()
+const authStore = useAuthStore()
+const data = ref<MilesExtractItem[]>([])
+const isLoading = ref(false)
 
-const userCode = computed(() => authtore.user?.usuario.codigo)
-const data = ref<ExtractItem[]>([])
-
-watchEffect(() => {
-  if (userCode.value) {
-    const extractedData = getExtractByUserCode(userCode.value)
-    data.value = extractedData
-  } else {
-    data.value = []
+const fetchExtractData = async () => {
+  if (!authStore.user?.usuario.codigo) return
+  
+  isLoading.value = true
+  try {
+    const response = await MilesService.getExtract(authStore.user.usuario.codigo)
+    if (!response.error) {
+      data.value = response.data.transacoes.map((item: MilesExtractItem) => ({
+        ...item,
+        valor_reais: new Intl.NumberFormat('pt-BR', {
+          style: 'currency',
+          currency: 'BRL'
+        }).format(item.valor_reais),
+        data: new Date(item.data).toLocaleString('pt-BR')
+      }))
+    } else {
+      toast({
+        title: 'Erro',
+        description: response.message,
+        variant: 'destructive',
+        duration: 2000,
+      })
+    }
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error 
+      ? error.message 
+      : 'Falha ao carregar extrato de milhas'
+    toast({
+      title: 'Erro',
+      description: errorMessage,
+      variant: 'destructive',
+      duration: 2000,
+    })
+  } finally {
+    isLoading.value = false
   }
-})
+}
 
-const columns: ColumnDef<ExtractItem>[] = [
+onMounted(fetchExtractData)
+
+const columns: ColumnDef<MilesExtractItem>[] = [
   {
     accessorKey: 'data',
     header: ({ column }) => {
@@ -54,44 +86,20 @@ const columns: ColumnDef<ExtractItem>[] = [
           variant: 'ghost',
           onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
         },
-        () => ['Data', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })],
+        () => ['Data', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })]
       )
     },
     cell: ({ row }) => h('div', row.getValue('data')),
-    sortingFn: (rowA, rowB, columnId) => {
-      const dateTimeA = rowA.getValue(columnId) as string
-      const dateTimeB = rowB.getValue(columnId) as string
-      const [dateA, timeA] = dateTimeA.split(' ')
-      const [dateB, timeB] = dateTimeB.split(' ')
-
-      const [dayA, monthA, yearA] = dateA.split('/').map(Number)
-      const [dayB, monthB, yearB] = dateB.split('/').map(Number)
-
-      let hoursA = 0,
-        minutesA = 0,
-        secondsA = 0
-      let hoursB = 0,
-        minutesB = 0,
-        secondsB = 0
-
-      if (timeA) {
-        ;[hoursA, minutesA, secondsA] = timeA.split(':').map(Number)
-      }
-
-      if (timeB) {
-        ;[hoursB, minutesB, secondsB] = timeB.split(':').map(Number)
-      }
-
-      const parsedDateA = new Date(yearA, monthA - 1, dayA, hoursA, minutesA, secondsA)
-      const parsedDateB = new Date(yearB, monthB - 1, dayB, hoursB, minutesB, secondsB)
-
-      return parsedDateA.getTime() - parsedDateB.getTime()
+    sortingFn: (rowA, rowB) => {
+      const dateA = new Date(rowA.original.data)
+      const dateB = new Date(rowB.original.data)
+      return dateA.getTime() - dateB.getTime()
     },
   },
   {
     accessorKey: 'codigo_reserva',
-    header: 'Código de reserva',
-    cell: ({ row }) => h('div', row.getValue('codigo_reserva')),
+    header: 'Código Reserva',
+    cell: ({ row }) => h('div', row.getValue('codigo_reserva') || 'N/A'),
   },
   {
     accessorKey: 'valor_reais',
@@ -102,21 +110,10 @@ const columns: ColumnDef<ExtractItem>[] = [
           variant: 'ghost',
           onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
         },
-        () => ['Valor', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })],
+        () => ['Valor (R$)', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })]
       )
     },
     cell: ({ row }) => h('div', row.getValue('valor_reais')),
-    sortingFn: (rowA, rowB, columnId) => {
-      const extractNumber = (value: string) => {
-        const cleaned = value.replace('R$', '').replace(/\./g, '').replace(',', '.')
-        return parseFloat(cleaned) || 0
-      }
-
-      const valueA = extractNumber(rowA.getValue(columnId))
-      const valueB = extractNumber(rowB.getValue(columnId))
-
-      return valueA - valueB
-    },
   },
   {
     accessorKey: 'quantidade_milhas',
@@ -127,7 +124,7 @@ const columns: ColumnDef<ExtractItem>[] = [
           variant: 'ghost',
           onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
         },
-        () => ['Milhas', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })],
+        () => ['Milhas', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })]
       )
     },
     cell: ({ row }) => h('div', row.getValue('quantidade_milhas')),
@@ -140,7 +137,12 @@ const columns: ColumnDef<ExtractItem>[] = [
   {
     accessorKey: 'tipo',
     header: 'Tipo',
-    cell: ({ row }) => h('div', row.getValue('tipo')),
+    cell: ({ row }) => {
+      const tipo = row.getValue('tipo') as string
+      return h('div', {
+        class: tipo === 'ENTRADA' ? 'text-green-500' : 'text-red-500'
+      }, tipo)
+    },
   },
 ]
 
@@ -162,7 +164,16 @@ const table = computed(() =>
     onColumnVisibilityChange: (updaterOrValue) => valueUpdater(updaterOrValue, columnVisibility),
     onRowSelectionChange: (updaterOrValue) => valueUpdater(updaterOrValue, rowSelection),
     onExpandedChange: (updaterOrValue) => valueUpdater(updaterOrValue, expanded),
+    state: {
+      get columnFilters() { return columnFilters.value },
+      get columnVisibility() { return columnVisibility.value },
+      get rowSelection() { return rowSelection.value },
+      get expanded() { return expanded.value },
+    },
     initialState: {
+      pagination: {
+        pageSize: 8,
+      },
       sorting: [
         {
           id: 'data',
@@ -170,21 +181,7 @@ const table = computed(() =>
         },
       ],
     },
-    state: {
-      get columnFilters() {
-        return columnFilters.value
-      },
-      get columnVisibility() {
-        return columnVisibility.value
-      },
-      get rowSelection() {
-        return rowSelection.value
-      },
-      get expanded() {
-        return expanded.value
-      },
-    },
-  }),
+  })
 )
 </script>
 

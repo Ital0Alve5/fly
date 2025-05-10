@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { Label } from '@/components/ui/label'
 import {
   NumberField,
@@ -13,50 +13,90 @@ import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { useAuthStore } from '@/stores/auth'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { useMilesStore } from '@/stores/miles'
-import { registerExtract, type ExtractItem } from '@/mock/extract'
-import { getTodayDate } from '@/utils/date/getTodayDate'
 import router from '@/router'
+import { MilesService } from '@/services/milesService'
 
 const authStore = useAuthStore()
-const milesStore = useMilesStore()
 const { toast } = useToast()
 
-const currentCheckoutMiles = computed({
-  get: () => milesStore.currentCheckoutMiles,
-  set: (value: number) => milesStore.setCurrentCheckoutMiles(value),
+const currentCheckoutMiles = ref(10)
+const totalMiles = ref(0)
+const pricePerMile = 5
+const isLoading = ref(false)
+
+const totalPrice = computed(() => currentCheckoutMiles.value * pricePerMile)
+
+onMounted(async () => {
+  if (!authStore.user?.usuario.codigo) return
+  
+  try {
+    const response = await MilesService.getSummary(authStore.user.usuario.codigo)
+    if (!response.error) {
+      totalMiles.value = response.data.saldo_milhas
+    } else {
+      toast({
+        title: 'Erro',
+        description: response.message,
+        variant: 'destructive',
+        duration: 2000,
+      })
+    }
+  } catch (error) {
+    const errorMessage = error instanceof Error 
+      ? error.message 
+      : 'Falha ao carregar saldo de milhas'
+    toast({
+      title: 'Erro',
+      description: errorMessage,
+      variant: 'destructive',
+      duration: 2000,
+    })
+  }
 })
-const totalMiles = computed({
-  get: () => milesStore.totalMiles,
-  set: (value: number) => milesStore.setTotalMiles(value),
-})
-const pricePerMile = computed(() => milesStore.pricePerMile)
-const totalPrice = computed(() => milesStore.totalPrice)
 
 const onSubmit = async () => {
-  const newExtract: ExtractItem = {
-    codigo_cliente: authStore.user?.usuario.codigo || 0,
-    data: getTodayDate(),
-    codigo_reserva: null,
-    valor_reais: totalPrice.value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
-    quantidade_milhas: currentCheckoutMiles.value,
-    descricao: 'COMPRA DE MILHAS',
-    tipo: 'ENTRADA',
+  if (!authStore.user?.usuario.codigo) return
+  
+  isLoading.value = true
+  
+  try {
+    const response = await MilesService.addMiles(
+      authStore.user.usuario.codigo,
+      currentCheckoutMiles.value
+    )
+
+    if (!response.error) {
+      totalMiles.value = response.data.saldo_milhas
+      
+      toast({
+        title: 'Pagamento efetuado com sucesso',
+        description: 'Suas milhas foram compradas com sucesso!',
+        variant: 'default',
+        duration: 2000,
+      })
+
+      router.push('/reservas')
+    } else {
+      toast({
+        title: 'Erro',
+        description: response.message,
+        variant: 'destructive',
+        duration: 2000,
+      })
+    }
+  } catch (error) {
+    const errorMessage = error instanceof Error 
+      ? error.message 
+      : 'Falha ao processar compra de milhas'
+    toast({
+      title: 'Erro',
+      description: errorMessage,
+      variant: 'destructive',
+      duration: 2000,
+    })
+  } finally {
+    isLoading.value = false
   }
-
-  registerExtract(newExtract)
-
-  milesStore.setTotalMiles(totalMiles.value + currentCheckoutMiles.value)
-  milesStore.setCurrentCheckoutMiles(10)
-
-  toast({
-    title: 'Pagamento efetuado com sucesso',
-    description: 'Suas milhas foram compradas com sucesso!',
-    variant: 'default',
-    duration: 2000,
-  })
-
-  router.push('/reservas')
 }
 </script>
 
@@ -108,9 +148,11 @@ const onSubmit = async () => {
         </CardContent>
       </Card>
     </div>
-    <Button @click="onSubmit" class="w-full mt-6">
-      Pagar
-      {{ totalPrice.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) }}</Button
-    >
+    <Button @click="onSubmit" class="w-full mt-6" :disabled="isLoading">
+      <span v-if="!isLoading">
+        Pagar {{ totalPrice.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) }}
+      </span>
+      <span v-else>Processando...</span>
+    </Button>
   </div>
 </template>

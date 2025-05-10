@@ -1,106 +1,117 @@
 import { defineStore } from 'pinia'
 import { useLocalStorage } from '@vueuse/core'
-import type { AuthenticatedUserData, Client, Employee } from '@/types/Auth/AuthenticatedUserData'
-import clientsMock from '@/mock/clients'
-import employeesMock from '@/mock/employees'
-import { passwords, addEmployeePassword, addClientPassword } from '@/mock/auth'
-
-function generatedRandomPassword(): string {
-  return Math.floor(1000 + Math.random() * 9000).toString()
-}
-
-function sendPasswordOnEmail(email: string, senha: string): void {
-  console.log(`Senha enviada para ${email}: ${senha}`)
-}
+import type { LoginResponse} from '@/types/Api'
+import { AuthService } from '@/services/authService'
+import { useToast } from '@/components/ui/toast'
+import api from '@/lib/axios'
 
 export const useAuthStore = defineStore('auth', () => {
+  const { toast } = useToast()
   const isAuthenticated = useLocalStorage('auth/isAuthenticated', false)
-  const user = useLocalStorage<AuthenticatedUserData | null>('auth/user', null, {
+  const user = useLocalStorage<LoginResponse | null>('auth/user', null, {
     serializer: {
       read: (v) => (v ? JSON.parse(v) : null),
       write: (v) => JSON.stringify(v),
     },
   })
 
-  async function login(email: string, password: string): Promise<AuthenticatedUserData | null> {
-    let authenticatedUser: Client | Employee | null = null
-
-    if (email.includes('@empresa.com')) {
-      authenticatedUser = employeesMock.getEmployeeByEmail(email)
-
-      if (passwords.employee[email] === password) {
+  async function login(email: string, password: string): Promise<LoginResponse | null> {
+    try {
+      const response = await AuthService.login(email, password)
+      
+      if (!response.error) {
         isAuthenticated.value = true
-
-        user.value = {
-          access_token: '',
-          token_type: '',
-          tipo: 'FUNCIONARIO',
-          senha: password,
-          usuario: authenticatedUser!,
-        }
-
+        user.value = response.data
         return user.value
+      } else {
+        toast({
+          title: 'Erro no login',
+          description: response.message,
+          variant: 'destructive',
+          duration: 2500,
+        })
+        return null
       }
-    } else {
-      authenticatedUser = clientsMock.getClientByEmail(email)
-
-      if (passwords.client[email] === password) {
-        isAuthenticated.value = true
-
-        user.value = {
-          access_token: '',
-          token_type: '',
-          tipo: 'CLIENTE',
-          senha: password,
-          usuario: authenticatedUser!,
-        }
-
-        return user.value
-      }
+    } catch (error) {
+      const errorMessage = error instanceof Error 
+      ? error.message 
+      : 'Falha ao tentar fazer login'
+      toast({
+        title: 'Erro no login',
+        description: errorMessage,
+        variant: 'destructive',
+        duration: 2500,
+      })
+      return null
     }
-
-    return null
   }
 
-  async function register(newUser: Client): Promise<AuthenticatedUserData | null> {
-    if (!newUser.nome || !newUser.email || !newUser.cpf || !newUser.endereco.cep) {
-      throw new Error('Todos os campos são obrigatórios.')
+  async function register(newUser: {
+    nome: string
+    email: string
+    cpf: string
+    endereco: {
+      cep: string
+      uf: string
+      cidade: string
+      bairro: string
+      rua: string
+      numero: string
+      complemento: string
     }
-
-    const senha = generatedRandomPassword()
-
-    clientsMock.registerClient(newUser)
-
-    sendPasswordOnEmail(newUser.email, senha)
-
-    isAuthenticated.value = true
-
-    user.value = {
-      access_token: '',
-      token_type: '',
-      tipo: 'CLIENTE',
-      senha: senha,
-      usuario: newUser,
+  }): Promise<LoginResponse | null> {
+    try {
+      const response = await AuthService.register(newUser)
+      
+      if (!response.error) {
+        toast({
+          title: 'Cadastro realizado!',
+          description: 'Verifique seu e-mail para a senha',
+          variant: 'default',
+        })
+        return response.data
+      } else {
+        toast({
+          title: 'Erro no cadastro',
+          description: response.message,
+          variant: 'destructive',
+          duration: 2500,
+        })
+        return null
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error 
+      ? error.message 
+      : 'Falha ao tentar cadastrar'
+      toast({
+        title: 'Erro no cadastro',
+        description: errorMessage,
+        variant: 'destructive',
+        duration: 2500,
+      })
+      return null
     }
-
-    addClientPassword(newUser.email, senha)
-
-    return user.value
-  }
-
-  async function registerEmployee(newEmployee: Employee) {
-    const senha = generatedRandomPassword()
-
-    employeesMock.registerEmployee(newEmployee)
-
-    sendPasswordOnEmail(newEmployee.email, senha)
-
-    addEmployeePassword(newEmployee.email, senha)
   }
 
   function logout() {
     isAuthenticated.value = false
     user.value = null
+    localStorage.removeItem('token')
+  }
+
+  async function checkAuth() {
+    const token = localStorage.getItem('token')
+    if (token) {
+      try {
+        const response = await api.get('/auth/me')
+        if (response.data) {
+          isAuthenticated.value = true
+          user.value = response.data
+        }
+      } catch {
+        logout()
+      }
+    }
   }
 
   return {
@@ -109,6 +120,6 @@ export const useAuthStore = defineStore('auth', () => {
     login,
     register,
     logout,
-    registerEmployee,
+    checkAuth,
   }
 })
