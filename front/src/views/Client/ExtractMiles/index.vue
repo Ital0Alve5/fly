@@ -1,11 +1,13 @@
 <script setup lang="ts">
-import { h, computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import type {
   ColumnDef,
   ColumnFiltersState,
   ExpandedState,
   VisibilityState,
 } from '@tanstack/vue-table'
+import { Button } from '@/components/ui/button'
+import { valueUpdater } from '@/lib/utils'
 import {
   Table,
   TableBody,
@@ -24,15 +26,14 @@ import {
   useVueTable,
 } from '@tanstack/vue-table'
 import { ArrowUpDown } from 'lucide-vue-next'
-import { Button } from '@/components/ui/button'
+import { h } from 'vue'
 import { useAuthStore } from '@/stores/auth'
-import { MilesService } from '@/services/milesService'
 import { useToast } from '@/components/ui/toast'
+import getExtract from './services/getExtractMiles'
 import type { MilesExtractItem } from '@/types/Api'
-import { valueUpdater } from '@/lib/utils'
 
-const { toast } = useToast()
 const authStore = useAuthStore()
+const { toast } = useToast()
 const data = ref<MilesExtractItem[]>([])
 const isLoading = ref(false)
 
@@ -41,9 +42,9 @@ const fetchExtractData = async () => {
   
   isLoading.value = true
   try {
-    const response = await MilesService.getExtract(authStore.user.usuario.codigo)
-    if (!response.error) {
-      data.value = response.data.transacoes.map((item: MilesExtractItem) => ({
+    const response = await getExtract(authStore.user.usuario.codigo)
+    if (!response.data.error) {
+      data.value = response.data.data.transacoes.map(item => ({
         ...item,
         valor_reais: new Intl.NumberFormat('pt-BR', {
           style: 'currency',
@@ -54,18 +55,15 @@ const fetchExtractData = async () => {
     } else {
       toast({
         title: 'Erro',
-        description: response.message,
+        description: response.data.message,
         variant: 'destructive',
         duration: 2000,
       })
     }
-  } catch (error: unknown) {
-    const errorMessage = error instanceof Error 
-      ? error.message 
-      : 'Falha ao carregar extrato de milhas'
+  } catch {
     toast({
       title: 'Erro',
-      description: errorMessage,
+      description: 'Falha ao carregar extrato de milhas',
       variant: 'destructive',
       duration: 2000,
     })

@@ -14,7 +14,8 @@ import { Separator } from '@/components/ui/separator'
 import { useAuthStore } from '@/stores/auth'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import router from '@/router'
-import { MilesService } from '@/services/milesService'
+import addMiles from '../services/addMillesService.ts'
+import getSummary from '../services/getSummaryMiles'
 
 const authStore = useAuthStore()
 const { toast } = useToast()
@@ -22,32 +23,28 @@ const { toast } = useToast()
 const currentCheckoutMiles = ref(10)
 const totalMiles = ref(0)
 const pricePerMile = 5
-const isLoading = ref(false)
-
 const totalPrice = computed(() => currentCheckoutMiles.value * pricePerMile)
+const isLoading = ref(false)
 
 onMounted(async () => {
   if (!authStore.user?.usuario.codigo) return
   
   try {
-    const response = await MilesService.getSummary(authStore.user.usuario.codigo)
-    if (!response.error) {
-      totalMiles.value = response.data.saldo_milhas
+    const response = await getSummary(authStore.user.usuario.codigo)
+    if (!response.data.error) {
+      totalMiles.value = response.data.data.saldo_milhas
     } else {
       toast({
         title: 'Erro',
-        description: response.message,
+        description: response.data.message,
         variant: 'destructive',
         duration: 2000,
       })
     }
-  } catch (error) {
-    const errorMessage = error instanceof Error 
-      ? error.message 
-      : 'Falha ao carregar saldo de milhas'
+  } catch {
     toast({
       title: 'Erro',
-      description: errorMessage,
+      description: 'Falha ao carregar saldo de milhas',
       variant: 'destructive',
       duration: 2000,
     })
@@ -58,15 +55,15 @@ const onSubmit = async () => {
   if (!authStore.user?.usuario.codigo) return
   
   isLoading.value = true
-  
   try {
-    const response = await MilesService.addMiles(
+    const response = await addMiles(
       authStore.user.usuario.codigo,
       currentCheckoutMiles.value
     )
 
-    if (!response.error) {
-      totalMiles.value = response.data.saldo_milhas
+    if (!response.data.error) {
+      totalMiles.value = response.data.data.saldo_milhas
+      currentCheckoutMiles.value = 10
       
       toast({
         title: 'Pagamento efetuado com sucesso',
@@ -79,18 +76,15 @@ const onSubmit = async () => {
     } else {
       toast({
         title: 'Erro',
-        description: response.message,
+        description: response.data.message,
         variant: 'destructive',
         duration: 2000,
       })
     }
-  } catch (error) {
-    const errorMessage = error instanceof Error 
-      ? error.message 
-      : 'Falha ao processar compra de milhas'
+  } catch {
     toast({
       title: 'Erro',
-      description: errorMessage,
+      description: 'Falha ao processar compra de milhas',
       variant: 'destructive',
       duration: 2000,
     })
