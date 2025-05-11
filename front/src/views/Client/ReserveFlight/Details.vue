@@ -27,7 +27,7 @@ import { registerExtract } from '@/mock/extract'
 import { useAuthStore } from '@/stores/auth'
 import { getTodayDate } from '@/utils/date/getTodayDate'
 import type { Flight } from '@/types/Flight'
-import { fetchFlightByCode } from '@/views/Client/FlightListing/sercvices/FlightListingService.ts'
+import { fetchFlightByCode } from '@/views/Client/FlightListing/services/FlightListingService'
 import { useToast } from '@/components/ui/toast'
 
 const route = useRoute()

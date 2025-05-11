@@ -1,5 +1,3 @@
-import { formatFromDate } from '@/utils/date/formatFromDate'
-import { loadCityByAirpoirt } from './airpoirts'
 import type { Flight } from '@/types/Flight'
 
 export const flights: Flight[] = [
@@ -245,47 +243,6 @@ export const flights: Flight[] = [
   },
 ]
 
-type RegisterFlightFormType = {
-  code: string
-  originAirport: string
-  destinationAirport: string
-  date: Date
-  price: number
-  seatsNumber: number
-}
-
-export async function registerFlight(data: RegisterFlightFormType) { // mudar para utilizar API POST /voos
-  await new Promise((resolve) => setTimeout(resolve, 2000))
-
-  if (flights.some((f) => f.codigo === data.code)) {
-    throw new Error('Código de voo já existe.')
-  }
-
-  const originCity = loadCityByAirpoirt(data.originAirport)
-  const destinationCity = loadCityByAirpoirt(data.destinationAirport)
-
-  flights.push({
-    codigo: data.code,
-    data: formatFromDate(data.date),
-    valor_passagem: data.price,
-    quantidade_poltronas_total: data.seatsNumber,
-    quantidade_poltronas_ocupadas: 0,
-    estado: 'CONFIRMADO',
-    aeroporto_origem: {
-      codigo: data.originAirport,
-      nome: `Aeroporto de ${originCity}`,
-      cidade: originCity,
-      uf: '',
-    },
-    aeroporto_destino: {
-      codigo: data.destinationAirport,
-      nome: `Aeroporto de ${destinationCity}`,
-      cidade: destinationCity,
-      uf: '',
-    },
-  })
-}
-
 export function reserveSeats(code: string, numberOfSeats: number): void {
   const flight = flights.find((f) => f.codigo === code)
   if (flight) {
@@ -297,6 +254,5 @@ export function reserveSeats(code: string, numberOfSeats: number): void {
 
 export default {
   flights,
-  registerFlight,
   reserveSeats,
 }

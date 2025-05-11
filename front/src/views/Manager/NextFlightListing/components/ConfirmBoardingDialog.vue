@@ -12,7 +12,7 @@ import { useToast } from '@/components/ui/toast'
 import { Input } from '@/components/ui/input'
 
 import { getReservationByCodeAndFlightCode, updateReservationStatus } from '@/mock/booking'
-import { fetchFlightByCode } from '@/views/Client/FlightListing/sercvices/FlightListingService.ts'
+import { fetchFlightByCode } from '@/views/Client/FlightListing/services/FlightListingService'
 
 const props = defineProps<{
   modelValue: boolean
