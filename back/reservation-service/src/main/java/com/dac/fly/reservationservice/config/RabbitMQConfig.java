@@ -9,6 +9,7 @@ import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFacto
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -23,6 +24,7 @@ public class RabbitMQConfig {
     public static final String INTERNAL_CANCELLED_KEY = "reserva.cancelada";
     public static final String INTERNAL_UPDATED_KEY = "reserva.atualizada";
     public static final String INTERNAL_CANCEL_FLIGHT_KEY = "reserva.flight-reservations-cancel";
+    public static final String INTERNAL_COMPENSATE_CREATE_KEY = "reserva.removida";
 
     @Bean
     public TopicExchange sagaExchange() {
@@ -129,5 +131,63 @@ public class RabbitMQConfig {
         return BindingBuilder.bind(internalFlightResCancel())
                 .to(internalExchange())
                 .with(RabbitMQConfig.INTERNAL_CANCEL_FLIGHT_KEY);
+    }
+
+    @Bean
+    public Queue compensateCreateReservationQueue() {
+        return new Queue(RabbitConstants.COMPENSATE_CREATE_RESERVATION_CMD_QUEUE, true);
+    }
+
+    @Bean
+    public Binding bindCompensateCreateReservation(TopicExchange exchange, Queue compensateQueue) {
+        return BindingBuilder
+                .bind(compensateQueue)
+                .to(exchange)
+                .with(RabbitConstants.COMPENSATE_CREATE_RESERVATION_CMD_QUEUE);
+    }
+
+    @Bean
+    public Queue internalCompensateCreateQueue() {
+        return new Queue(RabbitMQConfig.INTERNAL_COMPENSATE_CREATE_KEY, true);
+    }
+
+    @Bean
+    public Binding bindInternalCompensateCreate(
+            @Qualifier("internalExchange") DirectExchange internalExchange,
+            Queue internalCompensateCreateQueue) {
+        return BindingBuilder
+                .bind(internalCompensateCreateQueue)
+                .to(internalExchange)
+                .with(RabbitMQConfig.INTERNAL_COMPENSATE_CREATE_KEY);
+    }
+
+    @Bean
+    public Queue compensateCreateReservationRespQueue() {
+        return new Queue(RabbitConstants.COMPENSATE_CREATE_RESERVATION_RESP_QUEUE, true);
+    }
+
+    @Bean
+    public Binding bindCompensateCreateReservationResp(
+            @Qualifier("sagaExchange") TopicExchange sagaExchange,
+            @Qualifier("compensateCreateReservationRespQueue") Queue respQueue) {
+        return BindingBuilder
+                .bind(respQueue)
+                .to(sagaExchange)
+                .with(RabbitConstants.COMPENSATE_CREATE_RESERVATION_RESP_QUEUE);
+    }
+
+    @Bean
+    public Queue failedCreateReservationQueue() {
+        return new Queue(RabbitConstants.FAILED_CREATE_RESERVATION_QUEUE, true);
+    }
+
+    @Bean
+    public Binding bindFailedCreateReservation(
+            @Qualifier("sagaExchange") TopicExchange sagaExchange,
+            Queue failedCreateReservationQueue) {
+        return BindingBuilder
+                .bind(failedCreateReservationQueue)
+                .to(sagaExchange)
+                .with(RabbitConstants.FAILED_CREATE_RESERVATION_QUEUE);
     }
 }

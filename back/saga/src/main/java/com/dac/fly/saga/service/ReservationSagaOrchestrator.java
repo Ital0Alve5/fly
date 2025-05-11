@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import com.dac.fly.shared.config.RabbitConstants;
 import com.dac.fly.shared.dto.command.CancelReservationCommand;
+import com.dac.fly.shared.dto.command.CompensateCreateReservationCommand;
 import com.dac.fly.shared.dto.command.CreateReservationCommand;
 import com.dac.fly.shared.dto.command.UpdateMilesCommand;
 import com.dac.fly.shared.dto.command.UpdateSeatsCommand;
@@ -220,4 +221,63 @@ public class ReservationSagaOrchestrator {
             seatsResponses.remove(codigo);
         }
     }
+
+    public void compensateCreateReservationSaga(CreateReservationCommand failedCmd) {
+        String reservationId = failedCmd.codigo();
+
+        if (failedCmd.quantidade_poltronas() > 0) {
+            UpdateSeatsCommand compensateSeatsCmd = new UpdateSeatsCommand(
+                    reservationId,
+                    failedCmd.codigo_voo(),
+                    failedCmd.quantidade_poltronas(),
+                    true);
+
+            CompletableFuture<SeatsUpdatedEvent> seatsFuture = new CompletableFuture<>();
+            seatsResponses.put(reservationId, seatsFuture);
+
+            rabbit.convertAndSend(RabbitConstants.EXCHANGE, RabbitConstants.UPDATE_SEATS_CMD_QUEUE, compensateSeatsCmd);
+
+            try {
+                SeatsUpdatedEvent seatsEvt = seatsFuture.get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
+                if (!seatsEvt.success()) {
+                    throw new RuntimeException("Falha ao compensar assentos da reserva: " + reservationId);
+                }
+            } catch (InterruptedException | ExecutionException | TimeoutException ex) {
+                throw new RuntimeException("Erro ou timeout ao compensar assentos da reserva: " + reservationId, ex);
+            } finally {
+                seatsResponses.remove(reservationId);
+            }
+        }
+
+        if (failedCmd.milhas_utilizadas() != null && failedCmd.milhas_utilizadas() > 0) {
+            UpdateMilesCommand compensateMilesCmd = new UpdateMilesCommand(
+                    reservationId,
+                    failedCmd.codigo_cliente(),
+                    failedCmd.milhas_utilizadas(),
+                    true);
+
+            CompletableFuture<MilesUpdatedEvent> milesFuture = new CompletableFuture<>();
+            milesResponses.put(reservationId, milesFuture);
+
+            rabbit.convertAndSend(RabbitConstants.EXCHANGE, RabbitConstants.UPDATE_MILES_CMD_QUEUE, compensateMilesCmd);
+
+            try {
+                MilesUpdatedEvent milesEvt = milesFuture.get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
+                if (!milesEvt.success()) {
+                    throw new RuntimeException("Falha ao compensar milhas da reserva: " + reservationId);
+                }
+            } catch (InterruptedException | ExecutionException | TimeoutException ex) {
+                throw new RuntimeException("Erro ou timeout ao compensar milhas da reserva: " + reservationId, ex);
+            } finally {
+                milesResponses.remove(reservationId);
+            }
+        }
+
+        CompensateCreateReservationCommand compensateReservationCmd = new CompensateCreateReservationCommand(
+                reservationId);
+        rabbit.convertAndSend(RabbitConstants.EXCHANGE,
+                RabbitConstants.COMPENSATE_CREATE_RESERVATION_CMD_QUEUE,
+                compensateReservationCmd);
+    }
+
 }

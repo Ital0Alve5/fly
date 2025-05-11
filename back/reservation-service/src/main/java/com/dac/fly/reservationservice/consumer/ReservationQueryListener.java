@@ -44,4 +44,13 @@ public class ReservationQueryListener {
         }
     }
 
+    @RabbitListener(queues = RabbitMQConfig.INTERNAL_COMPENSATE_CREATE_KEY)
+    public void handleReservationRemovedEvent(String reservationId) {
+        boolean ok = service.deleteReservation(reservationId);
+        if (!ok) {
+            throw new AmqpRejectAndDontRequeueException(
+                    "Erro ao projetar remoção de reserva " + reservationId);
+        }
+    }
+
 }

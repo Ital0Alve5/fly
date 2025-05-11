@@ -184,4 +184,12 @@ public class ReservationCommandService {
                                 .map(e -> e.getNome())
                                 .orElse("DESCONHECIDO");
         }
+
+        public boolean exists(String reservationId) {
+                return repository.existsById(reservationId);
+        }
+
+        public void removeReservation(String reservationId) {
+                repository.deleteById(reservationId);
+        }
 }
