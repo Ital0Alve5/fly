@@ -3,7 +3,7 @@ import { FastifyTypedInstance } from 'src/shared/types'
 import { FastifyReply, FastifyRequest } from 'fastify'
 import { Env } from 'src/shared/env'
 import { updateFlightStateSchema } from './schema'
-import { employeeAuthMiddleware } from 'src/middlewares/employee-auth'  
+import { userAuthMiddleware } from 'src/middlewares/user-auth'
 
 export async function updateFlightStateRoute(app: FastifyTypedInstance) {
   const path = '/voos/:codigoVoo/estado'
@@ -12,7 +12,7 @@ export async function updateFlightStateRoute(app: FastifyTypedInstance) {
     path,
     {
       schema: updateFlightStateSchema,
-      preHandler: employeeAuthMiddleware,
+      preHandler: userAuthMiddleware,
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
