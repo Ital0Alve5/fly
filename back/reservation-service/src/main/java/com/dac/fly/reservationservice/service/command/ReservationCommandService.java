@@ -1,11 +1,9 @@
 package com.dac.fly.reservationservice.service.command;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.dac.fly.reservationservice.dto.HistoryDto;
 import com.dac.fly.reservationservice.dto.factory.ReservationResponseFactory;
 import com.dac.fly.reservationservice.dto.request.ReservationUpdateStatusDto;
 import com.dac.fly.reservationservice.dto.response.ReservationResponseDto;
@@ -164,17 +162,6 @@ public class ReservationCommandService {
                 }
 
                 return responseFactory.fromCommandReserva(reserva, novoEstado.estado(), origem, destino);
-        }
-
-        private List<HistoryDto> getReservationHistory(String reservationCode) {
-                return historyRepository.findByCodigoReserva(reservationCode).stream()
-                                .map(h -> new HistoryDto(
-                                                h.getId(),
-                                                h.getCodigoReserva(),
-                                                h.getData(),
-                                                resolveEstadoNome(h.getEstadoOrigem()),
-                                                resolveEstadoNome(h.getEstadoDestino())))
-                                .toList();
         }
 
         private String resolveEstadoNome(Long id) {

@@ -1,5 +1,6 @@
 package com.dac.fly.saga.service;
 
+import java.util.EnumSet;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
@@ -9,6 +10,7 @@ import java.util.concurrent.TimeoutException;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
+import com.dac.fly.saga.enums.SagaStep;
 import com.dac.fly.shared.config.RabbitConstants;
 import com.dac.fly.shared.dto.command.CancelReservationCommand;
 import com.dac.fly.shared.dto.command.CompensateCreateReservationCommand;
@@ -46,9 +48,8 @@ public class ReservationSagaOrchestrator {
         this.reservationCancelResponses = reservationCancelResponses;
     }
 
-    public CreatedReservationResponseDto startSaga(CreateReservationDto createDto) {
+    public CreatedReservationResponseDto createReservation(CreateReservationDto createDto) {
         String reservationId = ReservationCodeGenerator.generateReservationCode();
-
         CreateReservationCommand cmd = new CreateReservationCommand(
                 reservationId,
                 createDto.codigo_cliente(),
@@ -59,15 +60,25 @@ public class ReservationSagaOrchestrator {
                 createDto.codigo_aeroporto_origem(),
                 createDto.codigo_aeroporto_destino());
 
+        EnumSet<SagaStep> completedSteps = EnumSet.noneOf(SagaStep.class);
+
         try {
             if (cmd.milhas_utilizadas() != null && cmd.milhas_utilizadas() > 0) {
                 deductMiles(cmd);
+                completedSteps.add(SagaStep.MILES_DEDUCTED);
             }
 
             updateSeats(cmd);
+            completedSteps.add(SagaStep.SEATS_UPDATED);
 
-            return createReservation(cmd);
+            CreatedReservationResponseDto response = createReservation(cmd);
+            completedSteps.add(SagaStep.RESERVATION_CREATED);
 
+            return response;
+
+        } catch (RuntimeException ex) {
+            compensateCreateReservationSaga(cmd, completedSteps);
+            throw new RuntimeException("Falha ao criar reserva. Todas as ações realizadas foram compensadas.", ex);
         } finally {
             milesResponses.remove(reservationId);
             seatsResponses.remove(reservationId);
@@ -222,10 +233,17 @@ public class ReservationSagaOrchestrator {
         }
     }
 
-    public void compensateCreateReservationSaga(CreateReservationCommand failedCmd) {
+    public void compensateCreateReservationSaga(CreateReservationCommand failedCmd, EnumSet<SagaStep> completedSteps) {
         String reservationId = failedCmd.codigo();
 
-        if (failedCmd.quantidade_poltronas() > 0) {
+        if (completedSteps.contains(SagaStep.RESERVATION_CREATED)) {
+            CompensateCreateReservationCommand compensateReservationCmd = new CompensateCreateReservationCommand(
+                    reservationId);
+            rabbit.convertAndSend(RabbitConstants.EXCHANGE, RabbitConstants.COMPENSATE_CREATE_RESERVATION_CMD_QUEUE,
+                    compensateReservationCmd);
+        }
+
+        if (completedSteps.contains(SagaStep.SEATS_UPDATED)) {
             UpdateSeatsCommand compensateSeatsCmd = new UpdateSeatsCommand(
                     reservationId,
                     failedCmd.codigo_voo(),
@@ -233,9 +251,13 @@ public class ReservationSagaOrchestrator {
                     true);
 
             CompletableFuture<SeatsUpdatedEvent> seatsFuture = new CompletableFuture<>();
+
             seatsResponses.put(reservationId, seatsFuture);
 
-            rabbit.convertAndSend(RabbitConstants.EXCHANGE, RabbitConstants.UPDATE_SEATS_CMD_QUEUE, compensateSeatsCmd);
+            rabbit.convertAndSend(
+                    RabbitConstants.EXCHANGE,
+                    RabbitConstants.COMPENSATE_SEATS_CMD_QUEUE,
+                    compensateSeatsCmd);
 
             try {
                 SeatsUpdatedEvent seatsEvt = seatsFuture.get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
@@ -243,41 +265,40 @@ public class ReservationSagaOrchestrator {
                     throw new RuntimeException("Falha ao compensar assentos da reserva: " + reservationId);
                 }
             } catch (InterruptedException | ExecutionException | TimeoutException ex) {
-                throw new RuntimeException("Erro ou timeout ao compensar assentos da reserva: " + reservationId, ex);
+                throw new RuntimeException("Erro ao compensar assentos da reserva: " + reservationId, ex);
             } finally {
                 seatsResponses.remove(reservationId);
             }
         }
 
-        if (failedCmd.milhas_utilizadas() != null && failedCmd.milhas_utilizadas() > 0) {
-            UpdateMilesCommand compensateMilesCmd = new UpdateMilesCommand(
-                    reservationId,
-                    failedCmd.codigo_cliente(),
-                    failedCmd.milhas_utilizadas(),
-                    true);
+        if (completedSteps.contains(SagaStep.MILES_DEDUCTED)) {
+            if (failedCmd.milhas_utilizadas() != null && failedCmd.milhas_utilizadas() > 0) {
+                UpdateMilesCommand compensateMilesCmd = new UpdateMilesCommand(
+                        reservationId,
+                        failedCmd.codigo_cliente(),
+                        failedCmd.milhas_utilizadas(),
+                        true);
 
-            CompletableFuture<MilesUpdatedEvent> milesFuture = new CompletableFuture<>();
-            milesResponses.put(reservationId, milesFuture);
+                CompletableFuture<MilesUpdatedEvent> milesFuture = new CompletableFuture<>();
+                milesResponses.put(reservationId, milesFuture);
 
-            rabbit.convertAndSend(RabbitConstants.EXCHANGE, RabbitConstants.UPDATE_MILES_CMD_QUEUE, compensateMilesCmd);
+                rabbit.convertAndSend(
+                        RabbitConstants.EXCHANGE,
+                        RabbitConstants.COMPENSATE_MILES_CMD_QUEUE,
+                        compensateMilesCmd);
 
-            try {
-                MilesUpdatedEvent milesEvt = milesFuture.get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
-                if (!milesEvt.success()) {
-                    throw new RuntimeException("Falha ao compensar milhas da reserva: " + reservationId);
+                try {
+                    MilesUpdatedEvent milesEvt = milesFuture.get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
+                    if (!milesEvt.success()) {
+                        throw new RuntimeException("Falha ao compensar milhas da reserva: " + reservationId);
+                    }
+                } catch (InterruptedException | ExecutionException | TimeoutException ex) {
+                    throw new RuntimeException("Erro ou timeout ao compensar milhas da reserva: " + reservationId, ex);
+                } finally {
+                    milesResponses.remove(reservationId);
                 }
-            } catch (InterruptedException | ExecutionException | TimeoutException ex) {
-                throw new RuntimeException("Erro ou timeout ao compensar milhas da reserva: " + reservationId, ex);
-            } finally {
-                milesResponses.remove(reservationId);
             }
         }
-
-        CompensateCreateReservationCommand compensateReservationCmd = new CompensateCreateReservationCommand(
-                reservationId);
-        rabbit.convertAndSend(RabbitConstants.EXCHANGE,
-                RabbitConstants.COMPENSATE_CREATE_RESERVATION_CMD_QUEUE,
-                compensateReservationCmd);
     }
 
 }

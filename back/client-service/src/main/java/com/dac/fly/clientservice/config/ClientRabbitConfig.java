@@ -53,4 +53,16 @@ public class ClientRabbitConfig {
                 .to(exchange())
                 .with(RabbitConstants.CREATE_CLIENT_RESP_QUEUE);
     }
+
+    @Bean
+    public Queue compensateMilesCmdQueue() {
+        return new Queue(RabbitConstants.COMPENSATE_MILES_CMD_QUEUE, true);
+    }
+
+    @Bean
+    public Binding bindCompensateMilesCmd() {
+        return BindingBuilder.bind(compensateMilesCmdQueue())
+                .to(exchange())
+                .with(RabbitConstants.COMPENSATE_MILES_CMD_QUEUE);
+    }
 }

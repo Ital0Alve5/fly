@@ -27,134 +27,152 @@ import com.dac.fly.shared.dto.response.CancelledFlightResponseDto;
 @Service
 public class FlightService {
 
-    private final VooRepository vooRepository;
-    private final EstadoRepository estadoRepository;
-    private final AeroportoRepository aeroportoRepository;
+        private final VooRepository vooRepository;
+        private final EstadoRepository estadoRepository;
+        private final AeroportoRepository aeroportoRepository;
 
-    public FlightService(VooRepository vooRepository,
-            EstadoRepository estadoRepository,
-            AeroportoRepository aeroportoRepository) {
-        this.vooRepository = vooRepository;
-        this.estadoRepository = estadoRepository;
-        this.aeroportoRepository = aeroportoRepository;
-    }
-
-    public ResponseEntity<ApiResponse<List<FlightDetailsResponseDto>>> findAll(
-            OffsetDateTime data,
-            OffsetDateTime dataFim,
-            String origem,
-            String destino) {
-
-        List<Voo> voos;
-        if (data != null && dataFim != null) {
-            voos = vooRepository.findByDataBetween(data, dataFim);
-        } else if (data != null && origem != null && destino != null) {
-            OffsetDateTime inicio = data.toLocalDate().atStartOfDay().atOffset(ZoneOffset.UTC);
-            OffsetDateTime fim = inicio.plusDays(1);
-            voos = vooRepository.findByDataBetweenAndAeroportoOrigemCodigoAndAeroportoDestinoCodigo(
-                    inicio, fim, origem, destino);
-        } else {
-            voos = vooRepository.findAll();
+        public FlightService(VooRepository vooRepository,
+                        EstadoRepository estadoRepository,
+                        AeroportoRepository aeroportoRepository) {
+                this.vooRepository = vooRepository;
+                this.estadoRepository = estadoRepository;
+                this.aeroportoRepository = aeroportoRepository;
         }
 
-        List<FlightDetailsResponseDto> dtos = voos.stream()
-                .map(FlightDetailsResponseDto::fromEntity)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(ApiResponse.success(dtos));
-    }
+        public ResponseEntity<ApiResponse<List<FlightDetailsResponseDto>>> findAll(
+                        OffsetDateTime data,
+                        OffsetDateTime dataFim,
+                        String origem,
+                        String destino) {
 
-    public ResponseEntity<ApiResponse<FlightDetailsResponseDto>> findByCode(String codigo) {
-        return vooRepository.findById(codigo)
-                .map(v -> ResponseEntity.ok(ApiResponse.success(FlightDetailsResponseDto.fromEntity(v))))
-                .orElseGet(() -> ResponseEntity.status(404)
-                        .body(ApiResponse.error("Voo não encontrado", 404)));
-    }
+                List<Voo> voos;
+                if (data != null && dataFim != null) {
+                        voos = vooRepository.findByDataBetween(data, dataFim);
+                } else if (data != null && origem != null && destino != null) {
+                        OffsetDateTime inicio = data.toLocalDate().atStartOfDay().atOffset(ZoneOffset.UTC);
+                        OffsetDateTime fim = inicio.plusDays(1);
+                        voos = vooRepository.findByDataBetweenAndAeroportoOrigemCodigoAndAeroportoDestinoCodigo(
+                                        inicio, fim, origem, destino);
+                } else {
+                        voos = vooRepository.findAll();
+                }
 
-    public ResponseEntity<ApiResponse<FlightResponseDto>> create(CreateNewFlightRequestDto dto) {
-        Optional<Aeroporto> origem = aeroportoRepository.findById(dto.codigo_aeroporto_origem());
-        Optional<Aeroporto> destino = aeroportoRepository.findById(dto.codigo_aeroporto_destino());
-        Optional<Estado> estado = estadoRepository.findByNome(FlightStatusEnum.CONFIRMADO);
-
-        if (origem.isEmpty() || destino.isEmpty() || estado.isEmpty()) {
-            return ResponseEntity.badRequest()
-                    .body(ApiResponse.error("Dados inválidos para criar voo", 400));
+                List<FlightDetailsResponseDto> dtos = voos.stream()
+                                .map(FlightDetailsResponseDto::fromEntity)
+                                .collect(Collectors.toList());
+                return ResponseEntity.ok(ApiResponse.success(dtos));
         }
 
-        Voo voo = new Voo();
-        voo.setCodigo(FlightCodeGenerator.generateReservationCode());
-        voo.setData(OffsetDateTime.parse(dto.data()));
-        voo.setValorPassagem(dto.valor_passagem());
-        voo.setQuantidadePoltronasTotal(dto.quantidade_poltronas_total());
-        voo.setQuantidadePoltronasOcupadas(dto.quantidade_poltronas_ocupadas());
-        voo.setAeroportoOrigem(origem.get());
-        voo.setAeroportoDestino(destino.get());
-        voo.setEstado(estado.get());
-
-        Voo salvo = vooRepository.save(voo);
-        return ResponseEntity.status(201)
-                .body(ApiResponse.success(toDto(salvo)));
-    }
-
-    public CancelledFlightResponseDto updateStatus(String codigo, FlightStatusEnum novoStatus) {
-        Voo voo = vooRepository.findById(codigo)
-                .orElseThrow(() -> new RuntimeException("Voo não encontrado: " + codigo));
-
-        Estado estado = estadoRepository.findByNome(novoStatus)
-                .orElseThrow(() -> new RuntimeException("Estado não encontrado: " + novoStatus));
-
-        voo.setEstado(estado);
-        vooRepository.save(voo);
-
-        return new CancelledFlightResponseDto(
-                voo.getCodigo(),
-                voo.getData().toString(),
-                voo.getValorPassagem(),
-                voo.getQuantidadePoltronasTotal(),
-                voo.getQuantidadePoltronasOcupadas(),
-                voo.getEstado().getNome().toString(),
-                voo.getAeroportoOrigem().getCodigo(),
-                voo.getAeroportoDestino().getCodigo());
-    }
-
-    private FlightResponseDto toDto(Voo voo) {
-        return new FlightResponseDto(
-                voo.getCodigo(),
-                voo.getData().toString(),
-                voo.getValorPassagem(),
-                voo.getQuantidadePoltronasTotal(),
-                voo.getQuantidadePoltronasOcupadas(),
-                voo.getEstado().getNome(),
-                voo.getAeroportoOrigem().getCodigo(),
-                voo.getAeroportoDestino().getCodigo());
-    }
-
-    public boolean updateSeats(String flightCode, int delta) {
-        Voo voo = vooRepository.findById(flightCode)
-                .orElseThrow(() -> new RuntimeException("Voo não encontrado: " + flightCode));
-
-        int ocupadas = voo.getQuantidadePoltronasOcupadas() + delta;
-        if (ocupadas < 0 || ocupadas > voo.getQuantidadePoltronasTotal()) {
-            return false;
+        public ResponseEntity<ApiResponse<FlightDetailsResponseDto>> findByCode(String codigo) {
+                return vooRepository.findById(codigo)
+                                .map(v -> ResponseEntity
+                                                .ok(ApiResponse.success(FlightDetailsResponseDto.fromEntity(v))))
+                                .orElseGet(() -> ResponseEntity.status(404)
+                                                .body(ApiResponse.error("Voo não encontrado", 404)));
         }
 
-        voo.setQuantidadePoltronasOcupadas(ocupadas);
-        vooRepository.save(voo);
-        return true;
-    }
+        public ResponseEntity<ApiResponse<FlightResponseDto>> create(CreateNewFlightRequestDto dto) {
+                Optional<Aeroporto> origem = aeroportoRepository.findById(dto.codigo_aeroporto_origem());
+                Optional<Aeroporto> destino = aeroportoRepository.findById(dto.codigo_aeroporto_destino());
+                Optional<Estado> estado = estadoRepository.findByNome(FlightStatusEnum.CONFIRMADO);
 
-    public ResponseEntity<ApiResponse<FlightGroupedResponseDto>> findByAirport(
-            OffsetDateTime data, String origem, String destino) {
-        OffsetDateTime inicio = data.toLocalDate().atStartOfDay().atOffset(ZoneOffset.UTC);
-        OffsetDateTime fim = inicio.plusDays(1);
+                if (origem.isEmpty() || destino.isEmpty() || estado.isEmpty()) {
+                        return ResponseEntity.badRequest()
+                                        .body(ApiResponse.error("Dados inválidos para criar voo", 400));
+                }
 
-        List<Voo> voos = vooRepository.findByDataBetweenAndAeroportoOrigemCodigoAndAeroportoDestinoCodigo(
-                inicio, fim, origem, destino);
-        List<FlightDetailsResponseDto> detalhes = voos.stream()
-                .map(FlightDetailsResponseDto::fromEntity)
-                .collect(Collectors.toList());
+                Voo voo = new Voo();
+                voo.setCodigo(FlightCodeGenerator.generateReservationCode());
+                voo.setData(OffsetDateTime.parse(dto.data()));
+                voo.setValorPassagem(dto.valor_passagem());
+                voo.setQuantidadePoltronasTotal(dto.quantidade_poltronas_total());
+                voo.setQuantidadePoltronasOcupadas(dto.quantidade_poltronas_ocupadas());
+                voo.setAeroportoOrigem(origem.get());
+                voo.setAeroportoDestino(destino.get());
+                voo.setEstado(estado.get());
 
-        FlightGroupedResponseDto resposta = FlightGroupedResponseDto.of(
-                data.toString(), origem, destino, detalhes);
-        return ResponseEntity.ok(ApiResponse.success(resposta));
-    }
+                Voo salvo = vooRepository.save(voo);
+                return ResponseEntity.status(201)
+                                .body(ApiResponse.success(toDto(salvo)));
+        }
+
+        public CancelledFlightResponseDto updateStatus(String codigo, FlightStatusEnum novoStatus) {
+                Voo voo = vooRepository.findById(codigo)
+                                .orElseThrow(() -> new RuntimeException("Voo não encontrado: " + codigo));
+
+                Estado estado = estadoRepository.findByNome(novoStatus)
+                                .orElseThrow(() -> new RuntimeException("Estado não encontrado: " + novoStatus));
+
+                voo.setEstado(estado);
+                vooRepository.save(voo);
+
+                return new CancelledFlightResponseDto(
+                                voo.getCodigo(),
+                                voo.getData().toString(),
+                                voo.getValorPassagem(),
+                                voo.getQuantidadePoltronasTotal(),
+                                voo.getQuantidadePoltronasOcupadas(),
+                                voo.getEstado().getNome().toString(),
+                                voo.getAeroportoOrigem().getCodigo(),
+                                voo.getAeroportoDestino().getCodigo());
+        }
+
+        private FlightResponseDto toDto(Voo voo) {
+                return new FlightResponseDto(
+                                voo.getCodigo(),
+                                voo.getData().toString(),
+                                voo.getValorPassagem(),
+                                voo.getQuantidadePoltronasTotal(),
+                                voo.getQuantidadePoltronasOcupadas(),
+                                voo.getEstado().getNome(),
+                                voo.getAeroportoOrigem().getCodigo(),
+                                voo.getAeroportoDestino().getCodigo());
+        }
+
+        public boolean updateSeats(String flightCode, int delta) {
+                Voo voo = vooRepository.findById(flightCode)
+                                .orElseThrow(() -> new RuntimeException("Voo não encontrado: " + flightCode));
+
+                int ocupadas = voo.getQuantidadePoltronasOcupadas() + delta;
+                if (ocupadas < 0 || ocupadas > voo.getQuantidadePoltronasTotal()) {
+                        return false;
+                }
+
+                voo.setQuantidadePoltronasOcupadas(ocupadas);
+                vooRepository.save(voo);
+                return true;
+        }
+
+        public ResponseEntity<ApiResponse<FlightGroupedResponseDto>> findByAirport(
+                        OffsetDateTime data, String origem, String destino) {
+                OffsetDateTime inicio = data.toLocalDate().atStartOfDay().atOffset(ZoneOffset.UTC);
+                OffsetDateTime fim = inicio.plusDays(1);
+
+                List<Voo> voos = vooRepository.findByDataBetweenAndAeroportoOrigemCodigoAndAeroportoDestinoCodigo(
+                                inicio, fim, origem, destino);
+                List<FlightDetailsResponseDto> detalhes = voos.stream()
+                                .map(FlightDetailsResponseDto::fromEntity)
+                                .collect(Collectors.toList());
+
+                FlightGroupedResponseDto resposta = FlightGroupedResponseDto.of(
+                                data.toString(), origem, destino, detalhes);
+                return ResponseEntity.ok(ApiResponse.success(resposta));
+        }
+
+        public boolean compensateSeats(String codigoVoo, int quantidadePoltronas) {
+                var flight = vooRepository.findById(codigoVoo)
+                                .orElseThrow(() -> new RuntimeException("Voo não encontrado: " + codigoVoo));
+
+                int newOccupiedSeats = flight.getQuantidadePoltronasOcupadas() - quantidadePoltronas;
+
+                if (newOccupiedSeats < 0) {
+                        throw new RuntimeException("Compensação inválida, assentos negativos.");
+                }
+
+                flight.setQuantidadePoltronasOcupadas(newOccupiedSeats);
+                vooRepository.save(flight);
+
+                return true;
+        }
+
 }

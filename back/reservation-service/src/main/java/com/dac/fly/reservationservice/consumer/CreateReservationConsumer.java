@@ -44,10 +44,7 @@ public class CreateReservationConsumer {
                     response);
 
         } catch (RuntimeException e) {
-            rabbit.convertAndSend(
-                    RabbitConstants.EXCHANGE,
-                    RabbitConstants.FAILED_CREATE_RESERVATION_QUEUE,
-                    cmd);
+            System.err.println("Erro ao criar a reserva: " + e.getMessage());
 
             throw e;
         }

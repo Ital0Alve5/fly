@@ -9,7 +9,6 @@ import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFacto
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -139,10 +138,10 @@ public class RabbitMQConfig {
     }
 
     @Bean
-    public Binding bindCompensateCreateReservation(TopicExchange exchange, Queue compensateQueue) {
+    public Binding bindCompensateCreateReservation() {
         return BindingBuilder
-                .bind(compensateQueue)
-                .to(exchange)
+                .bind(compensateCreateReservationQueue())
+                .to(sagaExchange())
                 .with(RabbitConstants.COMPENSATE_CREATE_RESERVATION_CMD_QUEUE);
     }
 
@@ -152,42 +151,10 @@ public class RabbitMQConfig {
     }
 
     @Bean
-    public Binding bindInternalCompensateCreate(
-            @Qualifier("internalExchange") DirectExchange internalExchange,
-            Queue internalCompensateCreateQueue) {
+    public Binding bindInternalCompensateCreate() {
         return BindingBuilder
-                .bind(internalCompensateCreateQueue)
-                .to(internalExchange)
+                .bind(internalCompensateCreateQueue())
+                .to(internalExchange())
                 .with(RabbitMQConfig.INTERNAL_COMPENSATE_CREATE_KEY);
-    }
-
-    @Bean
-    public Queue compensateCreateReservationRespQueue() {
-        return new Queue(RabbitConstants.COMPENSATE_CREATE_RESERVATION_RESP_QUEUE, true);
-    }
-
-    @Bean
-    public Binding bindCompensateCreateReservationResp(
-            @Qualifier("sagaExchange") TopicExchange sagaExchange,
-            @Qualifier("compensateCreateReservationRespQueue") Queue respQueue) {
-        return BindingBuilder
-                .bind(respQueue)
-                .to(sagaExchange)
-                .with(RabbitConstants.COMPENSATE_CREATE_RESERVATION_RESP_QUEUE);
-    }
-
-    @Bean
-    public Queue failedCreateReservationQueue() {
-        return new Queue(RabbitConstants.FAILED_CREATE_RESERVATION_QUEUE, true);
-    }
-
-    @Bean
-    public Binding bindFailedCreateReservation(
-            @Qualifier("sagaExchange") TopicExchange sagaExchange,
-            Queue failedCreateReservationQueue) {
-        return BindingBuilder
-                .bind(failedCreateReservationQueue)
-                .to(sagaExchange)
-                .with(RabbitConstants.FAILED_CREATE_RESERVATION_QUEUE);
     }
 }

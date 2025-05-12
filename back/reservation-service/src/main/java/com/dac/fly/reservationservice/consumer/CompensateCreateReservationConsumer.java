@@ -33,11 +33,6 @@ public class CompensateCreateReservationConsumer {
                     internalExchange.getName(),
                     RabbitMQConfig.INTERNAL_COMPENSATE_CREATE_KEY,
                     cmd.codigoReserva());
-
-            rabbit.convertAndSend(
-                    RabbitConstants.EXCHANGE,
-                    RabbitConstants.COMPENSATE_CREATE_RESERVATION_RESP_QUEUE,
-                    new CompensateCreateReservationCommand(cmd.codigoReserva()));
         }
     }
 }

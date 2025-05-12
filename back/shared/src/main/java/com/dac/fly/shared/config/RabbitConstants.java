@@ -10,11 +10,11 @@ public final class RabbitConstants {
     /** --- Contexto: Reserva (Reservation Saga) --- */
     public static final String CREATE_RESERVATION_CMD_QUEUE = "saga.create-reservation";
     public static final String CREATED_QUEUE = "saga.created-reservation";
+    public static final String COMPENSATE_SEATS_CMD_QUEUE = "saga.compensate-seats-cmd";
+    public static final String COMPENSATE_MILES_CMD_QUEUE = "saga.compensate-miles-cmd";
 
     // filas de rollback/compensação
-    public static final String FAILED_CREATE_RESERVATION_QUEUE = "saga.failed-create-reservation";
     public static final String COMPENSATE_CREATE_RESERVATION_CMD_QUEUE = "saga.compensate-create-reservation";
-    public static final String COMPENSATE_CREATE_RESERVATION_RESP_QUEUE = "saga.compensate-create-resp";
 
     public static final String CANCEL_RESERVATION_CMD_QUEUE = "saga.cancel-reservation";
     public static final String CANCELED_RESERVATION_RESP_QUEUE = "saga.reservation-canceled";
