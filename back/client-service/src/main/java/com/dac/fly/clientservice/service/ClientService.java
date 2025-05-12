@@ -183,4 +183,9 @@ public class ClientService {
     private BigDecimal calculateRealValue(Integer miles) {
         return BigDecimal.valueOf(miles * 5);
     }
+
+    public boolean existsByCodigo(Long codigo) {
+        return clientRepository.existsById(codigo);
+    }
+
 }

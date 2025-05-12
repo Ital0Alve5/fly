@@ -12,6 +12,9 @@ import org.springframework.stereotype.Service;
 
 import com.dac.fly.saga.enums.CancelReservationSagaStep;
 import com.dac.fly.saga.enums.CreateReservationSagaStep;
+import com.dac.fly.saga.feign.ClientClient;
+import com.dac.fly.saga.feign.FlightClient;
+import com.dac.fly.saga.feign.ReservationClient;
 import com.dac.fly.shared.config.RabbitConstants;
 import com.dac.fly.shared.dto.command.CancelReservationCommand;
 import com.dac.fly.shared.dto.command.CompensateCancelReservationCommand;
@@ -37,21 +40,34 @@ public class ReservationSagaOrchestrator {
     private final ConcurrentHashMap<String, CompletableFuture<SeatsUpdatedEvent>> seatsResponses;
     private final ConcurrentHashMap<String, CompletableFuture<CreatedReservationResponseDto>> reservationResponses;
     private final ConcurrentHashMap<String, CompletableFuture<CancelledReservationEventDto>> reservationCancelResponses;
+    private final FlightClient flightClient;
+    private final ClientClient clientClient;
+    private final ReservationClient reservationClient;
 
     public ReservationSagaOrchestrator(
             RabbitTemplate rabbit,
             ConcurrentHashMap<String, CompletableFuture<MilesUpdatedEvent>> milesResponses,
             ConcurrentHashMap<String, CompletableFuture<SeatsUpdatedEvent>> seatsResponses,
             ConcurrentHashMap<String, CompletableFuture<CreatedReservationResponseDto>> reservationResponses,
-            ConcurrentHashMap<String, CompletableFuture<CancelledReservationEventDto>> reservationCancelResponses) {
+            ConcurrentHashMap<String, CompletableFuture<CancelledReservationEventDto>> reservationCancelResponses,
+            FlightClient flightClient, ClientClient clientClient, ReservationClient reservationClient) {
         this.rabbit = rabbit;
         this.milesResponses = milesResponses;
         this.seatsResponses = seatsResponses;
         this.reservationResponses = reservationResponses;
         this.reservationCancelResponses = reservationCancelResponses;
+        this.flightClient = flightClient;
+        this.clientClient = clientClient;
+        this.reservationClient = reservationClient;
     }
 
     public CreatedReservationResponseDto createReservation(CreateReservationDto createDto) {
+        if (!flightClient.existsByCode(createDto.codigo_voo())) {
+            throw new IllegalArgumentException("Voo não encontrado: " + createDto.codigo_voo());
+        } else if (!clientClient.existsByCode(createDto.codigo_cliente())) {
+            throw new IllegalArgumentException("Cliente não encontrado: " + createDto.codigo_cliente());
+        }
+
         String reservationId = ReservationCodeGenerator.generateReservationCode();
         CreateReservationCommand cmd = new CreateReservationCommand(
                 reservationId,
@@ -144,6 +160,10 @@ public class ReservationSagaOrchestrator {
     }
 
     public CancelledReservationResponseDto cancelReservationSaga(String codigo) {
+        if (!reservationClient.existsByCode(codigo)) {
+            throw new IllegalArgumentException("Reserva não encontrada: " + codigo);
+        }
+
         EnumSet<CancelReservationSagaStep> completed = EnumSet.noneOf(CancelReservationSagaStep.class);
         CancelledReservationEventDto cancelResp = null;
 
