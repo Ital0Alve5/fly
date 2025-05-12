@@ -7,18 +7,18 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
 import com.dac.fly.shared.config.RabbitConstants;
+import com.dac.fly.shared.dto.events.CancelledFlightEventDto;
 import com.dac.fly.shared.dto.events.FlightReservationsCancelledEventDto;
 import com.dac.fly.shared.dto.events.MilesUpdatedEvent;
-import com.dac.fly.shared.dto.response.CancelledFlightResponseDto;
 
 @Component
 public class FlightSagaConsumer {
 
-    private final ConcurrentHashMap<String, CompletableFuture<CancelledFlightResponseDto>> flightCancelResponses;
+    private final ConcurrentHashMap<String, CompletableFuture<CancelledFlightEventDto>> flightCancelResponses;
     private final ConcurrentHashMap<String, CompletableFuture<FlightReservationsCancelledEventDto>> reservationsCancelResponses;
 
     public FlightSagaConsumer(
-            ConcurrentHashMap<String, CompletableFuture<CancelledFlightResponseDto>> flightCancelResponses,
+            ConcurrentHashMap<String, CompletableFuture<CancelledFlightEventDto>> flightCancelResponses,
             ConcurrentHashMap<String, CompletableFuture<FlightReservationsCancelledEventDto>> reservationsCancelResponses,
             ConcurrentHashMap<String, CompletableFuture<MilesUpdatedEvent>> milesResponses) {
         this.flightCancelResponses = flightCancelResponses;
@@ -26,7 +26,7 @@ public class FlightSagaConsumer {
     }
 
     @RabbitListener(queues = RabbitConstants.FLIGHT_CANCELLED_RESP_QUEUE)
-    public void onFlightCancelled(CancelledFlightResponseDto evt) {
+    public void onFlightCancelled(CancelledFlightEventDto evt) {
         var future = flightCancelResponses.remove(evt.codigo());
         if (future != null) {
             future.complete(evt);

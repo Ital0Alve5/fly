@@ -16,7 +16,7 @@ import com.dac.fly.reservationservice.repository.command.HistoryRepository;
 import com.dac.fly.reservationservice.repository.command.ReservaCommandRepository;
 import com.dac.fly.reservationservice.repository.query.ReservaQueryRepository;
 import com.dac.fly.shared.dto.command.CreateReservationCommand;
-import com.dac.fly.shared.dto.response.CanceledReservationResponseDto;
+import com.dac.fly.shared.dto.events.CancelledReservationEventDto;
 import com.dac.fly.shared.dto.response.CreatedReservationResponseDto;
 
 @Service
@@ -81,15 +81,15 @@ public class ReservationCommandService {
                 return responseDto;
         }
 
-        public CanceledReservationResponseDto cancelReservationByCode(String codigoReserva) {
+        public CancelledReservationEventDto cancelReservationByCode(String codigoReserva) {
                 return doCancel(codigoReserva, ReservationStatusEnum.CANCELADA);
         }
 
-        public CanceledReservationResponseDto cancelReservationByFlight(String codigoReserva) {
+        public CancelledReservationEventDto cancelReservationByFlight(String codigoReserva) {
                 return doCancel(codigoReserva, ReservationStatusEnum.CANCELADA_VOO);
         }
 
-        public CanceledReservationResponseDto doCancel(String codigoReserva,
+        public CancelledReservationEventDto doCancel(String codigoReserva,
                         ReservationStatusEnum targetStatus) {
                 Reserva reservation = repository.findById(codigoReserva)
                                 .orElseThrow(() -> new RuntimeException("Reserva não encontrada: " + codigoReserva));
@@ -118,7 +118,7 @@ public class ReservationCommandService {
                                 .findById(codigoReserva)
                                 .orElseThrow(() -> new RuntimeException("Reserva não encontrada: " + codigoReserva));
 
-                CanceledReservationResponseDto cancelDto = new CanceledReservationResponseDto(
+                CancelledReservationEventDto cancelDto = new CancelledReservationEventDto(
                                 reservation.getCodigo(),
                                 reservation.getDataReserva(),
                                 reservation.getValorPago(),

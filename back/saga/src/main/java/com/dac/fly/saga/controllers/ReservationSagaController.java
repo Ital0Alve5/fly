@@ -10,9 +10,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.dac.fly.saga.service.ReservationSagaOrchestrator;
+import com.dac.fly.shared.dto.events.CancelledReservationEventDto;
 import com.dac.fly.shared.dto.request.CreateReservationDto;
 import com.dac.fly.shared.dto.response.ApiResponse;
-import com.dac.fly.shared.dto.response.CanceledReservationResponseDto;
+import com.dac.fly.shared.dto.response.CancelledReservationResponseDto;
 import com.dac.fly.shared.dto.response.CreatedReservationResponseDto;
 
 @RestController
@@ -38,10 +39,10 @@ public class ReservationSagaController {
     }
 
     @DeleteMapping("/cancela/{codigo}")
-    public ResponseEntity<ApiResponse<CanceledReservationResponseDto>> cancelSaga(
+    public ResponseEntity<ApiResponse<CancelledReservationResponseDto>> cancelSaga(
         @PathVariable("codigo") String codigo) {
         try {
-            CanceledReservationResponseDto dto = orchestrator.cancelReservationSaga(codigo);
+            CancelledReservationResponseDto dto = orchestrator.cancelReservationSaga(codigo);
             return ResponseEntity
                     .ok(ApiResponse.success(dto));
         } catch (RuntimeException e) {

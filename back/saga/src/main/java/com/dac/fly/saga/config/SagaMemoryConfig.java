@@ -3,13 +3,21 @@ package com.dac.fly.saga.config;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.dac.fly.shared.dto.events.*;
-import com.dac.fly.shared.dto.response.ClientCreatedResponseDto;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.dac.fly.shared.dto.response.CanceledReservationResponseDto;
-import com.dac.fly.shared.dto.response.CancelledFlightResponseDto;
+import com.dac.fly.shared.dto.events.CancelledFlightEventDto;
+import com.dac.fly.shared.dto.events.CancelledReservationEventDto;
+import com.dac.fly.shared.dto.events.EmployeeCreatedEventDto;
+import com.dac.fly.shared.dto.events.EmployeeDeletedEventDto;
+import com.dac.fly.shared.dto.events.EmployeeUpdatedEventDto;
+import com.dac.fly.shared.dto.events.FlightReservationsCancelledEventDto;
+import com.dac.fly.shared.dto.events.MilesUpdatedEvent;
+import com.dac.fly.shared.dto.events.SeatsUpdatedEvent;
+import com.dac.fly.shared.dto.events.UserCreatedEventDto;
+import com.dac.fly.shared.dto.events.UserDeletedEventDto;
+import com.dac.fly.shared.dto.events.UserUpdatedEventDto;
+import com.dac.fly.shared.dto.response.ClientCreatedResponseDto;
 import com.dac.fly.shared.dto.response.CreatedReservationResponseDto;
 
 /**
@@ -30,7 +38,7 @@ public class SagaMemoryConfig {
      * Futuro para a resposta de cancelamento de reserva na Saga.
      */
     @Bean
-    public ConcurrentHashMap<String, CompletableFuture<CanceledReservationResponseDto>> reservationCancelResponses() {
+    public ConcurrentHashMap<String, CompletableFuture<CancelledReservationEventDto>> reservationCancelResponses() {
         return new ConcurrentHashMap<>();
     }
 
@@ -54,7 +62,7 @@ public class SagaMemoryConfig {
      * Futuro para a resposta de cancelamento de voo pelo fly-service.
      */
     @Bean
-    public ConcurrentHashMap<String, CompletableFuture<CancelledFlightResponseDto>> flightCancelResponses() {
+    public ConcurrentHashMap<String, CompletableFuture<CancelledFlightEventDto>> flightCancelResponses() {
         return new ConcurrentHashMap<>();
     }
 

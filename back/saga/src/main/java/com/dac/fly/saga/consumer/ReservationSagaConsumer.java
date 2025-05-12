@@ -7,9 +7,9 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
 import com.dac.fly.shared.config.RabbitConstants;
+import com.dac.fly.shared.dto.events.CancelledReservationEventDto;
 import com.dac.fly.shared.dto.events.MilesUpdatedEvent;
 import com.dac.fly.shared.dto.events.SeatsUpdatedEvent;
-import com.dac.fly.shared.dto.response.CanceledReservationResponseDto;
 import com.dac.fly.shared.dto.response.CreatedReservationResponseDto;
 
 @Component
@@ -18,13 +18,13 @@ public class ReservationSagaConsumer {
     private final ConcurrentHashMap<String, CompletableFuture<MilesUpdatedEvent>> milesResponses;
     private final ConcurrentHashMap<String, CompletableFuture<SeatsUpdatedEvent>> seatsResponses;
     private final ConcurrentHashMap<String, CompletableFuture<CreatedReservationResponseDto>> reservationResponses;
-    private final ConcurrentHashMap<String, CompletableFuture<CanceledReservationResponseDto>> reservationCancelResponses;
+    private final ConcurrentHashMap<String, CompletableFuture<CancelledReservationEventDto>> reservationCancelResponses;
 
     public ReservationSagaConsumer(
             ConcurrentHashMap<String, CompletableFuture<MilesUpdatedEvent>> milesResponses,
             ConcurrentHashMap<String, CompletableFuture<SeatsUpdatedEvent>> seatsResponses,
             ConcurrentHashMap<String, CompletableFuture<CreatedReservationResponseDto>> reservationResponses,
-            ConcurrentHashMap<String, CompletableFuture<CanceledReservationResponseDto>> reservationCancelResponses) {
+            ConcurrentHashMap<String, CompletableFuture<CancelledReservationEventDto>> reservationCancelResponses) {
         this.milesResponses = milesResponses;
         this.seatsResponses = seatsResponses;
         this.reservationResponses = reservationResponses;
@@ -56,7 +56,7 @@ public class ReservationSagaConsumer {
     }
 
     @RabbitListener(queues = RabbitConstants.CANCELED_RESERVATION_RESP_QUEUE)
-    public void onReservationCanceled(CanceledReservationResponseDto evt) {
+    public void onReservationCanceled(CancelledReservationEventDto evt) {
         var future = reservationCancelResponses.remove(evt.codigo());
         if (future != null) {
             future.complete(evt);

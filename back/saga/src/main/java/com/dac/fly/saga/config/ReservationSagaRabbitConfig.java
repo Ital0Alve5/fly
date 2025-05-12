@@ -66,9 +66,9 @@ public class ReservationSagaRabbitConfig {
     @Bean
     public Binding bindCompensateCancelReservation() {
         return BindingBuilder
-            .bind(compensateCancelReservationCmdQueue())
-            .to(reservationSagaExchange())
-            .with(RabbitConstants.COMPENSATE_CANCEL_RESERVATION_CMD_QUEUE);
+                .bind(compensateCancelReservationCmdQueue())
+                .to(reservationSagaExchange())
+                .with(RabbitConstants.COMPENSATE_CANCEL_RESERVATION_CMD_QUEUE);
     }
     // -----------------------------------------------
 
@@ -127,4 +127,32 @@ public class ReservationSagaRabbitConfig {
                 .to(reservationSagaExchange())
                 .with(RabbitConstants.UPDATE_SEATS_RESP_QUEUE);
     }
+
+    @Bean("reservationCancelByFlightCmdQueue")
+    public Queue reservationCancelByFlightCmdQueue() {
+        return new Queue(RabbitConstants.CANCEL_RESERVATION_BY_FLIGHT_CMD_QUEUE, true);
+    }
+
+    @Bean
+    public Binding bindReservationCancelByFlight() {
+        return BindingBuilder
+                .bind(reservationCancelByFlightCmdQueue())
+                .to(reservationSagaExchange())
+                .with(RabbitConstants.CANCEL_RESERVATION_BY_FLIGHT_CMD_QUEUE);
+    }
+
+    // 2) Fila de evento “flight reservations cancelled”
+    @Bean("reservationFlightReservationsCancelledEventQueue")
+    public Queue reservationFlightReservationsCancelledEventQueue() {
+        return new Queue(RabbitConstants.FLIGHT_RESERVATIONS_CANCELLED_QUEUE, true);
+    }
+
+    @Bean
+    public Binding bindFlightReservationsCancelledEvent() {
+        return BindingBuilder
+                .bind(reservationFlightReservationsCancelledEventQueue())
+                .to(reservationSagaExchange())
+                .with(RabbitConstants.FLIGHT_RESERVATIONS_CANCELLED_QUEUE);
+    }
+
 }

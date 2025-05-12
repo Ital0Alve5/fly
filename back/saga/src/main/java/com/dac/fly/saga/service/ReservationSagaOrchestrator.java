@@ -19,10 +19,11 @@ import com.dac.fly.shared.dto.command.CompensateCreateReservationCommand;
 import com.dac.fly.shared.dto.command.CreateReservationCommand;
 import com.dac.fly.shared.dto.command.UpdateMilesCommand;
 import com.dac.fly.shared.dto.command.UpdateSeatsCommand;
+import com.dac.fly.shared.dto.events.CancelledReservationEventDto;
 import com.dac.fly.shared.dto.events.MilesUpdatedEvent;
 import com.dac.fly.shared.dto.events.SeatsUpdatedEvent;
 import com.dac.fly.shared.dto.request.CreateReservationDto;
-import com.dac.fly.shared.dto.response.CanceledReservationResponseDto;
+import com.dac.fly.shared.dto.response.CancelledReservationResponseDto;
 import com.dac.fly.shared.dto.response.CreatedReservationResponseDto;
 import com.dac.fly.shared.util.ReservationCodeGenerator;
 
@@ -35,14 +36,14 @@ public class ReservationSagaOrchestrator {
     private final ConcurrentHashMap<String, CompletableFuture<MilesUpdatedEvent>> milesResponses;
     private final ConcurrentHashMap<String, CompletableFuture<SeatsUpdatedEvent>> seatsResponses;
     private final ConcurrentHashMap<String, CompletableFuture<CreatedReservationResponseDto>> reservationResponses;
-    private final ConcurrentHashMap<String, CompletableFuture<CanceledReservationResponseDto>> reservationCancelResponses;
+    private final ConcurrentHashMap<String, CompletableFuture<CancelledReservationEventDto>> reservationCancelResponses;
 
     public ReservationSagaOrchestrator(
             RabbitTemplate rabbit,
             ConcurrentHashMap<String, CompletableFuture<MilesUpdatedEvent>> milesResponses,
             ConcurrentHashMap<String, CompletableFuture<SeatsUpdatedEvent>> seatsResponses,
             ConcurrentHashMap<String, CompletableFuture<CreatedReservationResponseDto>> reservationResponses,
-            ConcurrentHashMap<String, CompletableFuture<CanceledReservationResponseDto>> reservationCancelResponses) {
+            ConcurrentHashMap<String, CompletableFuture<CancelledReservationEventDto>> reservationCancelResponses) {
         this.rabbit = rabbit;
         this.milesResponses = milesResponses;
         this.seatsResponses = seatsResponses;
@@ -142,13 +143,13 @@ public class ReservationSagaOrchestrator {
         }
     }
 
-    public CanceledReservationResponseDto cancelReservationSaga(String codigo) {
+    public CancelledReservationResponseDto cancelReservationSaga(String codigo) {
         EnumSet<CancelReservationSagaStep> completed = EnumSet.noneOf(CancelReservationSagaStep.class);
-        CanceledReservationResponseDto cancelResp = null;
+        CancelledReservationEventDto cancelResp = null;
 
         try {
             CancelReservationCommand cancelCmd = new CancelReservationCommand(codigo);
-            CompletableFuture<CanceledReservationResponseDto> cancelFuture = new CompletableFuture<>();
+            CompletableFuture<CancelledReservationEventDto> cancelFuture = new CompletableFuture<>();
             reservationCancelResponses.put(codigo, cancelFuture);
             rabbit.convertAndSend(RabbitConstants.EXCHANGE, RabbitConstants.CANCEL_RESERVATION_CMD_QUEUE, cancelCmd);
 
@@ -188,7 +189,17 @@ public class ReservationSagaOrchestrator {
             }
             completed.add(CancelReservationSagaStep.SEATS_FREED);
 
-            return cancelResp;
+            return new CancelledReservationResponseDto(
+                    cancelResp.codigo(),
+                    cancelResp.data(),
+                    cancelResp.valor(),
+                    cancelResp.milhas_utilizadas(),
+                    cancelResp.quantidade_poltronas(),
+                    cancelResp.codigo_cliente(),
+                    cancelResp.estado(),
+                    cancelResp.codigo_voo(),
+                    cancelResp.codigo_aeroporto_origem(),
+                    cancelResp.codigo_aeroporto_destino());
 
         } catch (InterruptedException | RuntimeException | ExecutionException | TimeoutException ex) {
             compensateCancelReservationSaga(codigo, cancelResp, completed);
@@ -202,7 +213,7 @@ public class ReservationSagaOrchestrator {
 
     private void compensateCancelReservationSaga(
             String codigo,
-            CanceledReservationResponseDto cancelResp,
+            CancelledReservationEventDto cancelResp,
             EnumSet<CancelReservationSagaStep> completed) {
 
         if (completed.contains(CancelReservationSagaStep.SEATS_FREED)) {

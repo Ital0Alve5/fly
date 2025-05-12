@@ -21,8 +21,10 @@ import com.dac.fly.flyservice.repository.AeroportoRepository;
 import com.dac.fly.flyservice.repository.EstadoRepository;
 import com.dac.fly.flyservice.repository.VooRepository;
 import com.dac.fly.flyservice.util.FlightCodeGenerator;
+import com.dac.fly.shared.dto.events.CancelledFlightEventDto;
 import com.dac.fly.shared.dto.response.ApiResponse;
-import com.dac.fly.shared.dto.response.CancelledFlightResponseDto;
+
+import jakarta.transaction.Transactional;
 
 @Service
 public class FlightService {
@@ -96,23 +98,35 @@ public class FlightService {
                                 .body(ApiResponse.success(toDto(salvo)));
         }
 
-        public CancelledFlightResponseDto updateStatus(String codigo, FlightStatusEnum novoStatus) {
+        @Transactional
+        public CancelledFlightEventDto updateStatus(
+                        String codigo,
+                        FlightStatusEnum novoStatus) {
+
+                System.err.println(1);
                 Voo voo = vooRepository.findById(codigo)
                                 .orElseThrow(() -> new RuntimeException("Voo não encontrado: " + codigo));
+                System.err.println(2);
 
-                Estado estado = estadoRepository.findByNome(novoStatus)
+                var oldState = voo.getEstado().getNome().toString();
+                System.err.println(3);
+
+                Estado newEstado = estadoRepository.findByNome(novoStatus)
                                 .orElseThrow(() -> new RuntimeException("Estado não encontrado: " + novoStatus));
+                System.err.println(4);
 
-                voo.setEstado(estado);
+                voo.setEstado(newEstado);
                 vooRepository.save(voo);
+                System.err.println(5);
 
-                return new CancelledFlightResponseDto(
+                return new CancelledFlightEventDto(
                                 voo.getCodigo(),
                                 voo.getData().toString(),
                                 voo.getValorPassagem(),
                                 voo.getQuantidadePoltronasTotal(),
                                 voo.getQuantidadePoltronasOcupadas(),
-                                voo.getEstado().getNome().toString(),
+                                oldState,
+                                newEstado.getNome().name(),
                                 voo.getAeroportoOrigem().getCodigo(),
                                 voo.getAeroportoDestino().getCodigo());
         }
@@ -157,6 +171,19 @@ public class FlightService {
                 FlightGroupedResponseDto resposta = FlightGroupedResponseDto.of(
                                 data.toString(), origem, destino, detalhes);
                 return ResponseEntity.ok(ApiResponse.success(resposta));
+        }
+
+        public void revertFlightStatus(String codigo, String estadoAnterior) {
+                Voo voo = vooRepository.findById(codigo)
+                                .orElseThrow(() -> new RuntimeException("Voo não encontrado: " + codigo));
+
+                FlightStatusEnum prevEnum = FlightStatusEnum.valueOf(estadoAnterior);
+                Estado prevEstado = estadoRepository.findByNome(prevEnum)
+                                .orElseThrow(() -> new RuntimeException(
+                                                "Estado anterior não encontrado: " + estadoAnterior));
+
+                voo.setEstado(prevEstado);
+                vooRepository.save(voo);
         }
 
 }

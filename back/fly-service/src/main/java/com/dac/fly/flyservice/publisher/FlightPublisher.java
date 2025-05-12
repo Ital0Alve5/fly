@@ -4,7 +4,7 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Component;
 
 import com.dac.fly.shared.config.RabbitConstants;
-import com.dac.fly.shared.dto.response.CancelledFlightResponseDto;
+import com.dac.fly.shared.dto.events.CancelledFlightEventDto;
 
 @Component
 public class FlightPublisher {
@@ -15,7 +15,7 @@ public class FlightPublisher {
         this.rabbit = rabbit;
     }
 
-    public void publishFlightCancelled(CancelledFlightResponseDto dto) {
+    public void publishFlightCancelled(CancelledFlightEventDto dto) {
         rabbit.convertAndSend(
                 RabbitConstants.EXCHANGE,
                 RabbitConstants.FLIGHT_CANCELLED_RESP_QUEUE,

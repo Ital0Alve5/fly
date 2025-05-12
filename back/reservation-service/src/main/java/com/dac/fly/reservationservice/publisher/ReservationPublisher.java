@@ -7,7 +7,7 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Component;
 
 import com.dac.fly.shared.config.RabbitConstants;
-import com.dac.fly.shared.dto.response.CanceledReservationResponseDto;
+import com.dac.fly.shared.dto.events.CancelledReservationEventDto;
 import com.dac.fly.shared.dto.response.CreatedReservationResponseDto;
 
 @Component
@@ -34,7 +34,7 @@ public class ReservationPublisher {
         }
     }
 
-    public void publishCancelledReservationToSaga(CanceledReservationResponseDto dto) {
+    public void publishCancelledReservationToSaga(CancelledReservationEventDto dto) {
         try {
             rabbitTemplate.convertAndSend(
                 RabbitConstants.EXCHANGE,
