@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import com.dac.fly.reservationservice.dto.factory.ReservationResponseFactory;
 import com.dac.fly.reservationservice.dto.request.ReservationUpdateStatusDto;
 import com.dac.fly.reservationservice.dto.response.ReservationResponseDto;
+import com.dac.fly.reservationservice.entity.command.Estado;
 import com.dac.fly.reservationservice.entity.command.Historico;
 import com.dac.fly.reservationservice.entity.command.Reserva;
 import com.dac.fly.reservationservice.enums.ReservationStatusEnum;
@@ -94,6 +95,11 @@ public class ReservationCommandService {
                                 .orElseThrow(() -> new RuntimeException("Reserva não encontrada: " + codigoReserva));
 
                 Long oldStatus = reservation.getEstado();
+                String oldStateName = estadoRepository.findById(oldStatus)
+                                .orElseThrow(() -> new RuntimeException(
+                                                "Estado anterior não encontrado: " + oldStatus))
+                                .getNome();
+
                 Long newStatusId = estadoRepository.findByNome(targetStatus.toString())
                                 .orElseThrow(() -> new RuntimeException("Estado '" + targetStatus + "' não encontrado"))
                                 .getCodigo();
@@ -120,6 +126,7 @@ public class ReservationCommandService {
                                 reservation.getQuantidadePoltronas(),
                                 reservation.getCodigoCliente(),
                                 ReservationStatusEnum.CANCELADA.toString(),
+                                oldStateName,
                                 reservation.getCodigoVoo(),
                                 reservationQuery.getAeroportoOrigem(),
                                 reservationQuery.getAeroportoDestino());
@@ -179,4 +186,27 @@ public class ReservationCommandService {
         public void removeReservation(String reservationId) {
                 repository.deleteById(reservationId);
         }
+
+        public void revertReservationStatus(String codigoReserva, String previousState) {
+                Reserva reserva = repository.findById(codigoReserva)
+                                .orElseThrow(() -> new RuntimeException("Reserva não encontrada: " + codigoReserva));
+
+                Estado prevEstado = estadoRepository.findByNome(previousState)
+                                .orElseThrow(() -> new RuntimeException(
+                                                "Estado anterior não encontrado: " + previousState));
+
+                Long prevId = prevEstado.getCodigo();
+                Long currentId = reserva.getEstado();
+
+                reserva.setEstado(prevId);
+                repository.save(reserva);
+
+                Historico historico = new Historico(
+                                reserva.getCodigo(),
+                                LocalDateTime.now(),
+                                currentId,
+                                prevId);
+                historyRepository.save(historico);
+        }
+
 }

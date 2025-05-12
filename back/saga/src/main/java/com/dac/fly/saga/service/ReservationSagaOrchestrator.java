@@ -10,9 +10,11 @@ import java.util.concurrent.TimeoutException;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
+import com.dac.fly.saga.enums.CancelReservationSagaStep;
 import com.dac.fly.saga.enums.CreateReservationSagaStep;
 import com.dac.fly.shared.config.RabbitConstants;
 import com.dac.fly.shared.dto.command.CancelReservationCommand;
+import com.dac.fly.shared.dto.command.CompensateCancelReservationCommand;
 import com.dac.fly.shared.dto.command.CompensateCreateReservationCommand;
 import com.dac.fly.shared.dto.command.CreateReservationCommand;
 import com.dac.fly.shared.dto.command.UpdateMilesCommand;
@@ -71,7 +73,7 @@ public class ReservationSagaOrchestrator {
             updateSeats(cmd);
             completedSteps.add(CreateReservationSagaStep.SEATS_UPDATED);
 
-            CreatedReservationResponseDto response = createReservation(cmd);
+            CreatedReservationResponseDto response = sendCreateReservation(cmd);
             completedSteps.add(CreateReservationSagaStep.RESERVATION_CREATED);
 
             return response;
@@ -90,21 +92,13 @@ public class ReservationSagaOrchestrator {
         UpdateMilesCommand milesCmd = new UpdateMilesCommand(
                 cmd.codigo(),
                 cmd.codigo_cliente(),
-                cmd.milhas_utilizadas(), false);
-
+                cmd.milhas_utilizadas(),
+                false);
         CompletableFuture<MilesUpdatedEvent> future = new CompletableFuture<>();
         milesResponses.put(cmd.codigo(), future);
         rabbit.convertAndSend(RabbitConstants.EXCHANGE, RabbitConstants.UPDATE_MILES_CMD_QUEUE, milesCmd);
 
-        MilesUpdatedEvent event;
-        try {
-            event = future.get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
-        } catch (TimeoutException ex) {
-            throw new RuntimeException("Timeout ao aguardar dedução de milhas para reserva: " + cmd.codigo());
-        } catch (InterruptedException | ExecutionException ex) {
-            throw new RuntimeException("Erro ao aguardar dedução de milhas para reserva: " + cmd.codigo(), ex);
-        }
-
+        MilesUpdatedEvent event = getFuture(future, "dedução de milhas", cmd.codigo());
         if (!event.success()) {
             throw new RuntimeException("Falha na dedução de milhas para reserva: " + cmd.codigo());
         }
@@ -114,8 +108,8 @@ public class ReservationSagaOrchestrator {
         UpdateSeatsCommand seatsCmd = new UpdateSeatsCommand(
                 cmd.codigo(),
                 cmd.codigo_voo(),
-                cmd.quantidade_poltronas(), false);
-
+                cmd.quantidade_poltronas(),
+                false);
         CompletableFuture<SeatsUpdatedEvent> future = new CompletableFuture<>();
         seatsResponses.put(cmd.codigo(), future);
         rabbit.convertAndSend(RabbitConstants.EXCHANGE, RabbitConstants.UPDATE_SEATS_CMD_QUEUE, seatsCmd);
@@ -124,11 +118,11 @@ public class ReservationSagaOrchestrator {
         try {
             event = future.get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
         } catch (InterruptedException | ExecutionException | TimeoutException ex) {
+            // rollback miles
             rabbit.convertAndSend(RabbitConstants.EXCHANGE, RabbitConstants.UPDATE_MILES_CMD_QUEUE,
                     new UpdateMilesCommand(cmd.codigo(), cmd.codigo_cliente(), cmd.milhas_utilizadas(), true));
             throw new RuntimeException("Timeout/erro ao reservar assentos, milhas revertidas", ex);
         }
-
         if (!event.success()) {
             rabbit.convertAndSend(RabbitConstants.EXCHANGE, RabbitConstants.UPDATE_MILES_CMD_QUEUE,
                     new UpdateMilesCommand(cmd.codigo(), cmd.codigo_cliente(), cmd.milhas_utilizadas(), true));
@@ -136,96 +130,69 @@ public class ReservationSagaOrchestrator {
         }
     }
 
-    private CreatedReservationResponseDto createReservation(CreateReservationCommand cmd) {
+    private CreatedReservationResponseDto sendCreateReservation(CreateReservationCommand cmd) {
         CompletableFuture<CreatedReservationResponseDto> future = new CompletableFuture<>();
         reservationResponses.put(cmd.codigo(), future);
         rabbit.convertAndSend(RabbitConstants.EXCHANGE, RabbitConstants.CREATE_RESERVATION_CMD_QUEUE, cmd);
 
-        CreatedReservationResponseDto response;
         try {
-            response = future.get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
-        } catch (TimeoutException ex) {
-            throw new RuntimeException("Timeout ao aguardar criação de reserva: " + cmd.codigo());
-        } catch (InterruptedException | ExecutionException ex) {
+            return future.get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
+        } catch (InterruptedException | ExecutionException | TimeoutException ex) {
             throw new RuntimeException("Erro ao aguardar resposta de criação de reserva: " + cmd.codigo(), ex);
         }
-
-        return response;
     }
 
     public CanceledReservationResponseDto cancelReservationSaga(String codigo) {
+        EnumSet<CancelReservationSagaStep> completed = EnumSet.noneOf(CancelReservationSagaStep.class);
+        CanceledReservationResponseDto cancelResp = null;
+
         try {
             CancelReservationCommand cancelCmd = new CancelReservationCommand(codigo);
             CompletableFuture<CanceledReservationResponseDto> cancelFuture = new CompletableFuture<>();
             reservationCancelResponses.put(codigo, cancelFuture);
-
             rabbit.convertAndSend(RabbitConstants.EXCHANGE, RabbitConstants.CANCEL_RESERVATION_CMD_QUEUE, cancelCmd);
 
-            CanceledReservationResponseDto cancelResp;
-            try {
-                cancelResp = cancelFuture.get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
-            } catch (TimeoutException ex) {
-                throw new RuntimeException("Timeout ao aguardar cancelamento da reserva: " + codigo, ex);
-            } catch (InterruptedException | ExecutionException ex) {
-                throw new RuntimeException("Erro ao aguardar cancelamento da reserva: " + codigo, ex);
-            }
-
+            cancelResp = cancelFuture.get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
             if (!"CANCELADA".equals(cancelResp.estado())) {
                 throw new RuntimeException("Não foi possível cancelar reserva: " + codigo);
             }
+            completed.add(CancelReservationSagaStep.RESERVATION_CANCELLED);
 
-            UpdateMilesCommand compMiles = new UpdateMilesCommand(
+            UpdateMilesCommand refundMiles = new UpdateMilesCommand(
                     codigo,
                     cancelResp.codigo_cliente(),
-                    cancelResp.milhas_utilizadas(), true);
-
+                    cancelResp.milhas_utilizadas(),
+                    true);
             CompletableFuture<MilesUpdatedEvent> milesFuture = new CompletableFuture<>();
             milesResponses.put(codigo, milesFuture);
+            rabbit.convertAndSend(RabbitConstants.EXCHANGE, RabbitConstants.UPDATE_MILES_CMD_QUEUE, refundMiles);
 
-            rabbit.convertAndSend(
-                    RabbitConstants.EXCHANGE,
-                    RabbitConstants.UPDATE_MILES_CMD_QUEUE,
-                    compMiles);
-
-            MilesUpdatedEvent milesEvt;
-            try {
-                milesEvt = milesFuture.get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
-            } catch (TimeoutException ex) {
-                throw new RuntimeException("Timeout ao aguardar devolução de milhas para reserva: " + codigo, ex);
-            } catch (InterruptedException | ExecutionException ex) {
-                throw new RuntimeException("Erro ao aguardar devolução de milhas para reserva: " + codigo, ex);
-            }
+            MilesUpdatedEvent milesEvt = getFuture(milesFuture, "devolução de milhas", codigo);
             if (!milesEvt.success()) {
                 throw new RuntimeException("Falha ao devolver milhas para reserva: " + codigo);
             }
+            completed.add(CancelReservationSagaStep.MILES_REFUNDED);
 
-            UpdateSeatsCommand compSeats = new UpdateSeatsCommand(
+            UpdateSeatsCommand freeSeats = new UpdateSeatsCommand(
                     codigo,
                     cancelResp.codigo_voo(),
-                    cancelResp.quantidade_poltronas(), true);
-
+                    cancelResp.quantidade_poltronas(),
+                    true);
             CompletableFuture<SeatsUpdatedEvent> seatsFuture = new CompletableFuture<>();
             seatsResponses.put(codigo, seatsFuture);
+            rabbit.convertAndSend(RabbitConstants.EXCHANGE, RabbitConstants.UPDATE_SEATS_CMD_QUEUE, freeSeats);
 
-            rabbit.convertAndSend(
-                    RabbitConstants.EXCHANGE,
-                    RabbitConstants.UPDATE_SEATS_CMD_QUEUE,
-                    compSeats);
-
-            SeatsUpdatedEvent seatsEvt;
-            try {
-                seatsEvt = seatsFuture.get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
-            } catch (TimeoutException ex) {
-                throw new RuntimeException("Timeout ao aguardar liberação de assentos para reserva: " + codigo, ex);
-            } catch (InterruptedException | ExecutionException ex) {
-                throw new RuntimeException("Erro ao aguardar liberação de assentos para reserva: " + codigo, ex);
-            }
+            SeatsUpdatedEvent seatsEvt = getFuture(seatsFuture, "liberação de assentos", codigo);
             if (!seatsEvt.success()) {
                 throw new RuntimeException("Falha ao liberar assentos para reserva: " + codigo);
             }
+            completed.add(CancelReservationSagaStep.SEATS_FREED);
 
             return cancelResp;
 
+        } catch (InterruptedException | RuntimeException | ExecutionException | TimeoutException ex) {
+            compensateCancelReservationSaga(codigo, cancelResp, completed);
+            throw new RuntimeException("Erro no cancelamento — iniciando compensação", ex);
         } finally {
             reservationCancelResponses.remove(codigo);
             milesResponses.remove(codigo);
@@ -233,72 +200,120 @@ public class ReservationSagaOrchestrator {
         }
     }
 
-    public void compensateCreateReservationSaga(CreateReservationCommand failedCmd, EnumSet<CreateReservationSagaStep> completedSteps) {
+    private void compensateCancelReservationSaga(
+            String codigo,
+            CanceledReservationResponseDto cancelResp,
+            EnumSet<CancelReservationSagaStep> completed) {
+
+        if (completed.contains(CancelReservationSagaStep.SEATS_FREED)) {
+            UpdateSeatsCommand reserveSeats = new UpdateSeatsCommand(
+                    codigo,
+                    cancelResp.codigo_voo(),
+                    cancelResp.quantidade_poltronas(),
+                    false);
+            CompletableFuture<SeatsUpdatedEvent> seatsFut = new CompletableFuture<>();
+            seatsResponses.put(codigo, seatsFut);
+            rabbit.convertAndSend(
+                    RabbitConstants.EXCHANGE,
+                    RabbitConstants.ROLLBACK_SEATS_CMD_QUEUE,
+                    reserveSeats);
+            SeatsUpdatedEvent seatsEvt = getFuture(seatsFut, "re-reserva de assentos", codigo);
+            if (!seatsEvt.success()) {
+                throw new RuntimeException("Falha ao re-reservar assentos para reserva: " + codigo);
+            }
+            seatsResponses.remove(codigo);
+        }
+
+        if (completed.contains(CancelReservationSagaStep.MILES_REFUNDED)) {
+            UpdateMilesCommand deductMiles = new UpdateMilesCommand(
+                    codigo,
+                    cancelResp.codigo_cliente(),
+                    cancelResp.milhas_utilizadas(),
+                    false);
+            CompletableFuture<MilesUpdatedEvent> milesFut = new CompletableFuture<>();
+            milesResponses.put(codigo, milesFut);
+            rabbit.convertAndSend(
+                    RabbitConstants.EXCHANGE,
+                    RabbitConstants.ROLLBACK_MILES_CMD_QUEUE,
+                    deductMiles);
+            MilesUpdatedEvent milesEvt = getFuture(milesFut, "dedução de milhas compensatória", codigo);
+            if (!milesEvt.success()) {
+                throw new RuntimeException("Falha ao deduzir milhas na compensação: " + codigo);
+            }
+            milesResponses.remove(codigo);
+        }
+
+        if (completed.contains(CancelReservationSagaStep.RESERVATION_CANCELLED)) {
+            var compCancel = new CompensateCancelReservationCommand(
+                    codigo,
+                    cancelResp.estado_anterior());
+
+            rabbit.convertAndSend(
+                    RabbitConstants.EXCHANGE,
+                    RabbitConstants.COMPENSATE_CANCEL_RESERVATION_CMD_QUEUE,
+                    compCancel);
+        }
+    }
+
+    private <T> T getFuture(CompletableFuture<T> future, String action, String codigo) {
+        try {
+            return future.get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
+        } catch (TimeoutException ex) {
+            throw new RuntimeException("Timeout ao aguardar " + action + " para reserva: " + codigo, ex);
+        } catch (InterruptedException | ExecutionException ex) {
+            throw new RuntimeException("Erro ao aguardar " + action + " para reserva: " + codigo, ex);
+        }
+    }
+
+    public void compensateCreateReservationSaga(
+            CreateReservationCommand failedCmd,
+            EnumSet<CreateReservationSagaStep> completedSteps) {
         String reservationId = failedCmd.codigo();
 
         if (completedSteps.contains(CreateReservationSagaStep.RESERVATION_CREATED)) {
-            CompensateCreateReservationCommand compensateReservationCmd = new CompensateCreateReservationCommand(
-                    reservationId);
-            rabbit.convertAndSend(RabbitConstants.EXCHANGE, RabbitConstants.COMPENSATE_CREATE_RESERVATION_CMD_QUEUE,
-                    compensateReservationCmd);
+            CompensateCreateReservationCommand compRes = new CompensateCreateReservationCommand(reservationId);
+            rabbit.convertAndSend(
+                    RabbitConstants.EXCHANGE,
+                    RabbitConstants.COMPENSATE_CREATE_RESERVATION_CMD_QUEUE,
+                    compRes);
         }
 
         if (completedSteps.contains(CreateReservationSagaStep.SEATS_UPDATED)) {
-            UpdateSeatsCommand compensateSeatsCmd = new UpdateSeatsCommand(
+            UpdateSeatsCommand compSeats = new UpdateSeatsCommand(
                     reservationId,
                     failedCmd.codigo_voo(),
                     failedCmd.quantidade_poltronas(),
                     true);
-
-            CompletableFuture<SeatsUpdatedEvent> seatsFuture = new CompletableFuture<>();
-
-            seatsResponses.put(reservationId, seatsFuture);
-
+            CompletableFuture<SeatsUpdatedEvent> fut = new CompletableFuture<>();
+            seatsResponses.put(reservationId, fut);
             rabbit.convertAndSend(
                     RabbitConstants.EXCHANGE,
                     RabbitConstants.COMPENSATE_SEATS_CMD_QUEUE,
-                    compensateSeatsCmd);
-
-            try {
-                SeatsUpdatedEvent seatsEvt = seatsFuture.get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
-                if (!seatsEvt.success()) {
-                    throw new RuntimeException("Falha ao compensar assentos da reserva: " + reservationId);
-                }
-            } catch (InterruptedException | ExecutionException | TimeoutException ex) {
-                throw new RuntimeException("Erro ao compensar assentos da reserva: " + reservationId, ex);
-            } finally {
-                seatsResponses.remove(reservationId);
+                    compSeats);
+            SeatsUpdatedEvent evt = getFuture(fut, "compensação de assentos", reservationId);
+            if (!evt.success()) {
+                throw new RuntimeException("Falha ao compensar assentos da reserva: " + reservationId);
             }
+            seatsResponses.remove(reservationId);
         }
 
         if (completedSteps.contains(CreateReservationSagaStep.MILES_DEDUCTED)) {
-            if (failedCmd.milhas_utilizadas() != null && failedCmd.milhas_utilizadas() > 0) {
-                UpdateMilesCommand compensateMilesCmd = new UpdateMilesCommand(
-                        reservationId,
-                        failedCmd.codigo_cliente(),
-                        failedCmd.milhas_utilizadas(),
-                        true);
-
-                CompletableFuture<MilesUpdatedEvent> milesFuture = new CompletableFuture<>();
-                milesResponses.put(reservationId, milesFuture);
-
-                rabbit.convertAndSend(
-                        RabbitConstants.EXCHANGE,
-                        RabbitConstants.COMPENSATE_MILES_CMD_QUEUE,
-                        compensateMilesCmd);
-
-                try {
-                    MilesUpdatedEvent milesEvt = milesFuture.get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
-                    if (!milesEvt.success()) {
-                        throw new RuntimeException("Falha ao compensar milhas da reserva: " + reservationId);
-                    }
-                } catch (InterruptedException | ExecutionException | TimeoutException ex) {
-                    throw new RuntimeException("Erro ou timeout ao compensar milhas da reserva: " + reservationId, ex);
-                } finally {
-                    milesResponses.remove(reservationId);
-                }
+            UpdateMilesCommand compMiles = new UpdateMilesCommand(
+                    reservationId,
+                    failedCmd.codigo_cliente(),
+                    failedCmd.milhas_utilizadas(),
+                    true);
+            CompletableFuture<MilesUpdatedEvent> fut = new CompletableFuture<>();
+            milesResponses.put(reservationId, fut);
+            rabbit.convertAndSend(
+                    RabbitConstants.EXCHANGE,
+                    RabbitConstants.COMPENSATE_MILES_CMD_QUEUE,
+                    compMiles);
+            MilesUpdatedEvent evt = getFuture(fut, "compensação de milhas", reservationId);
+            if (!evt.success()) {
+                throw new RuntimeException("Falha ao compensar milhas da reserva: " + reservationId);
             }
+            milesResponses.remove(reservationId);
         }
     }
-
 }

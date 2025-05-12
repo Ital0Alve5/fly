@@ -65,4 +65,17 @@ public class ClientRabbitConfig {
                 .to(exchange())
                 .with(RabbitConstants.COMPENSATE_MILES_CMD_QUEUE);
     }
+
+    @Bean
+    public Queue rollbackMilesCmdQueue() {
+        return new Queue(RabbitConstants.ROLLBACK_MILES_CMD_QUEUE, true);
+    }
+
+    @Bean
+    public Binding bindRollbackMilesCmd() {
+        return BindingBuilder
+                .bind(rollbackMilesCmdQueue())
+                .to(exchange())
+                .with(RabbitConstants.ROLLBACK_MILES_CMD_QUEUE);
+    }
 }

@@ -159,20 +159,4 @@ public class FlightService {
                 return ResponseEntity.ok(ApiResponse.success(resposta));
         }
 
-        public boolean compensateSeats(String codigoVoo, int quantidadePoltronas) {
-                var flight = vooRepository.findById(codigoVoo)
-                                .orElseThrow(() -> new RuntimeException("Voo não encontrado: " + codigoVoo));
-
-                int newOccupiedSeats = flight.getQuantidadePoltronasOcupadas() - quantidadePoltronas;
-
-                if (newOccupiedSeats < 0) {
-                        throw new RuntimeException("Compensação inválida, assentos negativos.");
-                }
-
-                flight.setQuantidadePoltronasOcupadas(newOccupiedSeats);
-                vooRepository.save(flight);
-
-                return true;
-        }
-
 }

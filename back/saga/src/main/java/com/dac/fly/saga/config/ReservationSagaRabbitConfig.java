@@ -57,6 +57,21 @@ public class ReservationSagaRabbitConfig {
         return new Queue(RabbitConstants.UPDATE_SEATS_RESP_QUEUE, true);
     }
 
+    // --- nova fila de compensação do cancelamento ---
+    @Bean("compensateCancelReservationCmdQueue")
+    public Queue compensateCancelReservationCmdQueue() {
+        return new Queue(RabbitConstants.COMPENSATE_CANCEL_RESERVATION_CMD_QUEUE, true);
+    }
+
+    @Bean
+    public Binding bindCompensateCancelReservation() {
+        return BindingBuilder
+            .bind(compensateCancelReservationCmdQueue())
+            .to(reservationSagaExchange())
+            .with(RabbitConstants.COMPENSATE_CANCEL_RESERVATION_CMD_QUEUE);
+    }
+    // -----------------------------------------------
+
     @Bean
     public Binding bindReservationCreate() {
         return BindingBuilder.bind(reservationCreateCmdQueue())

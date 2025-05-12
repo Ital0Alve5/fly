@@ -74,4 +74,17 @@ public class FlyRabbitConfig {
                 .to(exchange)
                 .with(RabbitConstants.COMPENSATE_SEATS_CMD_QUEUE);
     }
+
+    @Bean
+    public Queue rollbackSeatsCmdQueue() {
+        return new Queue(RabbitConstants.ROLLBACK_SEATS_CMD_QUEUE, true);
+    }
+
+    @Bean
+    public Binding bindRollbackSeatsCmd(TopicExchange exchange) {
+        return BindingBuilder
+                .bind(rollbackSeatsCmdQueue())
+                .to(exchange)
+                .with(RabbitConstants.ROLLBACK_SEATS_CMD_QUEUE);
+    }
 }
