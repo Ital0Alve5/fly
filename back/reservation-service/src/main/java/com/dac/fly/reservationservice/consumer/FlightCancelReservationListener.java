@@ -11,10 +11,10 @@ import com.dac.fly.reservationservice.publisher.FlightReservationPublisher;
 import com.dac.fly.reservationservice.repository.command.ReservaCommandRepository;
 import com.dac.fly.reservationservice.service.command.ReservationCommandService;
 import com.dac.fly.shared.config.RabbitConstants;
+import com.dac.fly.shared.dto.events.CancelledReservationEventDto;
 import com.dac.fly.shared.dto.events.ClientMilesDto;
 import com.dac.fly.shared.dto.events.FlightReservationsCancelledEventDto;
 import com.dac.fly.shared.dto.request.CancelFlightDto;
-import com.dac.fly.shared.dto.response.CanceledReservationResponseDto;
 
 @Service
 public class FlightCancelReservationListener {
@@ -43,12 +43,13 @@ public class FlightCancelReservationListener {
         List<ClientMilesDto> refunds = new ArrayList<>(reservationIds.size());
 
         for (String resId : reservationIds) {
-            CanceledReservationResponseDto cancelDto = reservationService.cancelReservationByFlight(resId);
+            CancelledReservationEventDto cancelDto = reservationService.cancelReservationByFlight(resId);
 
             refunds.add(new ClientMilesDto(
                     cancelDto.codigo(),
                     cancelDto.codigo_cliente(),
-                    cancelDto.milhas_utilizadas()));
+                    cancelDto.milhas_utilizadas(),
+                    cancelDto.estado_anterior()));
         }
 
         var evt = new FlightReservationsCancelledEventDto(cmd.codigo(), refunds);

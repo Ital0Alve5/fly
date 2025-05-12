@@ -14,7 +14,7 @@ import com.dac.fly.reservationservice.service.command.ReservationCommandService;
 import com.dac.fly.shared.config.RabbitConstants;
 import com.dac.fly.shared.dto.command.CancelReservationCommand;
 import com.dac.fly.shared.dto.command.CompensateCancelReservationCommand;
-import com.dac.fly.shared.dto.response.CanceledReservationResponseDto;
+import com.dac.fly.shared.dto.events.CancelledReservationEventDto;
 
 @Component
 public class CancelReservationConsumer {
@@ -39,7 +39,7 @@ public class CancelReservationConsumer {
 
     @RabbitListener(queues = RabbitConstants.CANCEL_RESERVATION_CMD_QUEUE)
     public void handle(CancelReservationCommand cmd) {
-        CanceledReservationResponseDto resp = reservationCommandService.cancelReservationByCode(cmd.codigo());
+        CancelledReservationEventDto resp = reservationCommandService.cancelReservationByCode(cmd.codigo());
 
         // publica internamente para o CQRS (query side)
         rabbit.convertAndSend(
@@ -68,7 +68,7 @@ public class CancelReservationConsumer {
                 .findById(cmd.codigoReserva())
                 .orElseThrow(() -> new RuntimeException("Reserva (query) não encontrada: " + cmd.codigoReserva()));
 
-        var resp = new CanceledReservationResponseDto(
+        var resp = new CancelledReservationEventDto(
                 reservaCmd.getCodigo(),
                 reservaCmd.getDataReserva(), 
                 reservaCmd.getValorPago(), 

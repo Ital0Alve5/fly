@@ -12,9 +12,9 @@ import com.dac.fly.reservationservice.entity.query.Reserva;
 import com.dac.fly.reservationservice.repository.command.EstadoRepository;
 import com.dac.fly.reservationservice.repository.command.HistoryRepository;
 import com.dac.fly.reservationservice.repository.query.ReservaQueryRepository;
+import com.dac.fly.shared.dto.events.CancelledReservationEventDto;
 import com.dac.fly.shared.dto.events.ClientMilesDto;
 import com.dac.fly.shared.dto.events.FlightReservationsCancelledEventDto;
-import com.dac.fly.shared.dto.response.CanceledReservationResponseDto;
 import com.dac.fly.shared.dto.response.CreatedReservationResponseDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -76,7 +76,7 @@ public class ReservationQueryService {
         }
     }
 
-    public boolean saveCanceledReservation(CanceledReservationResponseDto evt) {
+    public boolean saveCanceledReservation(CancelledReservationEventDto evt) {
         try {
             Reserva view = reservaQueryRepository.findById(evt.codigo())
                     .orElseThrow(() -> new RuntimeException(
