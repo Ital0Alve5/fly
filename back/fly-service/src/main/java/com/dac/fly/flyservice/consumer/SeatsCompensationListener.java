@@ -24,20 +24,20 @@ public class SeatsCompensationListener {
     @RabbitListener(queues = RabbitConstants.COMPENSATE_SEATS_CMD_QUEUE)
     public void handleCompensateSeats(UpdateSeatsCommand cmd) {
         try {
-            flightService.compensateSeats(cmd.codigoVoo(), cmd.quantidadePoltronas());
+            flightService.updateSeats(
+                    cmd.codigoVoo(),
+                    -cmd.quantidadePoltronas());
 
             rabbit.convertAndSend(
-                RabbitConstants.EXCHANGE,
-                RabbitConstants.UPDATE_SEATS_RESP_QUEUE,
-                new SeatsUpdatedEvent(cmd.codigoReserva(), true)
-            );
+                    RabbitConstants.EXCHANGE,
+                    RabbitConstants.UPDATE_SEATS_RESP_QUEUE,
+                    new SeatsUpdatedEvent(cmd.codigoReserva(), true));
 
         } catch (AmqpException e) {
             rabbit.convertAndSend(
-                RabbitConstants.EXCHANGE,
-                RabbitConstants.UPDATE_SEATS_RESP_QUEUE,
-                new SeatsUpdatedEvent(cmd.codigoReserva(), false)
-            );
+                    RabbitConstants.EXCHANGE,
+                    RabbitConstants.UPDATE_SEATS_RESP_QUEUE,
+                    new SeatsUpdatedEvent(cmd.codigoReserva(), false));
 
             throw new RuntimeException("Falha na compensação dos assentos.", e);
         }

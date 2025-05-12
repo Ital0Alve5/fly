@@ -23,20 +23,20 @@ public class MilesCompensationListener {
     @RabbitListener(queues = RabbitConstants.COMPENSATE_MILES_CMD_QUEUE)
     public void handleCompensateMiles(UpdateMilesCommand cmd) {
         try {
-            boolean success = clientService.compensateMiles(cmd.codigoCliente(), cmd.milhasUtilizadas());
+            boolean success = clientService.updateMiles(
+                    cmd.codigoCliente(),
+                    cmd.milhasUtilizadas());
 
             rabbit.convertAndSend(
-                RabbitConstants.EXCHANGE,
-                RabbitConstants.UPDATE_MILES_RESP_QUEUE,
-                new MilesUpdatedEvent(cmd.codigoReserva(), success)
-            );
+                    RabbitConstants.EXCHANGE,
+                    RabbitConstants.UPDATE_MILES_RESP_QUEUE,
+                    new MilesUpdatedEvent(cmd.codigoReserva(), success));
 
         } catch (RuntimeException e) {
             rabbit.convertAndSend(
-                RabbitConstants.EXCHANGE,
-                RabbitConstants.UPDATE_MILES_RESP_QUEUE,
-                new MilesUpdatedEvent(cmd.codigoReserva(), false)
-            );
+                    RabbitConstants.EXCHANGE,
+                    RabbitConstants.UPDATE_MILES_RESP_QUEUE,
+                    new MilesUpdatedEvent(cmd.codigoReserva(), false));
 
             throw new RuntimeException("Falha na compensação das milhas", e);
         }

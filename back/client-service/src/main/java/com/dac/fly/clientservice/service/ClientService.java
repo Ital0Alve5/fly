@@ -183,17 +183,4 @@ public class ClientService {
     private BigDecimal calculateRealValue(Integer miles) {
         return BigDecimal.valueOf(miles * 5);
     }
-
-    public boolean compensateMiles(Long codigoCliente, int milhas) {
-        var cliente = clientRepository.findById(codigoCliente)
-                .orElseThrow(() -> new RuntimeException("Cliente não encontrado: " + codigoCliente));
-
-        int updatedMiles = cliente.getSaldoMilhas() + milhas;
-
-        cliente.setSaldoMilhas(updatedMiles);
-        clientRepository.save(cliente);
-
-        return true;
-    }
-
 }
