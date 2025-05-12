@@ -15,7 +15,6 @@ import com.dac.fly.reservationservice.entity.query.Reserva;
 import com.dac.fly.reservationservice.repository.query.ReservaQueryRepository;
 import com.dac.fly.shared.dto.response.ApiResponse;
 
-
 @RestController
 @RequestMapping("/reservas")
 public class ReservationQueryController {
@@ -58,5 +57,11 @@ public class ReservationQueryController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(ApiResponse.error("Erro ao buscar reservas do cliente", 400));
         }
+    }
+
+    @GetMapping("/{codigo}/exists")
+    public ResponseEntity<Boolean> existsByCode(@PathVariable("codigo") String codigo) {
+        boolean exists = reservaQueryRepository.existsById(codigo);
+        return ResponseEntity.ok(exists);
     }
 }

@@ -186,4 +186,7 @@ public class FlightService {
                 vooRepository.save(voo);
         }
 
+        public boolean existsByCodigo(String codigo) {
+                return vooRepository.existsById(codigo);
+        }
 }

@@ -20,7 +20,6 @@ import com.dac.fly.flyservice.dto.response.FlightResponseDto;
 import com.dac.fly.flyservice.service.FlightService;
 import com.dac.fly.shared.dto.response.ApiResponse;
 
-
 @RestController
 @RequestMapping({ "/voos", "/voo" })
 public class VooController {
@@ -65,4 +64,11 @@ public class VooController {
     public ResponseEntity<ApiResponse<FlightResponseDto>> create(@RequestBody CreateNewFlightRequestDto dto) {
         return flightService.create(dto);
     }
+
+    @GetMapping("/{codigo}/exists")
+    public ResponseEntity<Boolean> existsByCode(@PathVariable("codigo") String codigo) {
+        boolean exists = flightService.existsByCodigo(codigo);
+        return ResponseEntity.ok(exists);
+    }
+
 }

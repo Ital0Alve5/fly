@@ -1,10 +1,8 @@
 package com.dac.fly.clientservice.controllers;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -40,7 +38,7 @@ public class ClientController {
 
     @PutMapping("/{codigoCliente}/milhas")
     public ResponseEntity<ApiResponse<MilesResponseDTO>> addMiles(@PathVariable Long codigoCliente,
-                                                                   @RequestBody AddMilesRequestDTO request) {
+            @RequestBody AddMilesRequestDTO request) {
         try {
             MilesResponseDTO response = clientService.addMiles(codigoCliente, request);
             return ResponseEntity.ok(ApiResponse.success(response));
@@ -60,4 +58,11 @@ public class ClientController {
                     .body(ApiResponse.error(e.getMessage(), 400));
         }
     }
+
+    @GetMapping("/{codigo}/exists")
+    public ResponseEntity<Boolean> existsByCode(@PathVariable("codigo") Long codigo) {
+        boolean exists = clientService.existsByCodigo(codigo);
+        return ResponseEntity.ok(exists);
+    }
+
 }
