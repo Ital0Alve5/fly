@@ -1,6 +1,7 @@
 package com.dac.fly.flyservice.consumer;
 
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
 import com.dac.fly.flyservice.publisher.SeatsPublisher;
@@ -14,27 +15,32 @@ public class SeatsCommandListener {
 
     private final FlightService flightService;
     private final SeatsPublisher publisher;
+    private final RabbitTemplate rabbit;
 
-    public SeatsCommandListener(FlightService flightService, SeatsPublisher publisher) {
+    public SeatsCommandListener(FlightService flightService, SeatsPublisher publisher, RabbitTemplate rabbit) {
         this.flightService = flightService;
         this.publisher = publisher;
+        this.rabbit = rabbit;
     }
 
     @RabbitListener(queues = RabbitConstants.UPDATE_SEATS_CMD_QUEUE)
     public void handleUpdateSeats(UpdateSeatsCommand cmd) {
-        boolean success;
 
         try {
+            boolean success;
+
             if (cmd.isCompensate()) {
                 success = flightService.updateSeats(cmd.codigoVoo(), -cmd.quantidadePoltronas());
             } else {
-                    success = flightService.updateSeats(cmd.codigoVoo(), +cmd.quantidadePoltronas());
+                success = flightService.updateSeats(cmd.codigoVoo(), +cmd.quantidadePoltronas());
             }
+
+            publisher.publishSeatsUpdated(new SeatsUpdatedEvent(cmd.codigoReserva(), success));
+
         } catch (Exception e) {
             System.err.println("Erro ao processar assentos: " + e.getMessage());
-            success = false;
-        }
 
-        publisher.publishSeatsUpdated(new SeatsUpdatedEvent(cmd.codigoReserva(), success));
+            throw e;
+        }
     }
 }

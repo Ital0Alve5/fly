@@ -3,7 +3,6 @@ package com.dac.fly.clientservice.service;
 import java.math.BigDecimal;
 import java.util.List;
 
-import com.dac.fly.shared.dto.command.CreateClientCommandDto;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +16,7 @@ import com.dac.fly.clientservice.entity.Transactions;
 import com.dac.fly.clientservice.repository.ClientRepository;
 import com.dac.fly.clientservice.repository.TransactionsRepository;
 import com.dac.fly.clientservice.util.DocumentUtils;
+import com.dac.fly.shared.dto.command.CreateClientCommandDto;
 
 @Service
 public class ClientService {
@@ -153,14 +153,14 @@ public class ClientService {
     public boolean updateMiles(Long clientId, Integer miles) {
         Client client = clientRepository.findById(clientId)
                 .orElseThrow(() -> new RuntimeException("Cliente não encontrado: " + clientId));
-    
+
         if (miles < 0) {
             if (client.getSaldoMilhas() < Math.abs(miles)) {
                 return false;
             }
-            client.setSaldoMilhas(client.getSaldoMilhas() + miles); 
+            client.setSaldoMilhas(client.getSaldoMilhas() + miles);
             clientRepository.save(client);
-    
+
             Transactions tx = Transactions.createDebitTransaction(
                     client,
                     Math.abs(miles),
@@ -171,16 +171,29 @@ public class ClientService {
         } else {
             client.setSaldoMilhas(client.getSaldoMilhas() + miles);
             clientRepository.save(client);
-    
+
             Transactions tx = createCreditTransaction(client, miles);
             tx.setDescricao("ESTORNO DE MILHAS POR CANCELAMENTO DE VOO");
             transactionsRepository.save(tx);
         }
-    
+
         return true;
     }
-    
+
     private BigDecimal calculateRealValue(Integer miles) {
         return BigDecimal.valueOf(miles * 5);
     }
+
+    public boolean compensateMiles(Long codigoCliente, int milhas) {
+        var cliente = clientRepository.findById(codigoCliente)
+                .orElseThrow(() -> new RuntimeException("Cliente não encontrado: " + codigoCliente));
+
+        int updatedMiles = cliente.getSaldoMilhas() + milhas;
+
+        cliente.setSaldoMilhas(updatedMiles);
+        clientRepository.save(cliente);
+
+        return true;
+    }
+
 }

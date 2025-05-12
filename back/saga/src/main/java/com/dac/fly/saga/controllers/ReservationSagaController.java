@@ -28,7 +28,7 @@ public class ReservationSagaController {
     public ResponseEntity<ApiResponse<CreatedReservationResponseDto>> startSaga(
             @RequestBody CreateReservationDto dto) {
         try {
-            CreatedReservationResponseDto response = orchestrator.startSaga(dto);
+            CreatedReservationResponseDto response = orchestrator.createReservation(dto);
             return ResponseEntity.ok(ApiResponse.success(response));
         } catch (RuntimeException e) {
             return ResponseEntity

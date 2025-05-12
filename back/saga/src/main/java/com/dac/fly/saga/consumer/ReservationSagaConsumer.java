@@ -62,5 +62,4 @@ public class ReservationSagaConsumer {
             future.complete(evt);
         }
     }
-
 }

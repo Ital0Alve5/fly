@@ -62,4 +62,16 @@ public class FlyRabbitConfig {
                 .to(exchange)
                 .with(RabbitConstants.FLIGHT_CANCELLED_RESP_QUEUE);
     }
+
+    @Bean
+    public Queue compensateSeatsCmdQueue() {
+        return new Queue(RabbitConstants.COMPENSATE_SEATS_CMD_QUEUE, true);
+    }
+
+    @Bean
+    public Binding bindCompensateSeatsCmd(TopicExchange exchange) {
+        return BindingBuilder.bind(compensateSeatsCmdQueue())
+                .to(exchange)
+                .with(RabbitConstants.COMPENSATE_SEATS_CMD_QUEUE);
+    }
 }

@@ -30,18 +30,23 @@ public class CreateReservationConsumer {
 
     @RabbitListener(queues = RabbitConstants.CREATE_RESERVATION_CMD_QUEUE)
     public void handle(CreateReservationCommand cmd) {
-        CreatedReservationResponseDto response = reservationService.createReservation(cmd);
+        try {
+            CreatedReservationResponseDto response = reservationService.createReservation(cmd);
 
-        rabbit.convertAndSend(
-                RabbitConstants.EXCHANGE,
-                RabbitConstants.CREATED_QUEUE,
-                response);
+            rabbit.convertAndSend(
+                    RabbitConstants.EXCHANGE,
+                    RabbitConstants.CREATED_QUEUE,
+                    response);
 
-        // cqrs
-        rabbit.convertAndSend(
-                internalExchange.getName(), // "reserva-exchange"
-                RabbitMQConfig.INTERNAL_CREATED_KEY, // "reserva.criada"
-                response 
-        );
+            rabbit.convertAndSend(
+                    internalExchange.getName(),
+                    RabbitMQConfig.INTERNAL_CREATED_KEY,
+                    response);
+
+        } catch (RuntimeException e) {
+            System.err.println("Erro ao criar a reserva: " + e.getMessage());
+
+            throw e;
+        }
     }
 }

@@ -149,4 +149,20 @@ public class ReservationQueryService {
                 .map(e -> e.getNome())
                 .orElse("DESCONHECIDO");
     }
+
+    public boolean exists(String reservationId) {
+        return reservaQueryRepository.existsById(reservationId);
+    }
+
+    public boolean deleteReservation(String reservationId) {
+        try {
+            if (reservaQueryRepository.existsById(reservationId)) {
+                reservaQueryRepository.deleteById(reservationId);
+            }
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
 }

@@ -23,6 +23,7 @@ public class RabbitMQConfig {
     public static final String INTERNAL_CANCELLED_KEY = "reserva.cancelada";
     public static final String INTERNAL_UPDATED_KEY = "reserva.atualizada";
     public static final String INTERNAL_CANCEL_FLIGHT_KEY = "reserva.flight-reservations-cancel";
+    public static final String INTERNAL_COMPENSATE_CREATE_KEY = "reserva.removida";
 
     @Bean
     public TopicExchange sagaExchange() {
@@ -129,5 +130,31 @@ public class RabbitMQConfig {
         return BindingBuilder.bind(internalFlightResCancel())
                 .to(internalExchange())
                 .with(RabbitMQConfig.INTERNAL_CANCEL_FLIGHT_KEY);
+    }
+
+    @Bean
+    public Queue compensateCreateReservationQueue() {
+        return new Queue(RabbitConstants.COMPENSATE_CREATE_RESERVATION_CMD_QUEUE, true);
+    }
+
+    @Bean
+    public Binding bindCompensateCreateReservation() {
+        return BindingBuilder
+                .bind(compensateCreateReservationQueue())
+                .to(sagaExchange())
+                .with(RabbitConstants.COMPENSATE_CREATE_RESERVATION_CMD_QUEUE);
+    }
+
+    @Bean
+    public Queue internalCompensateCreateQueue() {
+        return new Queue(RabbitMQConfig.INTERNAL_COMPENSATE_CREATE_KEY, true);
+    }
+
+    @Bean
+    public Binding bindInternalCompensateCreate() {
+        return BindingBuilder
+                .bind(internalCompensateCreateQueue())
+                .to(internalExchange())
+                .with(RabbitMQConfig.INTERNAL_COMPENSATE_CREATE_KEY);
     }
 }
