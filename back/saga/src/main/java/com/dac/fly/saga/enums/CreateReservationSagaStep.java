@@ -1,6 +1,6 @@
 package com.dac.fly.saga.enums;
 
-public enum SagaStep {
+public enum CreateReservationSagaStep {
     MILES_DEDUCTED,
     SEATS_UPDATED,
     RESERVATION_CREATED

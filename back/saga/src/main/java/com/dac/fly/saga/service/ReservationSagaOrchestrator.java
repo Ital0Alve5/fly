@@ -10,7 +10,7 @@ import java.util.concurrent.TimeoutException;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
-import com.dac.fly.saga.enums.SagaStep;
+import com.dac.fly.saga.enums.CreateReservationSagaStep;
 import com.dac.fly.shared.config.RabbitConstants;
 import com.dac.fly.shared.dto.command.CancelReservationCommand;
 import com.dac.fly.shared.dto.command.CompensateCreateReservationCommand;
@@ -60,19 +60,19 @@ public class ReservationSagaOrchestrator {
                 createDto.codigo_aeroporto_origem(),
                 createDto.codigo_aeroporto_destino());
 
-        EnumSet<SagaStep> completedSteps = EnumSet.noneOf(SagaStep.class);
+        EnumSet<CreateReservationSagaStep> completedSteps = EnumSet.noneOf(CreateReservationSagaStep.class);
 
         try {
             if (cmd.milhas_utilizadas() != null && cmd.milhas_utilizadas() > 0) {
                 deductMiles(cmd);
-                completedSteps.add(SagaStep.MILES_DEDUCTED);
+                completedSteps.add(CreateReservationSagaStep.MILES_DEDUCTED);
             }
 
             updateSeats(cmd);
-            completedSteps.add(SagaStep.SEATS_UPDATED);
+            completedSteps.add(CreateReservationSagaStep.SEATS_UPDATED);
 
             CreatedReservationResponseDto response = createReservation(cmd);
-            completedSteps.add(SagaStep.RESERVATION_CREATED);
+            completedSteps.add(CreateReservationSagaStep.RESERVATION_CREATED);
 
             return response;
 
@@ -233,17 +233,17 @@ public class ReservationSagaOrchestrator {
         }
     }
 
-    public void compensateCreateReservationSaga(CreateReservationCommand failedCmd, EnumSet<SagaStep> completedSteps) {
+    public void compensateCreateReservationSaga(CreateReservationCommand failedCmd, EnumSet<CreateReservationSagaStep> completedSteps) {
         String reservationId = failedCmd.codigo();
 
-        if (completedSteps.contains(SagaStep.RESERVATION_CREATED)) {
+        if (completedSteps.contains(CreateReservationSagaStep.RESERVATION_CREATED)) {
             CompensateCreateReservationCommand compensateReservationCmd = new CompensateCreateReservationCommand(
                     reservationId);
             rabbit.convertAndSend(RabbitConstants.EXCHANGE, RabbitConstants.COMPENSATE_CREATE_RESERVATION_CMD_QUEUE,
                     compensateReservationCmd);
         }
 
-        if (completedSteps.contains(SagaStep.SEATS_UPDATED)) {
+        if (completedSteps.contains(CreateReservationSagaStep.SEATS_UPDATED)) {
             UpdateSeatsCommand compensateSeatsCmd = new UpdateSeatsCommand(
                     reservationId,
                     failedCmd.codigo_voo(),
@@ -271,7 +271,7 @@ public class ReservationSagaOrchestrator {
             }
         }
 
-        if (completedSteps.contains(SagaStep.MILES_DEDUCTED)) {
+        if (completedSteps.contains(CreateReservationSagaStep.MILES_DEDUCTED)) {
             if (failedCmd.milhas_utilizadas() != null && failedCmd.milhas_utilizadas() > 0) {
                 UpdateMilesCommand compensateMilesCmd = new UpdateMilesCommand(
                         reservationId,
