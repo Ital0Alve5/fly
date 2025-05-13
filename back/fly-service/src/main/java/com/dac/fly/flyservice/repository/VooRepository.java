@@ -10,6 +10,9 @@ import com.dac.fly.flyservice.entity.Voo;
 public interface VooRepository extends JpaRepository<Voo, String> {
     List<Voo> findByDataBetween(OffsetDateTime inicio, OffsetDateTime fim);
 
-    List<Voo> findByDataBetweenAndAeroportoOrigemCodigoAndAeroportoDestinoCodigo(
-            OffsetDateTime inicio, OffsetDateTime fim, String origem, String destino);
+    List<Voo> findByDataBetweenAndAeroportoOrigemCodigo(OffsetDateTime inicio, OffsetDateTime fim, String origem);
+
+    List<Voo> findByDataBetweenAndAeroportoDestinoCodigo(OffsetDateTime inicio, OffsetDateTime fim, String destino);
+
+    List<Voo> findByDataBetweenAndAeroportoOrigemCodigoAndAeroportoDestinoCodigo(OffsetDateTime inicio, OffsetDateTime fim, String origem, String destino);
 }
