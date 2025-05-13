@@ -17,6 +17,13 @@ export async function loadMilesTransactionsRoute(app: FastifyTypedInstance) {
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
         const { codigoCliente } = request.params as { codigoCliente: string }
+
+        if(request.user?.data.codigo !== codigoCliente) {
+          return reply.status(HttpStatusCode.Forbidden).send({
+            message: 'Você não tem permissão para acessar este cliente',
+          })
+        }
+
         const response = await axios.get(
           `${Env.CLIENT_SERVICE_URL}/clientes/${codigoCliente}/milhas`,
           {

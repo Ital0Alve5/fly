@@ -14,6 +14,6 @@ export const updateReservationStateSchema: FastifySchema = {
     codigoReserva: z.string().describe('Código da reserva a ser atualizada'),
   }),
   body: z.object({
-    estado: z.enum(['EMBARCADA']).describe('Novo estado da reserva'),
+    estado: z.enum(['CHECK-IN', 'EMBARCADA', 'CANCELADA']).describe('Novo estado da reserva'),
   }),
 } 

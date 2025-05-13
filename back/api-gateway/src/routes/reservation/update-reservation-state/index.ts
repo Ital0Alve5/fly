@@ -17,7 +17,19 @@ export async function updateReservationStateRoute(app: FastifyTypedInstance) {
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
         const { codigoReserva } = request.params as { codigoReserva: string }
-        const { estado } = request.body as { estado: 'EMBARCADA' }
+        const { estado } = request.body as { estado: string }
+
+        if (estado !== 'CHECK-IN' && request.user?.data.tipo !== 'FUNCIONARIO') {
+          return reply
+            .status(HttpStatusCode.Forbidden)
+            .send({ message: 'Você não tem permissão realizar essa ação' })
+        }
+
+        if (estado === 'CHECK-IN' && request.user?.data.tipo !== 'CLIENTE') {
+          return reply
+            .status(HttpStatusCode.Forbidden)
+            .send({ message: 'Você não tem permissão realizar essa ação' })
+        }
 
         const reservationResponse = await axios.patch(
           `${Env.RESERVATION_SERVICE_URL}/reservas/${codigoReserva}/estado`,
