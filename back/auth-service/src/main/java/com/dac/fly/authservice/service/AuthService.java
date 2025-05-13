@@ -8,6 +8,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.security.SecureRandom;
 
 import com.dac.fly.authservice.dto.email.EmailDto;
+import com.dac.fly.authservice.dto.response.LoginResponseDto;
 import com.dac.fly.shared.dto.command.CreateUserCommandDto;
 import com.dac.fly.shared.dto.command.UpdateUserCommandDto;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -39,14 +40,21 @@ public class AuthService {
         this.emailService = emailService;
     }
 
-    public String login(String email, String senha) {
+    public Auth findByEmail(String email){
+        Auth user = authRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Usuario não encontrado com email: " + email));
+
+        return user;
+    }
+
+    public LoginResponseDto login(String email, String senha) {
         Auth user = authRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Unauthorized"));
 
         if (!passwordEncoder.matches(senha, user.getSenha())) {
             throw new RuntimeException("Unauthorized");
         }
-        return jwtUtil.generateToken(user);
+        return new LoginResponseDto(user.getCodigoExterno(), jwtUtil.generateToken(user), "bearer", user.getRole());
     }
 
     public Auth registerUser(CreateUserCommandDto dto) {
@@ -84,8 +92,8 @@ public class AuthService {
     }
 
     public Auth updateUser(UpdateUserCommandDto dto) {
-        Auth user = authRepository.findByCodigoExterno(dto.codigoExterno())
-                .filter(u -> u.getRole().equals(dto.role()))
+        System.out.println(dto.role());
+        Auth user = authRepository.findByCodigoExternoAndRole(dto.codigoExterno(), dto.role())
                 .orElseThrow(() ->
                         new IllegalArgumentException("Não existe usuário com código externo: "
                                 + dto.codigoExterno() + " e role: " + dto.role())
@@ -108,6 +116,7 @@ public class AuthService {
 
         return authRepository.save(user);
     }
+
     public void deleteUser(String email) {
         Optional<Auth> optionalUser = authRepository.findByEmail(email);
 
@@ -119,7 +128,6 @@ public class AuthService {
             throw new IllegalArgumentException("Não existe usuário cadastrado com o e-mail: " + email);
         }
     }
-
 
     public void logout(String token) {
         tokenBlacklist.add(token);

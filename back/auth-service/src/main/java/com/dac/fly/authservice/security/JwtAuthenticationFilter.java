@@ -68,6 +68,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getServletPath();
-        return path.matches("/login");
+        return path.matches("^(/login|/usuarios(/.*)?)$");
     }
 }

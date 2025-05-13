@@ -2,6 +2,7 @@ package com.dac.fly.saga.controllers;
 
 import com.dac.fly.saga.service.ClientSagaOrchestrator;
 import com.dac.fly.shared.dto.request.CreateClientRequestDto;
+import com.dac.fly.shared.dto.response.ClientCreatedResponseDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,17 +20,19 @@ public class ClientSagaController {
     }
 
     @PostMapping()
-    public ResponseEntity<ApiResponse<Boolean>> createClient(
+    public ResponseEntity<ApiResponse<ClientCreatedResponseDto>> createClient(
             @RequestBody CreateClientRequestDto dto) {
         try {
-            orchestrator.createClientSaga(dto);
+            ClientCreatedResponseDto data = orchestrator.createClientSaga(dto);
             return ResponseEntity
-                    .ok(ApiResponse.success(true));
-        } catch (RuntimeException e) {
-            System.out.println(e.getMessage());
+                    .ok(ApiResponse.success(data));
+        }catch (IllegalArgumentException e){
             return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
-                    .body(ApiResponse.error(e.getMessage(), HttpStatus.NOT_FOUND.value()));
+                    .status(HttpStatus.CONFLICT)
+                    .body(ApiResponse.error(
+                            e.getMessage(),
+                            HttpStatus.CONFLICT.value()
+                    ));
         }
     }
 }

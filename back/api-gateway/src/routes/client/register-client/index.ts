@@ -24,17 +24,15 @@ export async function registerClientRoute(app: FastifyTypedInstance) {
           saldoMilhas: saldo_milhas,
         }
 
-        const response = await axios.post(
-          `${Env.SAGA_URL}${path}`,
-          payload,
-        )
+        const response = await axios.post(`${Env.SAGA_URL}${path}`, payload)
 
         return reply.send(response.data.data)
       } catch (err) {
         if (axios.isAxiosError(err) && err.response) {
+          console.log('Register client error: ', err.response.data)
           return reply
             .status(err.response.status)
-            .send(err.response.data.data)
+            .send({ message: err.response.data.message })
         }
 
         return reply

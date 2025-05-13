@@ -28,7 +28,7 @@ public class EmailService {
         String firstName = nameParts[0];
         String subject = "Requisição de nova senha para " + firstName + "!";
         String template = loadPasswordTemplateEmail();
-        template = template.replace("#{nome}", firstName);
+        template = template.replace("#{name}", firstName);
         template = template.replace("#{password}", emailData.senha());
 
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();

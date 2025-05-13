@@ -8,5 +8,5 @@ import com.dac.fly.authservice.entity.Auth;
 
 public interface AuthRepository extends MongoRepository<Auth, String> {
     Optional<Auth> findByEmail(String email);
-    Optional<Auth> findByCodigoExterno(Long codigoExterno);
+    Optional<Auth> findByCodigoExternoAndRole(Long codigoExterno, String role);
 }

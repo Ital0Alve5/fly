@@ -26,8 +26,8 @@ public class AuthController {
     public ResponseEntity<ApiResponse<LoginResponseDto>> login(
             @RequestBody LoginRequestDto dto) {
         try {
-            String token = authService.login(dto.login(), dto.senha());
-            return ResponseEntity.ok(ApiResponse.success(new LoginResponseDto(token)));
+            LoginResponseDto response = authService.login(dto.login(), dto.senha());
+            return ResponseEntity.ok(ApiResponse.success(response));
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(ApiResponse.error(e.getMessage(), 401));

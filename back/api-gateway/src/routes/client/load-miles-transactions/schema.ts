@@ -11,6 +11,6 @@ export const loadMilesTransactionsSchema: FastifySchema = {
     },
   ],  
   params: z.object({
-    codigoCliente: z.number(),
+    codigoCliente: z.string(),
   }),
 } 

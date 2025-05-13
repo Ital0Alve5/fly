@@ -1,10 +1,10 @@
 package com.dac.fly.clientservice.publisher;
 
+import com.dac.fly.shared.dto.events.ClientCreatedEventDto;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Component;
 
 import com.dac.fly.shared.config.RabbitConstants;
-import com.dac.fly.shared.dto.response.ClientCreatedResponseDto;
 
 @Component
 public class ClientPublisher {
@@ -19,7 +19,7 @@ public class ClientPublisher {
         rabbit.convertAndSend(
                 RabbitConstants.EXCHANGE,
                 RabbitConstants.CREATE_CLIENT_RESP_QUEUE,
-                new ClientCreatedResponseDto(codigo, email, success)
+                new ClientCreatedEventDto(codigo, email, success)
         );
     }
 }

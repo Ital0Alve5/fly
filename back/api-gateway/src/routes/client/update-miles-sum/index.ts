@@ -29,7 +29,9 @@ export async function updateMilesSumRoute(app: FastifyTypedInstance) {
         return reply.send(response.data.data)
       } catch (err) {
         if (axios.isAxiosError(err) && err.response) {
-          return reply.status(err.response.status).send(err.response.data.data)
+          return reply
+            .status(err.response.status)
+            .send({ message: err.response.data.message })
         }
 
         return reply

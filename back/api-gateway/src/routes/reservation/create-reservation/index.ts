@@ -16,45 +16,22 @@ export async function createReservationRoute(app: FastifyTypedInstance) {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
-        const reservationData = request.body as {
-          codigo_cliente: number
-          valor: number
-          milhas_utilizadas: number
-          quantidade_poltronas: number
-          codigo_voo: string
-          codigo_aeroporto_origem: string
-          codigo_aeroporto_destino: string
-        }
-
         const reservationResponse = await axios.post(
           `${Env.RESERVATION_SERVICE_URL}/reservas`,
-          reservationData,
+          request.body,
           {
             headers: {
               Authorization: `Bearer ${request.user?.token}`,
             },
           },
         )
- 
-        try {
-          const { data: flightResponse } = await axios.get(
-            `${Env.FLY_SERVICE_URL}/voos/${reservationData.codigo_voo}`,
-          )
 
-          const combinedResponse = {
-            ...reservationResponse.data.data,
-            codigo_aeroporto_origem: flightResponse.data.codigo_aeroporto_origem,
-            codigo_aeroporto_destino: flightResponse.data.codigo_aeroporto_destino,
-          }
-
-          return reply.status(HttpStatusCode.Created).send(combinedResponse)
-        } catch (flightError) {
-          console.error('Erro ao buscar dados do voo:', flightError)
-          return reply.status(HttpStatusCode.Created).send(reservationResponse.data.data)
-        }
+        return reply.status(HttpStatusCode.Created).send(reservationResponse.data.data)
       } catch (err) {
         if (axios.isAxiosError(err) && err.response) {
-          return reply.status(err.response.status).send(err.response.data.data)
+          return reply
+            .status(err.response.status)
+            .send({ message: err.response.data.message })
         }
 
         return reply

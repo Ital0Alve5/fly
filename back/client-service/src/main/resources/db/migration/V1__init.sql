@@ -5,7 +5,7 @@ DROP TABLE IF EXISTS endereco CASCADE;
 CREATE TABLE IF NOT EXISTS endereco (
   id BIGSERIAL PRIMARY KEY,
   cep VARCHAR(10),
-  uf VARCHAR(2),
+  uf VARCHAR(20),
   cidade VARCHAR(100),
   bairro VARCHAR(100),
   rua VARCHAR(100),
@@ -48,7 +48,7 @@ ON DELETE CASCADE;
 INSERT INTO endereco (cep, uf, cidade, bairro, rua, numero, complemento)
 VALUES (
   '82590-300',
-  'PR',
+  'Paraná',
   'Curitiba',
   'Boa Vista',
   'Rua Fulano de Tal',
@@ -60,7 +60,7 @@ VALUES (
 INSERT INTO cliente (endereco_id, cpf, email, nome, saldo_milhas)
 VALUES (
   1,
-  '90769281001',
+  '961.785.470-80',
   'heitor@gmail.com',
   'Heitor',
   0

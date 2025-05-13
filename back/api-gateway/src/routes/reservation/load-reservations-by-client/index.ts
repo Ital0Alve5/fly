@@ -48,7 +48,9 @@ export async function loadReservationsByClientRoute(app: FastifyTypedInstance) {
         return reply.send(enrichedReservations)
       } catch (err) {
         if (axios.isAxiosError(err) && err.response) {
-          return reply.status(err.response.status).send(err.response.data.data)
+          return reply
+            .status(err.response.status)
+            .send({ message: err.response.data.message })
         }
 
         return reply

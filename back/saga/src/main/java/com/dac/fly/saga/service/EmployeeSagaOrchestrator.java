@@ -1,14 +1,20 @@
 package com.dac.fly.saga.service;
 
+import com.dac.fly.saga.feign.AuthClient;
+import com.dac.fly.saga.feign.EmployeeClient;
 import com.dac.fly.shared.config.RabbitConstants;
 import com.dac.fly.shared.dto.command.*;
 import com.dac.fly.shared.dto.events.*;
 import com.dac.fly.shared.dto.request.CreateNewEmployeeDto;
 import com.dac.fly.shared.dto.request.UpdateEmployeeDto;
+import com.dac.fly.shared.dto.response.AuthDTO;
 import com.dac.fly.shared.dto.response.EmployeeDto;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Objects;
 import java.util.concurrent.*;
 
 @Service
@@ -23,6 +29,8 @@ public class EmployeeSagaOrchestrator {
     private final ConcurrentHashMap<String, CompletableFuture<UserUpdatedEventDto>> userUpdateResponses;
     private final ConcurrentHashMap<String, CompletableFuture<EmployeeDeletedEventDto>> employeeDeleteResponses;
     private final ConcurrentHashMap<String, CompletableFuture<UserDeletedEventDto>> userDeleteResponses;
+    private final EmployeeClient employeeClient;
+    private final AuthClient authClient;
 
     public EmployeeSagaOrchestrator(
             RabbitTemplate rabbit,
@@ -31,7 +39,8 @@ public class EmployeeSagaOrchestrator {
             ConcurrentHashMap<String, CompletableFuture<EmployeeUpdatedEventDto>> employeeUpdatedResponses,
             ConcurrentHashMap<String, CompletableFuture<UserUpdatedEventDto>> userUpdateResponses,
             ConcurrentHashMap<String, CompletableFuture<EmployeeDeletedEventDto>> employeeDeleteResponses,
-            ConcurrentHashMap<String, CompletableFuture<UserDeletedEventDto>> userDeleteResponses
+            ConcurrentHashMap<String, CompletableFuture<UserDeletedEventDto>> userDeleteResponses,
+            EmployeeClient employeeClient, AuthClient authClient
     ) {
         this.rabbit = rabbit;
         this.employeeCreateResponses = employeeCreateResponses;
@@ -40,9 +49,25 @@ public class EmployeeSagaOrchestrator {
         this.userUpdateResponses = userUpdateResponses;
         this.employeeDeleteResponses = employeeDeleteResponses;
         this.userDeleteResponses = userDeleteResponses;
+        this.employeeClient = employeeClient;
+        this.authClient = authClient;
     }
 
     public EmployeeDto createEmployeeSaga(CreateNewEmployeeDto dto) {
+        AuthDTO existsByEmail = authClient.findUserByEmail(dto.email());
+        if(Objects.nonNull(existsByEmail)) {
+            throw new IllegalArgumentException(
+                    "E-mail já cadastrado"
+            );
+        }
+
+        EmployeeDto existsByCpf = employeeClient.findEmployeeByCpf(dto.cpf());
+        if(Objects.nonNull(existsByCpf)) {
+            throw new IllegalArgumentException(
+                    "CPF já cadastrado"
+            );
+        }
+
         CompletableFuture<EmployeeCreatedEventDto> employeeFuture = new CompletableFuture<>();
         employeeCreateResponses.put(dto.email(), employeeFuture);
 
@@ -73,6 +98,27 @@ public class EmployeeSagaOrchestrator {
     }
 
     public EmployeeDto updateEmployeeSaga(UpdateEmployeeDto dto) {
+        EmployeeDto existsByCode = employeeClient.findEmployeeByCode(dto.codigo());
+        if(Objects.isNull(existsByCode)) {
+            throw new IllegalArgumentException(
+                    "Funcionario não encontrado"
+            );
+        }
+
+        AuthDTO emailExists = authClient.findUserByEmail(dto.email());
+        if(Objects.nonNull(emailExists) && !emailExists.codigoExterno().equals(dto.codigo())) {
+            throw new IllegalArgumentException(
+                    "Email já cadastrado"
+            );
+        }
+
+        EmployeeDto existsByCpf = employeeClient.findEmployeeByCpf(dto.cpf());
+        if(Objects.nonNull(existsByCpf) && !existsByCpf.codigo().equals(dto.codigo())) {
+            throw new IllegalArgumentException(
+                    "CPF já cadastrado"
+            );
+        }
+
         CompletableFuture<EmployeeUpdatedEventDto> employeeFuture = new CompletableFuture<>();
         employeeUpdatedResponses.put(dto.codigo().toString(), employeeFuture);
 
@@ -110,6 +156,15 @@ public class EmployeeSagaOrchestrator {
     }
 
     public EmployeeDto deleteEmployeeSaga(Long codigo) {
+        EmployeeDto existsByCode = employeeClient.findEmployeeByCode(codigo);
+        if(Objects.isNull(existsByCode)) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND,
+                    "Funcionário não encontrado."
+            );
+
+        }
+
         CompletableFuture<EmployeeDeletedEventDto> employeeFuture = new CompletableFuture<>();
         employeeDeleteResponses.put(codigo.toString(), employeeFuture);
 

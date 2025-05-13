@@ -22,12 +22,12 @@ export async function logoutRoute(app: FastifyTypedInstance) {
           },
         })
 
-        console.log(response.data.data)
         return reply.send(response.data.data)
       } catch (err) {
-        console.log(err.response.data)
         if (axios.isAxiosError(err) && err.response) {
-          return reply.status(err.response.status).send(err.response.data.data)
+          return reply
+            .status(err.response.status)
+            .send({ message: err.response.data.message })
         }
 
         return reply
