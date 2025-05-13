@@ -48,7 +48,7 @@ public class VooController {
             fim = dataFim.plusDays(1).atStartOfDay().atOffset(ZoneOffset.UTC);
         }
 
-        if (inicio != null) {
+        if (origem != null || destino != null) {
             return flightService.findByAirport(inicio, origem, destino);
         }
 

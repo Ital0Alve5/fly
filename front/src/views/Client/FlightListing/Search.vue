@@ -6,7 +6,7 @@ import { useAuthStore } from '@/stores/auth'
 import { useGlobalStore } from '@/stores/global'
 import type { Flight } from '@/types/Flight'
 import { ref } from 'vue'
-import { fetchAllFlights } from '@/views/Client/FlightListing/sercvices/FlightListingService.ts'
+import { fetchAllFlights,fetchFilteredFlights } from '@/views/Client/FlightListing/services/FlightListingService'
 
 const authStore = useAuthStore()
 const globalStore = useGlobalStore()
@@ -15,15 +15,22 @@ const flightsList = ref<Flight[]>([])
 const loading = ref(false)
 const fetchedFlights = ref(false)
 
-async function handleSearch(originAipoirt: string, destinationAirpoirt: string) {
+async function handleSearch(originAirport: string, destinationAirport: string) {
   try {
     if (loading.value) {
       return
     }
 
     loading.value = true
+    
+    let flights;
 
-    const flights = await fetchAllFlights(originAipoirt, destinationAirpoirt)
+    if (originAirport === '' && destinationAirport === '') {
+      flights = await fetchAllFlights();
+    } else {
+      flights = await fetchFilteredFlights(originAirport, destinationAirport);
+    }
+
     flightsList.value = flights
     fetchedFlights.value = true
   } catch (error) {

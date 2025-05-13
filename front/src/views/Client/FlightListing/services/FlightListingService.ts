@@ -1,5 +1,4 @@
 import api from '@/lib/axios'
-import type { Flight } from '@/types/Flight'
 
 export const fetchAllFlights = async () => {
   try {
@@ -15,16 +14,16 @@ export const fetchFilteredFlights = async (origin: string, destination: string) 
   try {
     const params = new URLSearchParams();
     
-    if (origin) params.append('origem', origin.toLowerCase());
-    if (destination) params.append('destino', destination.toLowerCase());
+    const today = new Date().toISOString().split('T')[0];
     
-    console.log(`Fetching: /voos?${params.toString()}`);
+    params.append('data', today);
+
+    if (origin) params.append('origem', origin.toUpperCase());
+    if (destination) params.append('destino', destination.toUpperCase());
     
     const response = await api.get(`/voos?${params.toString()}`);
     
-    console.log('Response:', response.data);
-    
-    return response.data;
+    return response.data.voos;
   } catch (error) {
     console.error('Erro ao buscar voos filtrados:', error);
     throw error;
