@@ -17,7 +17,19 @@ export async function updateReservationStateRoute(app: FastifyTypedInstance) {
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
         const { codigoReserva } = request.params as { codigoReserva: string }
-        const { estado } = request.body as { estado: 'EMBARCADA' }
+        const { estado } = request.body as { estado: string }
+
+        if (estado !== 'CHECK-IN' && request.user?.data.tipo !== 'FUNCIONARIO') {
+          return reply
+            .status(HttpStatusCode.Forbidden)
+            .send({ message: 'Você não tem permissão realizar essa ação' })
+        }
+
+        if (estado === 'CHECK-IN' && request.user?.data.tipo !== 'CLIENTE') {
+          return reply
+            .status(HttpStatusCode.Forbidden)
+            .send({ message: 'Você não tem permissão realizar essa ação' })
+        }
 
         const reservationResponse = await axios.patch(
           `${Env.RESERVATION_SERVICE_URL}/reservas/${codigoReserva}/estado`,
@@ -29,25 +41,12 @@ export async function updateReservationStateRoute(app: FastifyTypedInstance) {
           },
         )
 
-        try {
-          const { data: flightResponse } = await axios.get(
-            `${Env.FLY_SERVICE_URL}/voos/${reservationResponse.data.data.codigo_voo}`,
-          )
-
-          const combinedResponse = {
-            ...reservationResponse.data.data,
-            codigo_aeroporto_origem: flightResponse.data.codigo_aeroporto_origem,
-            codigo_aeroporto_destino: flightResponse.data.codigo_aeroporto_destino,
-          }
-
-          return reply.send(combinedResponse)
-        } catch (flightError) {
-          console.error(`Erro ao buscar dados do voo ${reservationResponse.data.data.codigo_voo}:`, flightError)
-          return reply.send(reservationResponse.data.data)
-        }
+        return reply.status(HttpStatusCode.NoContent).send(reservationResponse.data.data)
       } catch (err) {
         if (axios.isAxiosError(err) && err.response) {
-          return reply.status(err.response.status).send(err.response.data.data)
+          return reply
+            .status(err.response.status)
+            .send({ message: err.response.data.message })
         }
 
         return reply
@@ -56,4 +55,4 @@ export async function updateReservationStateRoute(app: FastifyTypedInstance) {
       }
     },
   )
-} 
+}

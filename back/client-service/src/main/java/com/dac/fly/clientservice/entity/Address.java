@@ -18,7 +18,7 @@ public class Address {
     @Column(length = 10)
     private String cep;
 
-    @Column(length = 2)
+    @Column(length = 20)
     private String uf;
 
     @Column(length = 100)

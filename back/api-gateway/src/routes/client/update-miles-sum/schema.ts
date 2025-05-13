@@ -11,7 +11,7 @@ export const updateMilesSumSchema: FastifySchema = {
     },
   ],
   params: z.object({
-    codigoCliente: z.number(),
+    codigoCliente: z.string(),
   }),
   body: z.object({
     quantidade: z.number().positive('A quantidade deve ser positiva'),

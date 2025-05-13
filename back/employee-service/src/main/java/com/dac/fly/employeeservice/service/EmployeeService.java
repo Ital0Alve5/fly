@@ -28,6 +28,27 @@ public class EmployeeService {
         return employees.stream().map(e -> EmployeeDto.fromEntity(e)).toList();
     }
 
+    public EmployeeDto findEmployeeByCodigo(Long codigo) {
+        Funcionario employee = repository.findByCodigo(codigo)
+                .orElseThrow(() -> new RuntimeException("funcionario não encontrado com código: " + codigo));
+
+        return EmployeeDto.fromEntity(employee);
+    }
+
+    public EmployeeDto findEmployeeByEmail(String email) {
+        Funcionario employee = repository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("funcionario não encontrado com email: " + email));
+
+        return EmployeeDto.fromEntity(employee);
+    }
+
+    public EmployeeDto findEmployeeByCpf(String cpf) {
+        Funcionario employee = repository.findByCpf(cpf)
+                .orElseThrow(() -> new RuntimeException("funcionario não encontrado com cpf: " + cpf));
+
+        return EmployeeDto.fromEntity(employee);
+    }
+
     public EmployeeDto createNewEmployee(CreateEmployeeCommandDto newEmployeeDto) {
         Funcionario employee = new Funcionario();
 

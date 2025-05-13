@@ -14,8 +14,26 @@ export async function loginRoute(app: FastifyTypedInstance) {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
-        const response = await axios.post(Env.AUTH_SERVICE_URL + path, request.body)
-        return reply.send(response.data.data)
+        const authResponse= await axios.post(Env.AUTH_SERVICE_URL + path, request.body)
+	const authResponseData = authResponse.data.data
+	
+	let usuario
+	if(authResponseData.tipo === "CLIENTE"){
+	  const clientData = await axios.get(`${Env.CLIENT_SERVICE_URL}/clientes/${authResponseData.codigoExterno}`)
+
+	  usuario = clientData.data.data
+	} else {
+	  const employeeData = await axios.get(`${Env.EMPLOYEE_SERVICE_URL}/funcionarios/${authResponseData.codigoExterno}`)
+
+	  usuario = employeeData.data.data
+	}
+
+        return reply.send({
+	    access_token: authResponseData.access_token,
+	    token_type: authResponseData.token_type,
+	    tipo: authResponseData.tipo,
+	    usuario: {...usuario, senha: ""}
+	  })
       } catch (err) {
         if (axios.isAxiosError(err) && err.response) {
           return reply.status(err.response.status).send(err.response.data.data)

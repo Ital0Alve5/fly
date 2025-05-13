@@ -18,20 +18,22 @@ public class EmployeeSagaController {
         this.orchestrator = orchestrator;
     }
 
-    @PostMapping()
+    @PostMapping
     public ResponseEntity<ApiResponse<EmployeeDto>> createEmployee(
             @RequestBody CreateNewEmployeeDto dto
-    ){
-       try {
-           EmployeeDto employee = orchestrator.createEmployeeSaga(dto);
-           return ResponseEntity
-                   .ok(ApiResponse.success(employee));
-       }catch (RuntimeException e){
-           return ResponseEntity
-                   .status(HttpStatus.NOT_FOUND)
-                   .body(ApiResponse.error(e.getMessage(), HttpStatus.NOT_FOUND.value()));
-
-       }
+    ) {
+        try {
+            EmployeeDto employee = orchestrator.createEmployeeSaga(dto);
+            return ResponseEntity
+                    .ok(ApiResponse.success(employee));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity
+                    .status(HttpStatus.CONFLICT)
+                    .body(ApiResponse.error(
+                            e.getMessage(),
+                            HttpStatus.CONFLICT.value()
+                    ));
+        }
     }
 
     @PutMapping("/{codigoFuncionario}")
@@ -58,7 +60,6 @@ public class EmployeeSagaController {
             return ResponseEntity
                     .ok(ApiResponse.success(employee));
         }catch (RuntimeException e){
-            System.out.println("Erro ao deletar funcionario: " + e.getMessage());
             return ResponseEntity
                     .status(HttpStatus.NOT_FOUND)
                     .body(ApiResponse.error(e.getMessage(), HttpStatus.NOT_FOUND.value()));

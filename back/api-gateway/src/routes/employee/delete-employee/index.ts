@@ -24,11 +24,12 @@ export async function deleteEmployeeRoute(app: FastifyTypedInstance) {
             },
           },
         )
-	console.log(response.data.data)
         return reply.send(response.data.data)
       } catch (err: any) {
         if (axios.isAxiosError(err) && err.response) {
-          return reply.status(err.response.status).send(err.response.data.data)
+          return reply
+            .status(err.response.status)
+            .send({ message: err.response.data.message })
         }
         return reply
           .status(HttpStatusCode.BadGateway)

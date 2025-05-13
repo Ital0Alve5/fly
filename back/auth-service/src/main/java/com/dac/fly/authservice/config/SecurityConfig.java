@@ -28,6 +28,7 @@ public class SecurityConfig {
                 .and()
                 .authorizeHttpRequests()
                 .requestMatchers("/login").permitAll()
+                .requestMatchers("/usuarios/**").permitAll()
                 .requestMatchers("/cliente").hasAuthority("CLIENTE")
                 .requestMatchers("/funcionario").hasAuthority("FUNCIONARIO")
                 .requestMatchers("/usuario", "/logout").authenticated()

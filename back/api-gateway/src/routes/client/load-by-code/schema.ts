@@ -11,6 +11,6 @@ export const loadClientByCodeSchema: FastifySchema = {
     },
   ],
   params: z.object({
-    codigoCliente: z.number(),
+    codigoCliente: z.string(),
   }),
 } 

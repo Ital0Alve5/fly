@@ -18,6 +18,12 @@ export async function loadReservationsByClientRoute(app: FastifyTypedInstance) {
       try {
         const { codigoCliente } = request.params as { codigoCliente: string }
 
+        if (request.user?.data.codigo !== codigoCliente) {
+          return reply
+            .status(HttpStatusCode.Forbidden)
+            .send({ message: 'Você não tem permissão para acessar este cliente' })
+        }
+
         const reservationsResponse = await axios.get(
           `${Env.RESERVATION_SERVICE_URL}/reservas/clientes/${codigoCliente}`,
           {
@@ -48,7 +54,9 @@ export async function loadReservationsByClientRoute(app: FastifyTypedInstance) {
         return reply.send(enrichedReservations)
       } catch (err) {
         if (axios.isAxiosError(err) && err.response) {
-          return reply.status(err.response.status).send(err.response.data.data)
+          return reply
+            .status(err.response.status)
+            .send({ message: err.response.data.message })
         }
 
         return reply

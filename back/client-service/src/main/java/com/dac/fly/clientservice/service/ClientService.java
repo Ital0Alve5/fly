@@ -188,4 +188,7 @@ public class ClientService {
         return clientRepository.existsById(codigo);
     }
 
+    public boolean existsByCpf(String cpf) {
+        return clientRepository.existsByCpf(cpf);
+    }
 }

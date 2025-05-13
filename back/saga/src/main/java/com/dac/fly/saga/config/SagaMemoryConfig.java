@@ -3,21 +3,10 @@ package com.dac.fly.saga.config;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.dac.fly.shared.dto.events.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.dac.fly.shared.dto.events.CancelledFlightEventDto;
-import com.dac.fly.shared.dto.events.CancelledReservationEventDto;
-import com.dac.fly.shared.dto.events.EmployeeCreatedEventDto;
-import com.dac.fly.shared.dto.events.EmployeeDeletedEventDto;
-import com.dac.fly.shared.dto.events.EmployeeUpdatedEventDto;
-import com.dac.fly.shared.dto.events.FlightReservationsCancelledEventDto;
-import com.dac.fly.shared.dto.events.MilesUpdatedEvent;
-import com.dac.fly.shared.dto.events.SeatsUpdatedEvent;
-import com.dac.fly.shared.dto.events.UserCreatedEventDto;
-import com.dac.fly.shared.dto.events.UserDeletedEventDto;
-import com.dac.fly.shared.dto.events.UserUpdatedEventDto;
-import com.dac.fly.shared.dto.response.ClientCreatedResponseDto;
 import com.dac.fly.shared.dto.response.CreatedReservationResponseDto;
 
 /**
@@ -78,7 +67,7 @@ public class SagaMemoryConfig {
      * Futuro para o evento de criar cliente para a resposta de criar cliente na saga.
      */
     @Bean
-    ConcurrentHashMap<String, CompletableFuture<ClientCreatedResponseDto>> clientCreateResponses() {
+    ConcurrentHashMap<String, CompletableFuture<ClientCreatedEventDto>> clientCreateResponses() {
         return new ConcurrentHashMap<>();
     }
 

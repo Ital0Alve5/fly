@@ -1,5 +1,7 @@
 package com.dac.fly.clientservice.controllers;
 
+import com.dac.fly.clientservice.util.DocumentUtils;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,6 +16,8 @@ import com.dac.fly.clientservice.dto.response.ClientResponseDTO;
 import com.dac.fly.clientservice.dto.response.MilesResponseDTO;
 import com.dac.fly.clientservice.dto.response.MilesStatementResponseDTO;
 import com.dac.fly.clientservice.service.ClientService;
+
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/clientes")
@@ -65,4 +69,9 @@ public class ClientController {
         return ResponseEntity.ok(exists);
     }
 
+    @GetMapping("/{cpf}/exists/cpf")
+    public ResponseEntity<Boolean> existsByCpf(@PathVariable("cpf") String cpf) {
+        boolean exists = clientService.existsByCpf(DocumentUtils.formatCpf(cpf));
+        return ResponseEntity.ok(exists);
+    }
 }
