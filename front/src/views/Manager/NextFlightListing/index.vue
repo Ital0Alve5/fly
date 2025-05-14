@@ -72,7 +72,6 @@ async function handleFlightRegistered(code: string) {
   createdFlight.value = true
 }
 
-
 async function handelCancelFlight() {
   try {
     const success = await cancelFlight(selectedFlight.value)
@@ -97,7 +96,6 @@ async function handelCancelFlight() {
     })
   }
 }
-
 </script>
 
 <template>
@@ -140,6 +138,7 @@ async function handelCancelFlight() {
         <TableHeader>
           <TableRow>
             <TableHead> Data/hora </TableHead>
+            <TableHead>Código</TableHead>
             <TableHead>Origem</TableHead>
             <TableHead>Destino</TableHead>
             <TableHead>Status</TableHead>
@@ -150,6 +149,9 @@ async function handelCancelFlight() {
           <TableRow v-for="flight in flights" :key="flight.codigo">
             <TableCell>
               {{ formatDateTime(flight.data) }}
+            </TableCell>
+            <TableCell>
+              {{ flight.codigo }}
             </TableCell>
             <TableCell> {{ flight.aeroporto_origem.codigo }} </TableCell>
             <TableCell>{{ flight.aeroporto_destino.codigo }}</TableCell>
