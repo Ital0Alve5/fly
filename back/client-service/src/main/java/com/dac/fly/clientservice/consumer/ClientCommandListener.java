@@ -2,6 +2,8 @@ package com.dac.fly.clientservice.consumer;
 
 import java.util.Objects;
 
+import com.dac.fly.shared.dto.command.CompensateCreateReservationCommand;
+import com.dac.fly.shared.dto.command.DeleteClientCommandDto;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
@@ -22,7 +24,7 @@ public class ClientCommandListener {
     }
 
     @RabbitListener(queues = RabbitConstants.CREATE_CLIENT_CMD_QUEUE)
-    public void handleUpdateMiles(CreateClientCommandDto cmd) {
+    public void handleCreateClient(CreateClientCommandDto cmd) {
         boolean success;
         ClientResponseDTO response;
 
@@ -31,6 +33,17 @@ public class ClientCommandListener {
             success = Objects.nonNull(response);
 
             publisher.publishClientCreatedResponse(response.getCodigo(), cmd.email(), success);
+        } catch (Exception e) {
+            System.err.println("Erro ao criar cliente: " + e.getMessage());
+        }
+    }
+
+    @RabbitListener(queues = RabbitConstants.DELETE_CLIENT_CMD_QUEUE)
+    public void handleDeleteClient(DeleteClientCommandDto cmd) {
+        try {
+            clientService.deleteClient(cmd.codigo());
+
+            publisher.publishClientDeletedResponse(cmd.codigo(), cmd.email(), true);
         } catch (Exception e) {
             System.err.println("Erro ao criar cliente: " + e.getMessage());
         }

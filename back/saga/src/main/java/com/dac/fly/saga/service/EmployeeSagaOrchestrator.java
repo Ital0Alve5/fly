@@ -158,11 +158,9 @@ public class EmployeeSagaOrchestrator {
     public EmployeeDto deleteEmployeeSaga(Long codigo) {
         EmployeeDto existsByCode = employeeClient.findEmployeeByCode(codigo);
         if(Objects.isNull(existsByCode)) {
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND,
-                    "Funcionário não encontrado."
+            throw new IllegalArgumentException(
+                    "Funcionario não encontrado"
             );
-
         }
 
         CompletableFuture<EmployeeDeletedEventDto> employeeFuture = new CompletableFuture<>();
