@@ -1,5 +1,9 @@
 package com.dac.fly.saga.service;
 
+import com.dac.fly.saga.enums.CreateClientSagaStep;
+import com.dac.fly.saga.enums.CreateEmployeeSagaStep;
+import com.dac.fly.saga.enums.DeleteEmployeeSagaStep;
+import com.dac.fly.saga.enums.UpdateEmployeeSagaStep;
 import com.dac.fly.saga.feign.AuthClient;
 import com.dac.fly.saga.feign.EmployeeClient;
 import com.dac.fly.shared.config.RabbitConstants;
@@ -10,10 +14,9 @@ import com.dac.fly.shared.dto.request.UpdateEmployeeDto;
 import com.dac.fly.shared.dto.response.AuthDTO;
 import com.dac.fly.shared.dto.response.EmployeeDto;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
+import java.util.EnumSet;
 import java.util.Objects;
 import java.util.concurrent.*;
 
@@ -55,141 +58,224 @@ public class EmployeeSagaOrchestrator {
 
     public EmployeeDto createEmployeeSaga(CreateNewEmployeeDto dto) {
         AuthDTO existsByEmail = authClient.findUserByEmail(dto.email());
-        if(Objects.nonNull(existsByEmail)) {
+        if (Objects.nonNull(existsByEmail)) {
             throw new IllegalArgumentException(
                     "E-mail já cadastrado"
             );
         }
 
         EmployeeDto existsByCpf = employeeClient.findEmployeeByCpf(dto.cpf());
-        if(Objects.nonNull(existsByCpf)) {
+        if (Objects.nonNull(existsByCpf)) {
             throw new IllegalArgumentException(
                     "CPF já cadastrado"
             );
         }
 
-        CompletableFuture<EmployeeCreatedEventDto> employeeFuture = new CompletableFuture<>();
-        employeeCreateResponses.put(dto.email(), employeeFuture);
+        EnumSet<CreateEmployeeSagaStep> completedSteps = EnumSet.allOf(CreateEmployeeSagaStep.class);
+        Long createdCode = null;
 
-        rabbit.convertAndSend(
-                RabbitConstants.EXCHANGE,
-                RabbitConstants.CREATE_EMPLOYEE_CMD_QUEUE,
-                new CreateEmployeeCommandDto(
-                        dto.cpf(),
-                        dto.email(),
-                        dto.nome(),
-                        dto.telefone()
-                )
-        );
+        try {
+            CompletableFuture<EmployeeCreatedEventDto> employeeFuture = new CompletableFuture<>();
+            employeeCreateResponses.put(dto.email(), employeeFuture);
 
-        EmployeeCreatedEventDto employeeCreated = getWithTimeout(employeeCreateResponses, dto.email());
+            rabbit.convertAndSend(
+                    RabbitConstants.EXCHANGE,
+                    RabbitConstants.CREATE_EMPLOYEE_CMD_QUEUE,
+                    new CreateEmployeeCommandDto(
+                            dto.cpf(),
+                            dto.email(),
+                            dto.nome(),
+                            dto.telefone()
+                    )
+            );
 
-        CompletableFuture<UserCreatedEventDto> userFuture = new CompletableFuture<>();
-        userCreateResponses.put(dto.email(), userFuture);
+            EmployeeCreatedEventDto employeeCreated = getWithTimeout(employeeCreateResponses, dto.email());
+            createdCode = employeeCreated.codigo();
+            completedSteps.add(CreateEmployeeSagaStep.EMPLOYEE_CREATED);
 
-        rabbit.convertAndSend(
-                RabbitConstants.EXCHANGE,
-                RabbitConstants.CREATE_USER_CMD_QUEUE,
-                new CreateUserCommandDto(dto.nome(), dto.email(), employeeCreated.codigo(), "FUNCIONARIO", dto.senha()));
+            CompletableFuture<UserCreatedEventDto> userFuture = new CompletableFuture<>();
+            userCreateResponses.put(dto.email(), userFuture);
 
-        getWithTimeout(userCreateResponses, dto.email());
+            rabbit.convertAndSend(
+                    RabbitConstants.EXCHANGE,
+                    RabbitConstants.CREATE_USER_CMD_QUEUE,
+                    new CreateUserCommandDto(dto.nome(), dto.email(), employeeCreated.codigo(), "FUNCIONARIO", dto.senha()));
 
-        return new EmployeeDto(employeeCreated.codigo(), dto.cpf(), dto.email(), dto.nome(), dto.telefone());
+            getWithTimeout(userCreateResponses, dto.email());
+            completedSteps.add(CreateEmployeeSagaStep.USER_CREATED);
+
+            System.out.println("Returning dto");
+            return new EmployeeDto(employeeCreated.codigo(), dto.cpf(), dto.email(), dto.nome(), dto.telefone());
+        } catch (Exception e) {
+            compensateCreateEmployee(createdCode, completedSteps);
+        } finally {
+            employeeCreateResponses.remove(dto.email());
+            userCreateResponses.remove(dto.email());
+        }
+
+        System.out.println("Returning null");
+        return null;
+    }
+
+    private void compensateCreateEmployee(Long codigo, EnumSet<CreateEmployeeSagaStep> completedSteps) {
+        if(completedSteps.contains(CreateEmployeeSagaStep.EMPLOYEE_CREATED)) {
+            rabbit.convertAndSend(
+                    RabbitConstants.EXCHANGE,
+                    RabbitConstants.DELETE_EMPLOYEE_CMD_QUEUE,
+                    new DeleteEmployeeCommandDto(codigo)
+            );
+        }
     }
 
     public EmployeeDto updateEmployeeSaga(UpdateEmployeeDto dto) {
-        EmployeeDto existsByCode = employeeClient.findEmployeeByCode(dto.codigo());
-        if(Objects.isNull(existsByCode)) {
-            throw new IllegalArgumentException(
-                    "Funcionario não encontrado"
-            );
+        EmployeeDto original = employeeClient.findEmployeeByCode(dto.codigo());
+        if (Objects.isNull(original)) {
+            throw new IllegalArgumentException("Funcionario não encontrado");
         }
-
         AuthDTO emailExists = authClient.findUserByEmail(dto.email());
-        if(Objects.nonNull(emailExists) && !emailExists.codigoExterno().equals(dto.codigo())) {
-            throw new IllegalArgumentException(
-                    "Email já cadastrado"
-            );
+        if (Objects.nonNull(emailExists)
+                && ( !emailExists.codigoExterno().equals(dto.codigo())
+                || emailExists.role().equals("CLIENTE"))) {
+            throw new IllegalArgumentException("Email já cadastrado");
+        }
+        EmployeeDto cpfExists = employeeClient.findEmployeeByCpf(dto.cpf());
+        if (Objects.nonNull(cpfExists) && !cpfExists.codigo().equals(dto.codigo())) {
+            throw new IllegalArgumentException("CPF já cadastrado");
         }
 
-        EmployeeDto existsByCpf = employeeClient.findEmployeeByCpf(dto.cpf());
-        if(Objects.nonNull(existsByCpf) && !existsByCpf.codigo().equals(dto.codigo())) {
-            throw new IllegalArgumentException(
-                    "CPF já cadastrado"
+        EnumSet<UpdateEmployeeSagaStep> completedSteps = EnumSet.noneOf(UpdateEmployeeSagaStep.class);
+
+        try {
+            CompletableFuture<EmployeeUpdatedEventDto> empFuture = new CompletableFuture<>();
+            employeeUpdatedResponses.put(dto.codigo().toString(), empFuture);
+            rabbit.convertAndSend(
+                    RabbitConstants.EXCHANGE,
+                    RabbitConstants.UPDATE_EMPLOYEE_CMD_QUEUE,
+                    new UpdateEmployeeCommandDto(
+                            dto.codigo(),
+                            dto.cpf(),
+                            dto.email(),
+                            dto.nome(),
+                            dto.telefone(),
+                            dto.senha()
+                    )
+            );
+            getWithTimeout(employeeUpdatedResponses, dto.codigo().toString());
+            completedSteps.add(UpdateEmployeeSagaStep.EMPLOYEE_UPDATED);
+
+            CompletableFuture<UserUpdatedEventDto> userFuture = new CompletableFuture<>();
+            userUpdateResponses.put(dto.codigo().toString(), userFuture);
+            rabbit.convertAndSend(
+                    RabbitConstants.EXCHANGE,
+                    RabbitConstants.UPDATE_USER_CMD_QUEUE,
+                    new UpdateUserCommandDto(
+                            dto.codigo(),
+                            dto.nome(),
+                            dto.email(),
+                            "FUNCIONARIO",
+                            dto.senha()
+                    )
+            );
+            getWithTimeout(userUpdateResponses, dto.codigo().toString());
+            completedSteps.add(UpdateEmployeeSagaStep.USER_UPDATED);
+
+            return new EmployeeDto(
+                    dto.codigo(),
+                    dto.cpf(),
+                    dto.email(),
+                    dto.nome(),
+                    dto.telefone()
+            );
+
+        } catch (Exception e) {
+            compensateUpdateEmployee(original, completedSteps);
+            throw new RuntimeException("Falha na saga de atualização: " + e.getMessage(), e);
+        } finally {
+            employeeUpdatedResponses.remove(dto.codigo().toString());
+            userUpdateResponses.remove(dto.codigo().toString());
+        }
+    }
+
+    private void compensateUpdateEmployee(EmployeeDto original, EnumSet<UpdateEmployeeSagaStep> steps) {
+        if (steps.contains(UpdateEmployeeSagaStep.EMPLOYEE_UPDATED)
+                && !steps.contains(UpdateEmployeeSagaStep.USER_UPDATED)) {
+
+            rabbit.convertAndSend(
+                    RabbitConstants.EXCHANGE,
+                    RabbitConstants.UPDATE_EMPLOYEE_CMD_QUEUE,
+                    new UpdateEmployeeCommandDto(
+                            original.codigo(),
+                            original.cpf(),
+                            original.email(),
+                            original.nome(),
+                            original.telefone(),
+                            null
+                    )
             );
         }
-
-        CompletableFuture<EmployeeUpdatedEventDto> employeeFuture = new CompletableFuture<>();
-        employeeUpdatedResponses.put(dto.codigo().toString(), employeeFuture);
-
-        rabbit.convertAndSend(
-                RabbitConstants.EXCHANGE,
-                RabbitConstants.UPDATE_EMPLOYEE_CMD_QUEUE,
-                new UpdateEmployeeCommandDto(
-                        dto.codigo(),
-                        dto.cpf(),
-                        dto.email(),
-                        dto.nome(),
-                        dto.telefone(),
-                        dto.senha()
-                )
-        );
-
-        getWithTimeout(employeeUpdatedResponses, dto.codigo().toString());
-
-        CompletableFuture<UserUpdatedEventDto> userFuture = new CompletableFuture<>();
-        userUpdateResponses.put(dto.codigo().toString(), userFuture);
-
-        rabbit.convertAndSend(
-                RabbitConstants.EXCHANGE,
-                RabbitConstants.UPDATE_USER_CMD_QUEUE,
-                new UpdateUserCommandDto(dto.codigo(), dto.nome(), dto.email(), "FUNCIONARIO", dto.senha()));
-
-        getWithTimeout(userUpdateResponses, dto.codigo().toString());
-
-        return new EmployeeDto(
-                dto.codigo(),
-                dto.cpf(),
-                dto.email(),
-                dto.nome(),
-                dto.telefone());
     }
 
     public EmployeeDto deleteEmployeeSaga(Long codigo) {
-        EmployeeDto existsByCode = employeeClient.findEmployeeByCode(codigo);
-        if(Objects.isNull(existsByCode)) {
-            throw new IllegalArgumentException(
-                    "Funcionario não encontrado"
-            );
+        EmployeeDto original = employeeClient.findEmployeeByCode(codigo);
+        if (Objects.isNull(original)) {
+            throw new IllegalArgumentException("Funcionario não encontrado");
         }
 
-        CompletableFuture<EmployeeDeletedEventDto> employeeFuture = new CompletableFuture<>();
-        employeeDeleteResponses.put(codigo.toString(), employeeFuture);
+        EnumSet<DeleteEmployeeSagaStep> completedSteps = EnumSet.noneOf(DeleteEmployeeSagaStep.class);
 
-        rabbit.convertAndSend(
-                RabbitConstants.EXCHANGE,
-                RabbitConstants.DELETE_EMPLOYEE_CMD_QUEUE,
-                new DeleteEmployeeCommandDto(codigo)
-        );
+        try {
+            CompletableFuture<EmployeeDeletedEventDto> empDelFuture = new CompletableFuture<>();
+            employeeDeleteResponses.put(codigo.toString(), empDelFuture);
+            rabbit.convertAndSend(
+                    RabbitConstants.EXCHANGE,
+                    RabbitConstants.DELETE_EMPLOYEE_CMD_QUEUE,
+                    new DeleteEmployeeCommandDto(codigo)
+            );
+            EmployeeDeletedEventDto empDeleted = getWithTimeout(employeeDeleteResponses, codigo.toString());
+            completedSteps.add(DeleteEmployeeSagaStep.EMPLOYEE_DELETED);
 
-        EmployeeDeletedEventDto employeeDeleted = getWithTimeout(employeeDeleteResponses, codigo.toString());
+            CompletableFuture<UserDeletedEventDto> userDelFuture = new CompletableFuture<>();
+            userDeleteResponses.put(empDeleted.email(), userDelFuture);
+            rabbit.convertAndSend(
+                    RabbitConstants.EXCHANGE,
+                    RabbitConstants.DELETE_USER_CMD_QUEUE,
+                    new DeleteUserCommandDto(empDeleted.email())
+            );
+            getWithTimeout(userDeleteResponses, empDeleted.email());
+            completedSteps.add(DeleteEmployeeSagaStep.USER_DELETED);
 
-        CompletableFuture<UserDeletedEventDto> userFuture = new CompletableFuture<>();
-        userDeleteResponses.put(employeeDeleted.email(), userFuture);
+            return new EmployeeDto(
+                    empDeleted.codigo(),
+                    empDeleted.cpf(),
+                    empDeleted.email(),
+                    empDeleted.nome(),
+                    empDeleted.telefone()
+            );
 
-        rabbit.convertAndSend(
-                RabbitConstants.EXCHANGE,
-                RabbitConstants.DELETE_USER_CMD_QUEUE,
-                new DeleteUserCommandDto(employeeDeleted.email()));
+        } catch (Exception e) {
+            compensateDeleteEmployee(original, completedSteps);
+            throw new RuntimeException("Falha na saga de deleção: " + e.getMessage(), e);
+        } finally {
+            employeeDeleteResponses.remove(codigo.toString());
+            userDeleteResponses.remove(original.email());
+        }
+    }
 
-        getWithTimeout(userDeleteResponses, employeeDeleted.email());
+    private void compensateDeleteEmployee(EmployeeDto original, EnumSet<DeleteEmployeeSagaStep> steps) {
+        if (steps.contains(DeleteEmployeeSagaStep.EMPLOYEE_DELETED)
+                && !steps.contains(DeleteEmployeeSagaStep.USER_DELETED)) {
 
-        return new EmployeeDto(
-                employeeDeleted.codigo(),
-                employeeDeleted.cpf(),
-                employeeDeleted.email(),
-                employeeDeleted.nome(),
-                employeeDeleted.telefone());
+            rabbit.convertAndSend(
+                    RabbitConstants.EXCHANGE,
+                    RabbitConstants.CREATE_EMPLOYEE_CMD_QUEUE,
+                    new CreateEmployeeCommandDto(
+                            original.cpf(),
+                            original.email(),
+                            original.nome(),
+                            original.telefone()
+                    )
+            );
+        }
     }
 
 
