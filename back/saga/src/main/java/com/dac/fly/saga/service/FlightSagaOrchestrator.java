@@ -7,6 +7,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import com.dac.fly.shared.dto.response.CompletedFlightResponseDto;
 import org.springframework.amqp.AmqpException;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
@@ -18,11 +19,13 @@ import com.dac.fly.shared.dto.command.CompensateCancelFlightCommand;
 import com.dac.fly.shared.dto.command.CompensateCancelReservationCommand;
 import com.dac.fly.shared.dto.command.UpdateMilesCommand;
 import com.dac.fly.shared.dto.events.CancelledFlightEventDto;
+import com.dac.fly.shared.dto.events.CompletedFlightEventDto;
 import com.dac.fly.shared.dto.events.FlightReservationsCancelledEventDto;
+import com.dac.fly.shared.dto.events.FlightReservationsCompletedEventDto;
 import com.dac.fly.shared.dto.events.MilesUpdatedEvent;
 import com.dac.fly.shared.dto.request.CancelFlightDto;
 import com.dac.fly.shared.dto.response.CancelledFlightResponseDto;
-
+import com.dac.fly.saga.enums.CompleteFlightSagaStep;
 @Service
 public class FlightSagaOrchestrator {
 
@@ -146,6 +149,23 @@ public class FlightSagaOrchestrator {
                     new CompensateCancelFlightCommand(
                             flightEvt.codigo(),
                             flightEvt.estadoAnterior()));
+        }
+    }
+
+    public CompletedFlightResponseDto completeFlight(String flightCode){
+        if (!flightClient.existsByCode(flightCode)) {
+            throw new IllegalArgumentException("Voo não encontrado: " + flightCode);
+        }
+
+        EnumSet<CompleteFlightSagaStep> completed = EnumSet.noneOf(CompleteFlightSagaStep.class);
+        CompletedFlightEventDto flightEvt = null;
+        FlightReservationsCompletedEventDto resEvt = null;
+
+        try {
+            var flightFuture = new CompletableFuture<CompletedFlightEventDto>();
+            flightCompletedResponses.put(flightCode, flightFuture);
+        } catch (Exception e) {
+            // TODO: handle exception
         }
     }
 

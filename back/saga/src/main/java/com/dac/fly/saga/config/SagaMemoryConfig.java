@@ -118,4 +118,20 @@ public class SagaMemoryConfig {
     ConcurrentHashMap<String, CompletableFuture<UserDeletedEventDto>> userDeleteResponses() {
         return new ConcurrentHashMap<>();
     }
+
+    /**
+     * Futuro para o evento de completar voo para a resposta de completar voo na saga.
+     */
+    @Bean
+    ConcurrentHashMap<String, CompletableFuture<CompletedFlightEventDto>> flightCompletedResponses() {
+        return new ConcurrentHashMap<>();
+    }
+
+    /**
+     * Futuro para o evento de completar reservas para a resposta de completar voo na saga.
+     */
+    @Bean
+    ConcurrentHashMap<String, CompletableFuture<FlightReservationsCompletedEventDto>> reservationsCompletedResponses() {
+        return new ConcurrentHashMap<>();
+    }
 }

@@ -30,11 +30,15 @@ public final class RabbitConstants {
     /** --- Contexto: Voo (Flight Saga) --- */
     public static final String CANCEL_FLIGHT_CMD_QUEUE = "saga.cancel-flight";
     public static final String FLIGHT_CANCELLED_RESP_QUEUE = "saga.flight-cancelled";
+    public static final String COMPLETE_FLIGHT_CMD_QUEUE = "saga.complete-flight";
+    public static final String FLIGHT_COMPLETED_RESP_QUEUE = "saga.flight-completed";
     public static final String FLIGHT_RESERVATIONS_CANCELLED_QUEUE = "saga.flight-reservations-cancelled";
     public static final String CANCEL_RESERVATION_BY_FLIGHT_CMD_QUEUE = "saga.flight-reservations-cancel";
     public static final String COMPENSATE_CANCEL_FLIGHT_CMD_QUEUE = "saga.compensate-cancel-flight";
     public static final String ROLLBACK_FLIGHT_CMD_QUEUE          = "saga.rollback-flight-cmd";
-    
+    public static final String COMPLETE_RESERVATION_BY_FLIGHT_CMD_QUEUE = "saga.flight-reservations-complete";
+    public static final String FLIGHT_RESERVATIONS_COMPLETED_QUEUE = "saga.flight-reservations-completed";
+
     /** --- Contexto: Cliente (Client Saga) --- */
     public static final String CREATE_CLIENT_CMD_QUEUE = "saga.create-client-cmd";
     public static final String CREATE_CLIENT_RESP_QUEUE = "saga.create-client-resp";
