@@ -1,3 +1,4 @@
+import type { AuthenticatedUserData } from '@/types/Auth/AuthenticatedUserData'
 import axios from 'axios'
 
 const api = axios.create({
@@ -8,9 +9,14 @@ const api = axios.create({
 })
 
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token')
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`
+  const hasAuth = localStorage.getItem('auth/user') ?? '{}'
+
+  if (hasAuth === '{}') return config
+
+  const userAuth: AuthenticatedUserData = JSON.parse(hasAuth)
+
+  if (userAuth.access_token) {
+    config.headers.Authorization = `${userAuth.token_type} ${userAuth.access_token}`
   }
   return config
 })
@@ -20,11 +26,13 @@ api.interceptors.response.use(
   (error) => {
     const status = error.response?.status
     if (status === 401 || status === 403) {
-      localStorage.removeItem('token')
+      localStorage.removeItem('auth/user')
+      localStorage.removeItem("isAuthenticated")
+      
       window.location.href = '/login'
     }
     return Promise.reject(error)
-  }
+  },
 )
 
 export default api

@@ -1,6 +1,6 @@
 import api from '@/lib/axios'
-import { Employee } from '@/types/Auth/Employee'
-import { AxiosResponse } from 'axios'
+import type { Employee } from '@/types/Auth/Employee'
+import type { AxiosResponse } from 'axios'
 
 export default async function updateEmployee(data: {
   codigo: number,
