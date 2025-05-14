@@ -17,6 +17,7 @@ import com.dac.fly.reservationservice.repository.command.ReservaCommandRepositor
 import com.dac.fly.reservationservice.repository.query.ReservaQueryRepository;
 import com.dac.fly.shared.dto.command.CreateReservationCommand;
 import com.dac.fly.shared.dto.events.CancelledReservationEventDto;
+import com.dac.fly.shared.dto.events.FlightReservationsCompletedEventDto;
 import com.dac.fly.shared.dto.response.CreatedReservationResponseDto;
 
 @Service
@@ -89,6 +90,10 @@ public class ReservationCommandService {
                 return doCancel(codigoReserva, ReservationStatusEnum.CANCELADA_VOO);
         }
 
+        public void completeReservationByFlight(String codigoReserva) {
+                doComplete(codigoReserva, ReservationStatusEnum.REALIZADA);
+        }
+
         public CancelledReservationEventDto doCancel(String codigoReserva,
                         ReservationStatusEnum targetStatus) {
                 Reserva reservation = repository.findById(codigoReserva)
@@ -132,6 +137,36 @@ public class ReservationCommandService {
                                 reservationQuery.getAeroportoDestino());
 
                 return cancelDto;
+        }
+
+        public void doComplete(String codigoReserva, ReservationStatusEnum targetStatus) {
+                Reserva reserva = repository.findById(codigoReserva)
+                                .orElseThrow(() -> new RuntimeException("Reserva não encontrada: " + codigoReserva));
+
+                Long checkInStatusId = estadoRepository.findByNome(ReservationStatusEnum.CHECK_IN.toString())
+                                .orElseThrow(() -> new RuntimeException("Estado '" + ReservationStatusEnum.CHECK_IN
+                                                + "' não encontrado"))
+                                .getCodigo();
+
+                if (reserva.getEstado() != checkInStatusId) {
+                   return;
+                }
+
+                Long oldStatus = reserva.getEstado();
+
+                Long newStatusId = estadoRepository.findByNome(targetStatus.toString())
+                                .orElseThrow(() -> new RuntimeException("Estado '" + targetStatus + "' não encontrado"))
+                                .getCodigo();
+
+                reserva.setEstado(newStatusId);
+                repository.save(reserva);
+
+                Historico historyEntity = new Historico(
+                                reserva.getCodigo(),
+                                LocalDateTime.now(),
+                                oldStatus,
+                                newStatusId);
+                historyRepository.save(historyEntity);
         }
 
         public ReservationResponseDto updateReservationStatusByCode(String codigoReserva,

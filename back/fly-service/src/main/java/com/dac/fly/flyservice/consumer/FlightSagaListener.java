@@ -1,5 +1,6 @@
 package com.dac.fly.flyservice.consumer;
 
+import com.dac.fly.shared.dto.command.CompleteFlightDto;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +28,16 @@ public class FlightSagaListener {
             publisher.publishFlightCancelled(flightResponse);
         } catch (Exception e) {
             System.err.println("Erro ao cancelar voo " + cmd.codigo() + ": " + e.getMessage());
+        }
+    }
+
+    @RabbitListener(queues = RabbitConstants.COMPLETE_FLIGHT_CMD_QUEUE)
+    public void handleCompleteFlight(CompleteFlightDto cmd) {
+        try {
+            var flightResponse = service.updateStatus(cmd.codigo(), FlightStatusEnum.REALIZADO);
+            publisher.publishFlightCompleted(flightResponse);
+        } catch (Exception e) {
+            System.err.println("Erro ao completar voo " + cmd.codigo() + ": " + e.getMessage());
         }
     }
 }

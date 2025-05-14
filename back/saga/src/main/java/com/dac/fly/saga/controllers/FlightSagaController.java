@@ -1,5 +1,6 @@
 package com.dac.fly.saga.controllers;
 
+import com.dac.fly.shared.dto.response.CompletedFlightResponseDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -27,6 +28,20 @@ public class FlightSagaController {
             @PathVariable String flightCode) {
         try {
             CancelledFlightResponseDto dto = orchestrator.cancelFlightSaga(flightCode);
+            return ResponseEntity
+                    .ok(ApiResponse.success(dto));
+        } catch (RuntimeException e) {
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body(ApiResponse.error(e.getMessage(), HttpStatus.NOT_FOUND.value()));
+        }
+    }
+
+    @PatchMapping("realiza/{flightCode}")
+    public ResponseEntity<ApiResponse<CompletedFlightResponseDto>> completeFlight(
+            @PathVariable String flightCode) {
+        try {
+            CompletedFlightResponseDto dto = orchestrator.completeFlight(flightCode);
             return ResponseEntity
                     .ok(ApiResponse.success(dto));
         } catch (RuntimeException e) {

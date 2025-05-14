@@ -7,8 +7,11 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import com.dac.fly.shared.dto.command.CompleteFlightDto;
+import com.dac.fly.shared.dto.response.CompletedFlightResponseDto;
 import org.springframework.amqp.AmqpException;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.boot.autoconfigure.transaction.TransactionProperties;
 import org.springframework.stereotype.Service;
 
 import com.dac.fly.saga.enums.FlightCancelSagaStep;
@@ -18,11 +21,13 @@ import com.dac.fly.shared.dto.command.CompensateCancelFlightCommand;
 import com.dac.fly.shared.dto.command.CompensateCancelReservationCommand;
 import com.dac.fly.shared.dto.command.UpdateMilesCommand;
 import com.dac.fly.shared.dto.events.CancelledFlightEventDto;
+import com.dac.fly.shared.dto.events.CompletedFlightEventDto;
 import com.dac.fly.shared.dto.events.FlightReservationsCancelledEventDto;
+import com.dac.fly.shared.dto.events.FlightReservationsCompletedEventDto;
 import com.dac.fly.shared.dto.events.MilesUpdatedEvent;
 import com.dac.fly.shared.dto.request.CancelFlightDto;
 import com.dac.fly.shared.dto.response.CancelledFlightResponseDto;
-
+import com.dac.fly.saga.enums.CompleteFlightSagaStep;
 @Service
 public class FlightSagaOrchestrator {
 
@@ -32,18 +37,25 @@ public class FlightSagaOrchestrator {
     private final ConcurrentHashMap<String, CompletableFuture<CancelledFlightEventDto>> flightCancelResponses;
     private final ConcurrentHashMap<String, CompletableFuture<FlightReservationsCancelledEventDto>> reservationsCancelResponses;
     private final ConcurrentHashMap<String, CompletableFuture<MilesUpdatedEvent>> milesResponses;
+    private final ConcurrentHashMap<String, CompletableFuture<CompletedFlightEventDto>> flightCompleteResponses;
+    private final ConcurrentHashMap<String, CompletableFuture<FlightReservationsCompletedEventDto>> reservationsCompletedResponses;
     private final FlightClient flightClient;
 
     public FlightSagaOrchestrator(
             RabbitTemplate rabbit,
             ConcurrentHashMap<String, CompletableFuture<CancelledFlightEventDto>> flightCancelResponses,
             ConcurrentHashMap<String, CompletableFuture<FlightReservationsCancelledEventDto>> reservationsCancelResponses,
-            ConcurrentHashMap<String, CompletableFuture<MilesUpdatedEvent>> milesResponses, FlightClient flightClient) {
+            ConcurrentHashMap<String, CompletableFuture<MilesUpdatedEvent>> milesResponses, FlightClient flightClient,
+            ConcurrentHashMap<String, CompletableFuture<CompletedFlightEventDto>> flightCompleteResponses,
+            ConcurrentHashMap<String, CompletableFuture<FlightReservationsCompletedEventDto>> reservationsCompletedResponses,
+            TransactionProperties transactionProperties) {
         this.rabbit = rabbit;
         this.flightCancelResponses = flightCancelResponses;
         this.reservationsCancelResponses = reservationsCancelResponses;
         this.milesResponses = milesResponses;
         this.flightClient = flightClient;
+        this.flightCompleteResponses = flightCompleteResponses;
+        this.reservationsCompletedResponses = reservationsCompletedResponses;
     }
 
     public CancelledFlightResponseDto cancelFlightSaga(String flightCode) {
@@ -146,6 +158,65 @@ public class FlightSagaOrchestrator {
                     new CompensateCancelFlightCommand(
                             flightEvt.codigo(),
                             flightEvt.estadoAnterior()));
+        }
+    }
+
+    public CompletedFlightResponseDto completeFlight(String flightCode) {
+        if (!flightClient.existsByCode(flightCode)) {
+            throw new IllegalArgumentException("Voo não encontrado: " + flightCode);
+        }
+
+        EnumSet<CompleteFlightSagaStep> completed = EnumSet.noneOf(CompleteFlightSagaStep.class);
+        try {
+            var flightFuture = new CompletableFuture<CompletedFlightEventDto>();
+            flightCompleteResponses.put(flightCode, flightFuture);
+
+            rabbit.convertAndSend(
+                    RabbitConstants.EXCHANGE,
+                    RabbitConstants.COMPLETE_FLIGHT_CMD_QUEUE,
+                    new CompleteFlightDto(flightCode));
+            completed.add(CompleteFlightSagaStep.FLIGHT_COMPLETED);
+            CompletedFlightEventDto flightEvt = getWithTimeout(flightCompleteResponses, flightCode);
+
+            var resFuture = new CompletableFuture<FlightReservationsCompletedEventDto>();
+
+            reservationsCompletedResponses.put(flightCode, resFuture);
+            rabbit.convertAndSend(
+                    RabbitConstants.EXCHANGE,
+                    RabbitConstants.COMPLETE_RESERVATION_BY_FLIGHT_CMD_QUEUE,
+                    new CompleteFlightDto(flightCode));
+            getWithTimeout(reservationsCompletedResponses, flightCode);
+            completed.add(CompleteFlightSagaStep.RESERVATIONS_COMPLETED);
+
+            return new CompletedFlightResponseDto(
+                    flightEvt.codigo(),
+                    flightEvt.data(),
+                    flightEvt.valor_passagem(),
+                    flightEvt.quantidade_poltronas_total(),
+                    flightEvt.quantidade_poltronas_ocupadas(),
+                    flightEvt.estado(),
+                    flightEvt.codigo_aeroporto_origem(),
+                    flightEvt.codigo_aeroporto_destino());
+        } catch (Exception e) {
+           compensateCompleteFlightSaga(flightCode, completed);
+        } finally {
+            reservationsCompletedResponses.remove(flightCode);
+            flightCompleteResponses.remove(flightCode);
+        }
+
+        return null;
+    }
+
+    private void compensateCompleteFlightSaga(
+            String flightCode,
+            EnumSet<CompleteFlightSagaStep> completed) {
+
+        if (completed.contains(CompleteFlightSagaStep.FLIGHT_COMPLETED)) {
+            rabbit.convertAndSend(
+                    RabbitConstants.EXCHANGE,
+                    RabbitConstants.COMPENSATE_CANCEL_FLIGHT_CMD_QUEUE,
+                    new CompensateCancelFlightCommand(
+                            flightCode, "CONFIRMADA"));
         }
     }
 

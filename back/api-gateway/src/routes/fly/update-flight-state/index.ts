@@ -3,7 +3,7 @@ import { FastifyTypedInstance } from 'src/shared/types'
 import { FastifyReply, FastifyRequest } from 'fastify'
 import { Env } from 'src/shared/env'
 import { updateFlightStateSchema } from './schema'
-import { userAuthMiddleware } from 'src/middlewares/user-auth'
+import { employeeAuthMiddleware } from 'src/middlewares/employee-auth'
 
 export async function updateFlightStateRoute(app: FastifyTypedInstance) {
   const path = '/voos/:codigoVoo/estado'
@@ -12,7 +12,7 @@ export async function updateFlightStateRoute(app: FastifyTypedInstance) {
     path,
     {
       schema: updateFlightStateSchema,
-      preHandler: userAuthMiddleware,
+      preHandler: employeeAuthMiddleware,
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
@@ -20,7 +20,6 @@ export async function updateFlightStateRoute(app: FastifyTypedInstance) {
         const { estado } = request.body as { estado: 'CANCELADO' | 'REALIZADO' }
 
         let response
-
         if (estado === 'CANCELADO') {
           response = await axios.patch(`${Env.SAGA_URL}/voos/cancela/${codigoVoo}`, { estado })
         } else {

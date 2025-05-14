@@ -22,4 +22,12 @@ public class FlightPublisher {
                 dto
         );
     }
+
+    public void publishFlightCompleted(CancelledFlightEventDto dto) {
+        rabbit.convertAndSend(
+                RabbitConstants.EXCHANGE,
+                RabbitConstants.FLIGHT_COMPLETED_RESP_QUEUE,
+                dto
+        );
+    }
 }
