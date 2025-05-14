@@ -1,11 +1,14 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import LoginForm from './components/LoginForm.vue'
 import RegisterForm from './components/RegisterForm.vue'
+
+const activeTab = ref('login')
 </script>
 
 <template>
-  <Tabs default-value="login" class="w-[400px] mx-auto">
+  <Tabs v-model="activeTab" class="w-[400px] mx-auto">
     <TabsList class="grid grid-cols-2 w-full">
       <TabsTrigger value="login">Login</TabsTrigger>
       <TabsTrigger value="register">Cadastro</TabsTrigger>
@@ -15,7 +18,7 @@ import RegisterForm from './components/RegisterForm.vue'
       <LoginForm />
     </TabsContent>
     <TabsContent value="register">
-      <RegisterForm />
+      <RegisterForm @registered="activeTab = 'login'"/>
     </TabsContent>
   </Tabs>
 </template>

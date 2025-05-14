@@ -8,7 +8,24 @@ export const registerClient = async (client: Client): Promise<Client | null> => 
     try {
         client = formatarUsuario(client);
 
-        const response = await api.post(`/clientes`, formatarUsuario(client))
+        const response = await api.post(`/clientes`,
+            {
+                cpf: client.cpf,
+                email: client.email,
+                nome: client.nome,
+                saldo_milhas: client.saldo_milhas,
+                endereco: {
+                  cep: client.endereco.cep,
+                  uf: client.endereco.uf,
+                  cidade: client.endereco.cidade,
+                  bairro: client.endereco.bairro,
+                  rua: client.endereco.rua,
+                  numero: client.endereco.numero,
+                  complemento: client.endereco.complemento,
+                }
+            }
+        )
+
 
         return response.data
     } catch (error) {
