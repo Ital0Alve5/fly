@@ -16,6 +16,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useMilesStore } from '@/stores/miles'
 import { registerExtract, type ExtractItem } from '@/mock/extract'
 import { getTodayDate } from '@/utils/date/getTodayDate'
+import { addMilesToClient } from '@/clientService/ClientService'
 import router from '@/router'
 
 const authStore = useAuthStore()
@@ -34,29 +35,40 @@ const pricePerMile = computed(() => milesStore.pricePerMile)
 const totalPrice = computed(() => milesStore.totalPrice)
 
 const onSubmit = async () => {
-  const newExtract: ExtractItem = {
-    codigo_cliente: authStore.user?.usuario.codigo || 0,
-    data: getTodayDate(),
-    codigo_reserva: null,
-    valor_reais: totalPrice.value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
-    quantidade_milhas: currentCheckoutMiles.value,
-    descricao: 'COMPRA DE MILHAS',
-    tipo: 'ENTRADA',
+  try {
+    const newExtract: ExtractItem = {
+      codigo_cliente: authStore.user?.usuario?.codigo || 0,
+      data: getTodayDate(),
+      codigo_reserva: null,
+      valor_reais: totalPrice.value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
+      quantidade_milhas: currentCheckoutMiles.value,
+      descricao: 'COMPRA DE MILHAS',
+      tipo: 'ENTRADA',
+    }
+
+    addMilesToClient(currentCheckoutMiles.value);
+
+    registerExtract(newExtract) //TODO:  mudar para api /reservas POST
+
+    milesStore.setTotalMiles(totalMiles.value + currentCheckoutMiles.value) // TODO: mudar para usar dados do cliente(analisar ainda)
+    milesStore.setCurrentCheckoutMiles(10) // TODO: mudar para usar dados do cliente(analisar ainda)
+
+    toast({
+      title: 'Pagamento efetuado com sucesso',
+      description: 'Suas milhas foram compradas com sucesso!',
+      variant: 'default',
+      duration: 2000,
+    })
+
+    router.push('/reservas')
+  } catch {
+    toast({
+      title: 'Erro ao comprar milhas',
+      description: 'Houve um erro ao registrar a sua compra de milhas!',
+      variant: 'destructive',
+      duration: 2000,
+    })
   }
-
-  registerExtract(newExtract)
-
-  milesStore.setTotalMiles(totalMiles.value + currentCheckoutMiles.value)
-  milesStore.setCurrentCheckoutMiles(10)
-
-  toast({
-    title: 'Pagamento efetuado com sucesso',
-    description: 'Suas milhas foram compradas com sucesso!',
-    variant: 'default',
-    duration: 2000,
-  })
-
-  router.push('/reservas')
 }
 </script>
 

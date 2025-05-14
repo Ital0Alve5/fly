@@ -104,9 +104,9 @@ export type MilesExtractItem = {
 }
 
 export type MilesExtractResponse = {
-  codigo: number
-  saldo_milhas: number
-  transacoes: MilesExtractItem[]
+  codigo: number | undefined
+  saldo_milhas: number | undefined
+  transacoes: MilesExtractItem[] | undefined
 }
 
 export type MilesSummaryResponse = {

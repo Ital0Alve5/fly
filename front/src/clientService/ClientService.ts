@@ -1,5 +1,5 @@
 import type { Client } from '@/types/Auth/AuthenticatedUserData'
-import type { ReservationListResponse } from '@/types/Api'
+import type { ReservationListResponse, MilesExtractResponse } from '@/types/Api'
 import api from '@/lib/axios'
 import { formatarUsuario } from '@/utils/clientFormat'
 import { useAuthStore } from '@/stores/auth'
@@ -42,6 +42,35 @@ export const getClientReservationList = async (): Promise<ReservationListRespons
         return response.data
     } catch (error) {
         console.error('Erro ao pegar lista de reserva do cliente:', error)
+        return null
+    }
+}
+
+export const addMilesToClient = async (milesQuantity: number): Promise<{ codigo: number; saldo_milhas: number } | null> => {
+    const authStore = useAuthStore()
+    const code = authStore.user?.usuario?.codigo
+    try {
+        const response = await api.put(`/clientes/${code}/milhas`,
+            {
+                quantidade: milesQuantity
+            },
+        )
+        return response.data
+    } catch (error) {
+        console.error('Erro ao adicionar milhas:', error)
+        return null
+    }
+}
+
+export const getClientTransactionHistory = async (): Promise<MilesExtractResponse | null> => {
+    const authStore = useAuthStore()
+    const code = authStore.user?.usuario?.codigo
+    try {
+        const response = await api.get(`/clientes/${code}/milhas`)
+
+        return response.data
+    } catch (error) {
+        console.error('Erro ao adicionar milhas:', error)
         return null
     }
 }
