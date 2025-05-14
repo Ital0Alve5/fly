@@ -22,7 +22,7 @@ import PerformFlightDialog from './components/PerformFlightDialog.vue'
 import RegisterFlightDialog from './components/RegisterFlightDialog.vue'
 import { getFlightsInNext48Hours, cancelFlight } from '@/mock/flight'
 import { cancelReservationByFlightCode } from '@/mock/booking'
-
+import formatDateTime from '@/utils/date/formatDateTime'
 import ConfirmBoardingDialog from '@/views/Manager/NextFlightListing/components/ConfirmBoardingDialog.vue'
 import CancelFlightDialog from './components/CancelFlightDialog.vue'
 import getFlightsInNext48Hrs from './services/getFlightsInNext48Hrs'
@@ -133,7 +133,7 @@ function handelCancelFlight() {
         <TableBody>
           <TableRow v-for="flight in flights" :key="flight.codigo">
             <TableCell>
-              {{ flight.data }}
+              {{ formatDateTime(flight.data) }}
             </TableCell>
             <TableCell> {{ flight.aeroporto_origem.codigo }} </TableCell>
             <TableCell>{{ flight.aeroporto_destino.codigo }}</TableCell>
