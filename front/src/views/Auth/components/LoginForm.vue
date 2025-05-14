@@ -2,6 +2,7 @@
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useGlobalStore } from '@/stores/global'
+import login from '../services/login'
 
 import { useLoginForm } from '../composables/useLoginForm'
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card'
@@ -16,11 +17,22 @@ const globalStore = useGlobalStore()
 const { handleSubmit, email, password } = useLoginForm()
 
 const onSubmit = handleSubmit(async (values) => {
-  const userData = await authStore.login(values.email, values.password)
+  try {
+    const userData = await login({ login: values.email, senha: values.password })
 
-  if (userData) {
-    router.push(userData.tipo === 'FUNCIONARIO' ? '/adm/voos' : '/reservas')
-  } else {
+    if (userData) {
+      authStore.login(userData.data)
+
+      router.push(userData.data.tipo === 'FUNCIONARIO' ? '/adm/voos' : '/reservas')
+    } else {
+      globalStore.setNotification({
+        title: 'Erro no login!',
+        description: 'Verifique seu e-mail e senha.',
+        variant: 'destructive',
+      })
+    }
+  } catch (error) {
+    console.log(error)
     globalStore.setNotification({
       title: 'Erro no login!',
       description: 'Verifique seu e-mail e senha.',
@@ -52,7 +64,7 @@ const onSubmit = handleSubmit(async (values) => {
           <FormItem>
             <FormLabel>Senha</FormLabel>
             <FormControl>
-              <Input v-bind="componentField" type="password" placeholder="Senha (4 dígitos)" />
+              <Input v-bind="componentField" type="password" placeholder="Senha (6 dígitos)" />
             </FormControl>
             <FormMessage>{{ password.errorMessage.value }}</FormMessage>
           </FormItem>

@@ -1,0 +1,14 @@
+import api from '@/lib/axios'
+import type { Employee } from '@/types/Auth/Employee'
+import type { AxiosResponse } from 'axios'
+
+export default async function updateEmployee(data: {
+  codigo: number,
+  nome: string
+  email: string
+  telefone: string
+  cpf: string
+  senha: string
+}): Promise<AxiosResponse<Employee>> {
+  return await api.put(`/funcionarios/${data.codigo}`, data)
+}
