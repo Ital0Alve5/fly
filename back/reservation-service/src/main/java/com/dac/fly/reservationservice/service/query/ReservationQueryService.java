@@ -174,13 +174,16 @@ public class ReservationQueryService {
                         .orElseThrow(() -> new RuntimeException(
                                 "Projeção de reserva não encontrada: " + reservaCodigo));
 
-                System.out.println("Estado atual: " + view.getEstado());
-                System.out.println(view.getEstado().equals("EMBARCADA"));
-                if(!view.getEstado().equals("EMBARCADA")) {
+                if(view.getEstado().equals("CANCELADA VOO") || view.getEstado().equals("CANCELADA")) {
                     continue;
                 }
 
-                view.setEstado("REALIZADA");
+                if(view.getEstado().equals("EMBARCADA")) {
+                    view.setEstado("REALIZADA");
+                } else {
+                    view.setEstado("NÃO REALIZADA");
+                }
+
 
                 view.setHistorico(buildHistoryJson(reservaCodigo));
 

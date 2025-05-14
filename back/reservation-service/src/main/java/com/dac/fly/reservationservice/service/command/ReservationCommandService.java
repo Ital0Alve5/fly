@@ -27,7 +27,7 @@ public class ReservationCommandService {
         private final EstadoRepository estadoRepository;
         private final HistoryRepository historyRepository;
         private final ReservationResponseFactory responseFactory;
-        private final ReservaQueryRepository reservaQueryRepository;        
+        private final ReservaQueryRepository reservaQueryRepository;
 
         public ReservationCommandService(
                         ReservaCommandRepository repository,
@@ -91,7 +91,7 @@ public class ReservationCommandService {
         }
 
         public void completeReservationByFlight(String codigoReserva) {
-                doComplete(codigoReserva, ReservationStatusEnum.REALIZADA);
+                doComplete(codigoReserva);
         }
 
         public CancelledReservationEventDto doCancel(String codigoReserva,
@@ -139,16 +139,21 @@ public class ReservationCommandService {
                 return cancelDto;
         }
 
-        public void doComplete(String codigoReserva, ReservationStatusEnum targetStatus) {
+        public void doComplete(String codigoReserva) {
                 Reserva reserva = repository.findById(codigoReserva)
                                 .orElseThrow(() -> new RuntimeException("Reserva não encontrada: " + codigoReserva));
 
-
                 String estadoAtual = resolveEstadoNome(reserva.getEstado());
-                System.out.println("Estado atual: " + estadoAtual);
-                System.out.println(!"EMBARCADA".equals(estadoAtual));
-                if (!"EMBARCADA".equals(estadoAtual)) {
-                   return;
+                ReservationStatusEnum targetStatus;
+
+                if ("CANCELADA VOO".equals(estadoAtual) || "CANCELADA".equals(estadoAtual)) {
+                        return;
+                }
+
+                if ("EMBARCADA".equals(estadoAtual)) {
+                        targetStatus = ReservationStatusEnum.REALIZADA;
+                } else {
+                        targetStatus = ReservationStatusEnum.NAO_REALIZADA;
                 }
 
                 Long oldStatus = reserva.getEstado();
@@ -178,8 +183,9 @@ public class ReservationCommandService {
                         throw new RuntimeException("Não é permitido alterar o estado de uma reserva cancelada.");
                 }
 
-                if(!"CHECK-IN".equals(estadoAtual) && novoEstado.estado().equals(ReservationStatusEnum.EMBARCADA)) {
-                        throw new RuntimeException("Não é permitido alterar o estado da reserva para EMBARCADA sem estar no estado CHECK-IN.");
+                if (!"CHECK-IN".equals(estadoAtual) && novoEstado.estado().equals(ReservationStatusEnum.EMBARCADA)) {
+                        throw new RuntimeException(
+                                        "Não é permitido alterar o estado da reserva para EMBARCADA sem estar no estado CHECK-IN.");
                 }
 
                 Long idNovoEstado = estadoRepository.findByNome(novoEstado.estado().toString())

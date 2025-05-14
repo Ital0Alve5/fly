@@ -28,7 +28,7 @@ public enum ReservationStatusEnum {
         return switch (this) {
             case CHECK_IN -> "CHECK-IN";
             case CANCELADA_VOO -> "CANCELADA VOO";
-            case NAO_REALIZADA -> "NAO REALIZADA";
+            case NAO_REALIZADA -> "NÃO REALIZADA";
             default -> name();
         };
     }
