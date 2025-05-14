@@ -38,6 +38,8 @@ public final class RabbitConstants {
     /** --- Contexto: Cliente (Client Saga) --- */
     public static final String CREATE_CLIENT_CMD_QUEUE = "saga.create-client-cmd";
     public static final String CREATE_CLIENT_RESP_QUEUE = "saga.create-client-resp";
+    public static final String DELETE_CLIENT_CMD_QUEUE = "saga.delete-client-cmd";
+    public static final String DELETE_CLIENT_RESP_QUEUE = "saga.delete-client-resp";
 
     /** --- Contexto: Funcionário (Employee Saga) --- */
     public static final String CREATE_EMPLOYEE_CMD_QUEUE = "saga.create-employee-cmd";

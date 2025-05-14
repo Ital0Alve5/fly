@@ -2,6 +2,7 @@ package com.dac.fly.clientservice.service;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -178,6 +179,12 @@ public class ClientService {
         }
 
         return true;
+    }
+
+    public void deleteClient(Long clientCode) {
+        Optional<Client> optionalClient = clientRepository.findById(clientCode);
+
+        optionalClient.ifPresent(clientRepository::delete);
     }
 
     private BigDecimal calculateRealValue(Integer miles) {
