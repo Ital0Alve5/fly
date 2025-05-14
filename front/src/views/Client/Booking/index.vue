@@ -15,14 +15,18 @@ import { useMilesStore } from '@/stores/miles'
 import CancelReservationDialog from '@/components/dialogs/CancelReservationDialog.vue'
 import { getBookingByUserCode } from '@/mock/booking'
 import CheckReservationDialog from './components/CheckReservationDialog.vue'
+import { getClientReservationList } from '@/clientService/ClientService'
 import type { Reserve } from '@/types/Reserve'
+import type { ReservationListResponse } from '@/types/Api'
+import { formatDateTime } from '@/utils/date/formatDateTime'
 
 const router = useRouter()
 const milesStore = useMilesStore()
-const booking = ref<Reserve[]>([])
+const booking = ref<ReservationListResponse>([])
 
 onMounted(async () => {
-  booking.value = await getBookingByUserCode()
+  const result = await getClientReservationList();
+  booking.value = result ?? [];
 })
 
 const viewReservation = async (codigo: string) => {
@@ -80,7 +84,7 @@ function openCheckReservationDialog() {
               <TableBody>
                 <TableRow v-for="reservation in booking" :key="reservation.codigo">
                   <TableCell class="text-center px-6 py-4 text-lg">{{
-                    reservation.data
+                    formatDateTime(reservation.data)
                   }}</TableCell>
                   <TableCell class="text-center px-6 py-4 text-lg">{{
                     reservation.voo.aeroporto_origem.codigo

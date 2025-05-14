@@ -29,22 +29,43 @@ import { ArrowUpDown } from 'lucide-vue-next'
 import { h, ref } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { getExtractByUserCode, type ExtractItem } from '@/mock/extract'
+import { getClientTransactionHistory } from '@/clientService/ClientService'
+import type { MilesExtractResponse, MilesExtractItem } from '@/types/Api'
 
 const authtore = useAuthStore()
 
-const userCode = computed(() => authtore.user?.usuario.codigo)
-const data = ref<ExtractItem[]>([])
+const userCode = computed(() => authtore.user?.usuario?.codigo)
+const data = ref<MilesExtractResponse | null>(null)
 
-watchEffect(() => {
+watchEffect(async () => {
   if (userCode.value) {
-    const extractedData = getExtractByUserCode(userCode.value)
-    data.value = extractedData
+    try {
+      const response = await getClientTransactionHistory()
+
+      const transformed: MilesExtractResponse = {
+        codigo: response?.codigo,
+        saldo_milhas: response?.saldo_milhas,
+        transacoes: response?.transacoes?.map((item) => ({
+          data: new Date(item.data).toLocaleString('pt-BR'),
+          codigo_reserva: item.codigo_reserva ?? '-',
+          valor_reais: Number(item.valor_reais),
+          quantidade_milhas: item.quantidade_milhas,
+          descricao: item.descricao,
+          tipo: item.tipo,
+        })),
+      }
+
+      data.value = transformed
+    } catch (error) {
+      console.error('Erro ao buscar histórico de transações:', error)
+      data.value = null
+    }
   } else {
-    data.value = []
+    data.value = null
   }
 })
 
-const columns: ColumnDef<ExtractItem>[] = [
+const columns: ColumnDef<MilesExtractItem>[] = [
   {
     accessorKey: 'data',
     header: ({ column }) => {
@@ -151,7 +172,7 @@ const expanded = ref<ExpandedState>({})
 
 const table = computed(() =>
   useVueTable({
-    data: data.value,
+    data: data.value?.transacoes ?? [],
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),

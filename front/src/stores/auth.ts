@@ -1,9 +1,9 @@
 import { defineStore } from 'pinia'
 import { useLocalStorage } from '@vueuse/core'
 import type { AuthenticatedUserData, Client, Employee } from '@/types/Auth/AuthenticatedUserData'
-import clientsMock from '@/mock/clients'
 import employeesMock from '@/mock/employees'
 import { addEmployeePassword, addClientPassword } from '@/mock/auth'
+import { registerClient } from '@/clientService/ClientService'
 
 function generatedRandomPassword(): string {
   return Math.floor(1000 + Math.random() * 9000).toString()
@@ -38,26 +38,27 @@ export const useAuthStore = defineStore('auth', () => {
     if (!newUser.nome || !newUser.email || !newUser.cpf || !newUser.endereco.cep) {
       throw new Error('Todos os campos são obrigatórios.')
     }
+    try {
+      const client = await registerClient(newUser)
 
-    const senha = generatedRandomPassword()
+      const senha = generatedRandomPassword()
 
-    clientsMock.registerClient(newUser)
+      sendPasswordOnEmail(newUser.email, senha)
 
-    sendPasswordOnEmail(newUser.email, senha)
+      user.value = {
+        access_token: '',
+        token_type: '',
+        tipo: 'CLIENTE',
+        senha: senha,
+        usuario: client,
+      }
 
-    isAuthenticated.value = true
+      // addClientPassword(newUser.email, senha)
 
-    user.value = {
-      access_token: '',
-      token_type: '',
-      tipo: 'CLIENTE',
-      senha: senha,
-      usuario: newUser,
+      return user.value
+    } catch {
+      throw new Error('Erro ao registrar cliente.')
     }
-
-    addClientPassword(newUser.email, senha)
-
-    return user.value
   }
 
   async function registerEmployee(newEmployee: Employee) {

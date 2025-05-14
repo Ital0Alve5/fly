@@ -36,5 +36,5 @@ export type AuthenticatedUserData = {
   token_type: string
   tipo: 'CLIENTE' | 'FUNCIONARIO'
   senha: string
-  usuario: Client | Employee
+  usuario: Client | Employee | null
 }
