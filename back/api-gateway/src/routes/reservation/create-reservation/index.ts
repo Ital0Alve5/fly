@@ -18,15 +18,12 @@ export async function createReservationRoute(app: FastifyTypedInstance) {
       try {
         const { codigo_cliente } = request.body as { codigo_cliente: string }
 
-        console.log('Valida cliente:', request.user?.data.codigoExterno, codigo_cliente)
-        console.log('Tipo: ', typeof request.user?.data.codigoExterno, typeof codigo_cliente)
         if (request.user?.data.codigoExterno !== codigo_cliente) {
           return reply
             .status(HttpStatusCode.Forbidden)
             .send({ message: 'Você não tem permissão para acessar este cliente' })
         }
-
-        console.log('Validou cliente:', request.user?.data.codigoExterno, codigo_cliente)
+ 
         const reservationResponse = await axios.post(
           `${Env.SAGA_URL}/reservations`,
           request.body,
