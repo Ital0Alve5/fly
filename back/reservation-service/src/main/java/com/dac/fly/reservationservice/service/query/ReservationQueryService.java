@@ -174,7 +174,7 @@ public class ReservationQueryService {
                         .orElseThrow(() -> new RuntimeException(
                                 "Projeção de reserva não encontrada: " + reservaCodigo));
 
-                if(!view.getEstado().equals("CANCELADA VOO") || view.getEstado().equals("CANCELADA")) {
+                if(view.getEstado().equals("CANCELADA VOO") || view.getEstado().equals("CANCELADA")) {
                     continue;
                 }
 
