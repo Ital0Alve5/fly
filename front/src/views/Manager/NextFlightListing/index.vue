@@ -21,10 +21,11 @@ import { Button } from '@/components/ui/button'
 import PerformFlightDialog from './components/PerformFlightDialog.vue'
 import RegisterFlightDialog from './components/RegisterFlightDialog.vue'
 import { cancelReservationByFlightCode } from '@/mock/booking'
-import formatDateTime from '@/utils/date/formatDateTime'
+import { formatDateTime } from '@/utils/date/formatDateTime'
 import ConfirmBoardingDialog from '@/views/Manager/NextFlightListing/components/ConfirmBoardingDialog.vue'
 import CancelFlightDialog from './components/CancelFlightDialog.vue'
 import getFlightsInNext48Hrs from './services/getFlightsInNext48Hrs'
+import { cancelFlight } from '@/views/Manager/NextFlightListing/services/NextFlightListingService.ts'
 import type { Flight } from '@/types/Flight'
 
 const isBoardingDialogOpen = ref(false)
@@ -47,23 +48,26 @@ watch([isCancelDialogOpen, isPerformDialogOpen], async ([newCancelVal, newPerfor
   }
 })
 
-function handleConfirmBoarding(selectedFlightCode: string) {
+async function handleConfirmBoarding(selectedFlightCode: string) {
+  flights.value = (await getFlightsInNext48Hrs()).data
   selectedFlight.value = selectedFlightCode
   isBoardingDialogOpen.value = true
 }
 
-function handleCancelFlightDialog(selectedFlightCode: string) {
+async function handleCancelFlightDialog(selectedFlightCode: string) {
+  flights.value = (await getFlightsInNext48Hrs()).data
   selectedFlight.value = selectedFlightCode
   isCancelDialogOpen.value = true
 }
 
-function handlePerformFlight(selectedFlightCode: string) {
+async function handlePerformFlight(selectedFlightCode: string) {
+  flights.value = (await getFlightsInNext48Hrs()).data
   selectedFlight.value = selectedFlightCode
   isPerformDialogOpen.value = true
 }
 
 async function handleFlightRegistered(code: string) {
-  // await loadFlights()
+  flights.value = (await getFlightsInNext48Hrs()).data
   generatedCode.value = code
   createdFlight.value = true
 }
@@ -71,11 +75,8 @@ async function handleFlightRegistered(code: string) {
 
 async function handelCancelFlight() {
   try {
-    cancelReservationByFlightCode(selectedFlight.value) // mudar para API
-    // const success = await cancelFlight(selectedFlight.value)
-    // if (success) {
-      // cancelFlight(selectedFlight.value)
-      // await loadFlights()
+    const success = await cancelFlight(selectedFlight.value)
+    if (success) {
       isCancelDialogOpen.value = false
 
       toast({
@@ -84,9 +85,9 @@ async function handelCancelFlight() {
         variant: 'default',
         duration: 1000,
       })
-    // } else {
-    //   throw new Error('Erro ao cancelar voo')
-    // }
+    } else {
+      throw new Error('Erro ao cancelar voo')
+    }
   } catch (error) {
     toast({
       title: 'Erro ao cancelar voo',

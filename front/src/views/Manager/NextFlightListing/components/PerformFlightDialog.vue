@@ -10,7 +10,6 @@ import { Button } from '@/components/ui/button'
 import { searchReservesByFlightCode, updateReservationStatus } from '@/mock/booking'
 import { useToast } from '@/components/ui/toast'
 import { performFlight } from '@/views/Manager/NextFlightListing/services/NextFlightListingService.ts'
-import api from '@/lib/axios'
 import type { Reserve } from '@/types/Reserve'
 import { ref } from 'vue'
 
@@ -31,8 +30,6 @@ const handleConfirmPerformance = async () => {
     if (flightPerformed === null || flightPerformed === undefined || flightPerformed === false) {
       throw new Error('Falha ao atualizar status do voo')
     }
-
-    performFlight(props.selectedFlightCode);
 
     const reservations = await searchReservesByFlightCode(props.selectedFlightCode) // mudar para api
     reservations.forEach(async (reservation) => {

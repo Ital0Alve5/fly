@@ -8,7 +8,7 @@ export const cancelFlight = async (code: string): Promise<boolean> => {
         estado: 'CANCELADO'
       })
   
-      return response.status === 200
+      return response.status == 200
     } catch (error) {
       console.error('Erro ao cancelar o voo:', error)
       return false
@@ -19,12 +19,12 @@ export const cancelFlight = async (code: string): Promise<boolean> => {
 export const performFlight = async (code: string): Promise<boolean> => {
     try {
         const response = await api.patch(`/voos/${code}/estado`,
-            {
+          {
             estado: 'REALIZADO'
-            }
+          }
         )
 
-        return response.status === 200
+        return response.status == 200
     } catch (error) {
         console.error('Erro ao realizar o voo:', error)
         return false
@@ -70,10 +70,8 @@ export const registerFlight = async (data: {
   codigo_aeroporto_origem: string,
   codigo_aeroporto_destino: string
 }) => {
-  console.log(data)
   try {
     const response = await api.post(`/voos`, data);
-    console.log(response);
     return response.data || []
   } catch (error) {
     console.error('Erro ao cadastrar o voo:', error)
