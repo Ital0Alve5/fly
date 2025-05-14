@@ -26,9 +26,10 @@ export async function userAuthMiddleware(
     request.user = {
       token,
       type: 'user',
-      data: response.data,
+      data: response.data.data,
     }
 
+    console.log(request.user?.data)
     return
   } catch (err) {
     if (axios.isAxiosError(err) && err.response) {

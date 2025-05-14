@@ -26,9 +26,10 @@ export async function employeeAuthMiddleware(
     request.user = {
       token,
       type: 'employee',
-      data: response.data,
+      data: response.data.data,
     }
 
+    console.log(request.user?.data)
     return
   } catch (err) {
     if (axios.isAxiosError(err) && err.response) {
