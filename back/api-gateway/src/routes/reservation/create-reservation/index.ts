@@ -28,7 +28,7 @@ export async function createReservationRoute(app: FastifyTypedInstance) {
 
         console.log('Validou cliente:', request.user?.data.codigoExterno, codigo_cliente)
         const reservationResponse = await axios.post(
-          `${Env.SAGA_URL}/reservas`,
+          `${Env.SAGA_URL}/reservations`,
           request.body,
           {
             headers: {
