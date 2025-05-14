@@ -28,6 +28,22 @@ public class FlightSagaRabbitConfig {
         return new Queue(RabbitConstants.FLIGHT_CANCELLED_RESP_QUEUE, true);
     }
 
+    @Bean("flightCompleteCmdQueue")
+    public Queue flightCompleteCmdQueue() {
+        return new Queue(RabbitConstants.COMPLETE_FLIGHT_CMD_QUEUE, true);
+    }
+
+    @Bean("flightCompletedEventQueue")
+    public Queue flightCompletedEventQueue() { return new Queue(RabbitConstants.FLIGHT_COMPLETED_RESP_QUEUE, true); }
+
+    @Bean("completeReservationsByFlightCmdQueue")
+    public Queue completeReservationsByFlightCmdQueue() {
+        return new Queue(RabbitConstants.COMPLETE_RESERVATION_BY_FLIGHT_CMD_QUEUE, true);
+    }
+
+    @Bean("flightReservationsCompletedEventQueue")
+    public Queue flightReservationsCompletedEventQueue() { return new Queue(RabbitConstants.FLIGHT_RESERVATIONS_COMPLETED_QUEUE, true); }
+
     @Bean("flightReservationsCancelledEventQueue")
     public Queue flightReservationsCancelledEventQueue() {
         return new Queue(RabbitConstants.FLIGHT_RESERVATIONS_CANCELLED_QUEUE, true);
@@ -77,5 +93,34 @@ public class FlightSagaRabbitConfig {
         return BindingBuilder.bind(q)
                 .to(flightSagaExchange())
                 .with(RabbitConstants.CANCEL_RESERVATION_BY_FLIGHT_CMD_QUEUE);
+    }
+
+    @Bean
+    public Binding bindFlightComplete() {
+        return BindingBuilder.bind(flightCompleteCmdQueue())
+                .to(flightSagaExchange())
+                .with(RabbitConstants.COMPLETE_FLIGHT_CMD_QUEUE);
+    }
+
+    @Bean
+    public Binding bindFlightCompleted() {
+        return BindingBuilder.bind(flightCompletedEventQueue())
+                .to(flightSagaExchange())
+                .with(RabbitConstants.FLIGHT_COMPLETED_RESP_QUEUE);
+    }
+
+    @Bean
+    public Binding bindCompleteReservationsByFlightCmd(
+            @Qualifier("completeReservationsByFlightCmdQueue") Queue q) {
+        return BindingBuilder.bind(q)
+                .to(flightSagaExchange())
+                .with(RabbitConstants.COMPLETE_RESERVATION_BY_FLIGHT_CMD_QUEUE);
+    }
+
+    @Bean
+    public Binding bindFlightReservationsCompleted() {
+        return BindingBuilder.bind(flightReservationsCompletedEventQueue())
+                .to(flightSagaExchange())
+                .with(RabbitConstants.FLIGHT_RESERVATIONS_COMPLETED_QUEUE);
     }
 }
