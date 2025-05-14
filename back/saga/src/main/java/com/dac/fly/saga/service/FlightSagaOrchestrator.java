@@ -220,7 +220,6 @@ public class FlightSagaOrchestrator {
         }
     }
 
-
     private <T> T getWithTimeout(
             ConcurrentHashMap<String, CompletableFuture<T>> map,
             String key) {

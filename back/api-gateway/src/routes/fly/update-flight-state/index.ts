@@ -20,7 +20,6 @@ export async function updateFlightStateRoute(app: FastifyTypedInstance) {
         const { estado } = request.body as { estado: 'CANCELADO' | 'REALIZADO' }
 
         let response
-
         if (estado === 'CANCELADO') {
           response = await axios.patch(`${Env.SAGA_URL}/voos/cancela/${codigoVoo}`, { estado })
         } else {

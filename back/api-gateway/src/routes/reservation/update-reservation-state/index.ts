@@ -19,7 +19,6 @@ export async function updateReservationStateRoute(app: FastifyTypedInstance) {
         const { codigoReserva } = request.params as { codigoReserva: string }
         const { estado } = request.body as { estado: string }
 
-        console.log(request.user?.data, request.user?.data.role)
         if (estado !== 'CHECK-IN' && request.user?.data.role !== 'FUNCIONARIO') {
           return reply
             .status(HttpStatusCode.Forbidden)
