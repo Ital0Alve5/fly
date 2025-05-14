@@ -25,7 +25,7 @@ export async function updateFlightStateRoute(app: FastifyTypedInstance) {
           response = await axios.patch(`${Env.SAGA_URL}/voos/cancela/${codigoVoo}`, { estado })
         } else {
           response = await axios.patch(
-            `${Env.FLY_SERVICE_URL}/voos/realiza/${codigoVoo}`,
+            `${Env.SAGA_URL}/voos/realiza/${codigoVoo}`,
             { estado },
             {
               headers: {
