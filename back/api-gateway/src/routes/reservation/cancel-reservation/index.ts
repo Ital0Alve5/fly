@@ -17,7 +17,7 @@ export async function cancelReservationRoute(app: FastifyTypedInstance) {
         const { codigoReserva } = request.params as { codigoReserva: string }
 
         const reservationResponse = await axios.delete(
-          `${Env.RESERVATION_SERVICE_URL}/reservas/${codigoReserva}`,
+          `${Env.SAGA_URL}/reservations/cancela/${codigoReserva}`,
         )
 
         return reply.status(HttpStatusCode.NoContent).send(reservationResponse.data.data)

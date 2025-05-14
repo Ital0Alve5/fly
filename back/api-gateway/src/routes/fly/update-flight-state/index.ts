@@ -19,22 +19,26 @@ export async function updateFlightStateRoute(app: FastifyTypedInstance) {
         const { codigoVoo } = request.params as { codigoVoo: string }
         const { estado } = request.body as { estado: 'CANCELADO' | 'REALIZADO' }
 
-        const response = await axios.patch(
-          `${Env.FLY_SERVICE_URL}/voos/${codigoVoo}/estado`,
+        let response
+
+        if (estado === 'CANCELADO') {
+          response = await axios.patch(`${Env.SAGA_URL}/voos/cancela/${codigoVoo}`, { estado })
+        } else {
+          response = await axios.patch(
+            `${Env.SAGA_URL}/voos/realiza/${codigoVoo}`,
             { estado },
-          {
-            headers: {
-              Authorization: `Bearer ${request.user?.token}`,
+            {
+              headers: {
+                Authorization: `Bearer ${request.user?.token}`,
+              },
             },
-          },
-        )
-        
+          )
+        }
+
         return reply.send(response.data.data)
       } catch (err) {
         if (axios.isAxiosError(err) && err.response) {
-          return reply
-            .status(err.response.status)
-            .send({ message: err.response.data.message })
+          return reply.status(err.response.status).send({ message: err.response.data.message })
         }
 
         return reply
@@ -43,4 +47,4 @@ export async function updateFlightStateRoute(app: FastifyTypedInstance) {
       }
     },
   )
-} 
+}
