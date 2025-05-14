@@ -41,7 +41,7 @@ public class FlightSagaController {
     public ResponseEntity<ApiResponse<CompletedFlightResponseDto>> completeFlight(
             @PathVariable String flightCode) {
         try {
-            CompletedFlightResponseDto dto = orchestrator.cancelFlightSaga(flightCode);
+            CompletedFlightResponseDto dto = orchestrator.completeFlight(flightCode);
             return ResponseEntity
                     .ok(ApiResponse.success(dto));
         } catch (RuntimeException e) {

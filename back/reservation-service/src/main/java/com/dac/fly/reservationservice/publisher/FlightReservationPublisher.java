@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import com.dac.fly.reservationservice.config.RabbitMQConfig;
 import com.dac.fly.shared.config.RabbitConstants;
 import com.dac.fly.shared.dto.events.FlightReservationsCancelledEventDto;
+import com.dac.fly.shared.dto.events.FlightReservationsCompletedEventDto;
 
 @Component
 public class FlightReservationPublisher {
@@ -35,5 +36,18 @@ public class FlightReservationPublisher {
             RabbitMQConfig.INTERNAL_CANCEL_FLIGHT_KEY,
             evt);
     }
-    
+
+    public void publishCompletedFlightReservations(FlightReservationsCompletedEventDto evt) {
+        rabbit.convertAndSend(
+            internalExchange.getName(),
+            RabbitConstants.COMPLETE_RESERVATION_BY_FLIGHT_CMD_QUEUE,
+            evt);
+    }
+
+    public void publishFlightReservationsCompletedForCqrs(FlightReservationsCompletedEventDto evt) {
+        rabbit.convertAndSend(
+            internalExchange.getName(),
+            RabbitMQConfig.INTERNAL_COMPLETE_FLIGHT_KEY,
+            evt);
+    }
 }

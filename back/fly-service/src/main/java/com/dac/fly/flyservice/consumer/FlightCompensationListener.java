@@ -1,5 +1,6 @@
 package com.dac.fly.flyservice.consumer;
 
+import com.dac.fly.shared.dto.command.CompensateCompleteFlightCommand;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
@@ -32,6 +33,23 @@ public class FlightCompensationListener {
             throw iae;
         } catch (Exception e) {
             System.err.printf("Erro ao compensar cancelamento de voo %s: %s%n",
+                    cmd.flightCode(), e.getMessage());
+            throw e;
+        }
+    }
+
+    @RabbitListener(queues = RabbitConstants.COMPENSATE_COMPLETE_FLIGHT_CMD_QUEUE)
+    public void handleCompensateCompleteFlight(CompensateCompleteFlightCommand cmd) {
+        try {
+            flightService.updateStatus(
+                    cmd.flightCode(),
+                    FlightStatusEnum.CONFIRMADO);
+        } catch (IllegalArgumentException iae) {
+            System.err.printf("Estado anterior inválido para compensação de voo %s: %s%n",
+                    cmd.flightCode(), cmd.estadoAnterior());
+            throw iae;
+        } catch (Exception e) {
+            System.err.printf("Erro ao compensar realização de voo %s: %s%n",
                     cmd.flightCode(), e.getMessage());
             throw e;
         }

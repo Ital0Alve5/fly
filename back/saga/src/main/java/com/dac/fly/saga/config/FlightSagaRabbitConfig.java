@@ -54,6 +54,11 @@ public class FlightSagaRabbitConfig {
         return new Queue(RabbitConstants.UPDATE_MILES_RESP_QUEUE, true);
     }
 
+    @Bean("compensateCompleteFlightCmdQueue")
+    public Queue compensateCompleteFlight() {
+        return new Queue(RabbitConstants.COMPENSATE_COMPLETE_FLIGHT_CMD_QUEUE, true);
+    }
+
     @Bean
     public Binding bindFlightCancel() {
         return BindingBuilder.bind(flightCancelCmdQueue())
@@ -122,5 +127,12 @@ public class FlightSagaRabbitConfig {
         return BindingBuilder.bind(flightReservationsCompletedEventQueue())
                 .to(flightSagaExchange())
                 .with(RabbitConstants.FLIGHT_RESERVATIONS_COMPLETED_QUEUE);
+    }
+
+    @Bean
+    public Binding bindCompensateCompleteFlight() {
+        return BindingBuilder.bind(compensateCompleteFlight())
+                .to(flightSagaExchange())
+                .with(RabbitConstants.COMPENSATE_COMPLETE_FLIGHT_CMD_QUEUE);
     }
 }

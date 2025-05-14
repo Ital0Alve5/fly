@@ -15,6 +15,7 @@ import com.dac.fly.reservationservice.repository.query.ReservaQueryRepository;
 import com.dac.fly.shared.dto.events.CancelledReservationEventDto;
 import com.dac.fly.shared.dto.events.ClientMilesDto;
 import com.dac.fly.shared.dto.events.FlightReservationsCancelledEventDto;
+import com.dac.fly.shared.dto.events.FlightReservationsCompletedEventDto;
 import com.dac.fly.shared.dto.response.CreatedReservationResponseDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -158,6 +159,26 @@ public class ReservationQueryService {
         try {
             if (reservaQueryRepository.existsById(reservationId)) {
                 reservaQueryRepository.deleteById(reservationId);
+            }
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public boolean handleFlightReservationsCompleted(FlightReservationsCompletedEventDto evt) {
+        try {
+            for (String reservaCodigo : evt.reservationCodes()) {
+
+                Reserva view = reservaQueryRepository.findById(reservaCodigo)
+                        .orElseThrow(() -> new RuntimeException(
+                                "Projeção de reserva não encontrada: " + reservaCodigo));
+
+                view.setEstado("REALIZADA");
+
+                view.setHistorico(buildHistoryJson(reservaCodigo));
+
+                reservaQueryRepository.save(view);
             }
             return true;
         } catch (Exception e) {

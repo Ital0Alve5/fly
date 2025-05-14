@@ -9,7 +9,7 @@ import com.dac.fly.reservationservice.service.query.ReservationQueryService;
 import com.dac.fly.shared.dto.events.CancelledReservationEventDto;
 import com.dac.fly.shared.dto.events.FlightReservationsCancelledEventDto;
 import com.dac.fly.shared.dto.response.CreatedReservationResponseDto;
-
+import com.dac.fly.shared.dto.events.FlightReservationsCompletedEventDto;
 @Component
 public class ReservationQueryListener {
 
@@ -53,4 +53,12 @@ public class ReservationQueryListener {
         }
     }
 
+    @RabbitListener(queues = RabbitMQConfig.INTERNAL_COMPLETE_FLIGHT_KEY)
+    public void handleReservationRemovedEvent(FlightReservationsCompletedEventDto evt) {
+        boolean ok = service.handleFlightReservationsCompleted(evt);
+        if (!ok) {
+            throw new AmqpRejectAndDontRequeueException(
+                    "Erro ao projetar remoção de reserva " + evt.flightCode());
+        }
+    }
 }

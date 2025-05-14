@@ -33,6 +33,19 @@ public class FlyRabbitConfig {
         return new TopicExchange(RabbitConstants.EXCHANGE);
     }
 
+    @Bean("flightCompleteCmdQueue")
+    public Queue flightCompleteCmdQueue() {
+        return new Queue(RabbitConstants.COMPLETE_FLIGHT_CMD_QUEUE, true);
+    }
+
+    @Bean("flightCompletedEventQueue")
+    public Queue flightCompletedEventQueue() { return new Queue(RabbitConstants.FLIGHT_COMPLETED_RESP_QUEUE, true); }
+
+    @Bean("compensateCompleteFlightCmdQueue")
+    public Queue compensateCompleteFlight() {
+        return new Queue(RabbitConstants.COMPENSATE_COMPLETE_FLIGHT_CMD_QUEUE, true);
+    }
+
     @Bean
     public Binding bindUpdateSeatsCommand(
             @Qualifier("updateSeatsCommandQueue") Queue updateSeatsCommandQueue,
@@ -101,5 +114,26 @@ public class FlyRabbitConfig {
                 .bind(q)
                 .to(ex)
                 .with(RabbitConstants.COMPENSATE_CANCEL_FLIGHT_CMD_QUEUE);
+    }
+
+    @Bean
+    public Binding bindFlightComplete() {
+        return BindingBuilder.bind(flightCompleteCmdQueue())
+                .to(exchange())
+                .with(RabbitConstants.COMPLETE_FLIGHT_CMD_QUEUE);
+    }
+
+    @Bean
+    public Binding bindFlightCompleted() {
+        return BindingBuilder.bind(flightCompletedEventQueue())
+                .to(exchange())
+                .with(RabbitConstants.FLIGHT_COMPLETED_RESP_QUEUE);
+    }
+
+    @Bean
+    public Binding bindCompensateCompleteFlight() {
+        return BindingBuilder.bind(compensateCompleteFlight())
+                .to(exchange())
+                .with(RabbitConstants.COMPENSATE_COMPLETE_FLIGHT_CMD_QUEUE);
     }
 }

@@ -38,6 +38,7 @@ public final class RabbitConstants {
     public static final String ROLLBACK_FLIGHT_CMD_QUEUE          = "saga.rollback-flight-cmd";
     public static final String COMPLETE_RESERVATION_BY_FLIGHT_CMD_QUEUE = "saga.flight-reservations-complete";
     public static final String FLIGHT_RESERVATIONS_COMPLETED_QUEUE = "saga.flight-reservations-completed";
+    public static final String COMPENSATE_COMPLETE_FLIGHT_CMD_QUEUE = "saga.compensate-complete-flight";
 
     /** --- Contexto: Cliente (Client Saga) --- */
     public static final String CREATE_CLIENT_CMD_QUEUE = "saga.create-client-cmd";

@@ -9,6 +9,7 @@ import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFacto
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -24,7 +25,7 @@ public class RabbitMQConfig {
     public static final String INTERNAL_UPDATED_KEY = "reserva.atualizada";
     public static final String INTERNAL_CANCEL_FLIGHT_KEY = "reserva.flight-reservations-cancel";
     public static final String INTERNAL_COMPENSATE_CREATE_KEY = "reserva.removida";
-
+    public static final String INTERNAL_COMPLETE_FLIGHT_KEY = "reserva.flight-reservations-complete";
     @Bean
     public TopicExchange sagaExchange() {
         return new TopicExchange(RabbitConstants.EXCHANGE);
@@ -58,6 +59,15 @@ public class RabbitMQConfig {
     }
 
     // filas "externas" (saga commands / responses)
+
+    @Bean("completeReservationsByFlightCmdQueue")
+    public Queue completeReservationsByFlightCmdQueue() {
+        return new Queue(RabbitConstants.COMPLETE_RESERVATION_BY_FLIGHT_CMD_QUEUE, true);
+    }
+
+    @Bean("flightReservationsCompletedEventQueue")
+    public Queue flightReservationsCompletedEventQueue() { return new Queue(RabbitConstants.FLIGHT_RESERVATIONS_COMPLETED_QUEUE, true); }
+
     @Bean
     public Queue createReservationCmd() {
         return new Queue(RabbitConstants.CREATE_RESERVATION_CMD_QUEUE, true);
@@ -89,12 +99,24 @@ public class RabbitMQConfig {
         return new Queue(RabbitMQConfig.INTERNAL_CANCEL_FLIGHT_KEY, true);
     }
 
+    @Bean
+    public Queue internalFlightResComplete() {
+        return new Queue(RabbitMQConfig.INTERNAL_COMPLETE_FLIGHT_KEY, true);
+    }
+
     // binds
     @Bean
     public Binding bindCreate() {
         return BindingBuilder.bind(createReservationCmd())
                 .to(sagaExchange())
                 .with(RabbitConstants.CREATE_RESERVATION_CMD_QUEUE);
+    }
+
+    @Bean
+    public Binding bindInternalFlightResComplete() {
+        return BindingBuilder.bind(internalFlightResComplete())
+                .to(internalExchange())
+                .with(RabbitMQConfig.INTERNAL_COMPLETE_FLIGHT_KEY);
     }
 
     @Bean
@@ -156,5 +178,20 @@ public class RabbitMQConfig {
                 .bind(internalCompensateCreateQueue())
                 .to(internalExchange())
                 .with(RabbitMQConfig.INTERNAL_COMPENSATE_CREATE_KEY);
+    }
+
+    @Bean
+    public Binding bindCompleteReservationsByFlightCmd(
+            @Qualifier("completeReservationsByFlightCmdQueue") Queue q) {
+        return BindingBuilder.bind(q)
+                .to(sagaExchange())
+                .with(RabbitConstants.COMPLETE_RESERVATION_BY_FLIGHT_CMD_QUEUE);
+    }
+
+    @Bean
+    public Binding bindFlightReservationsCompleted() {
+        return BindingBuilder.bind(flightReservationsCompletedEventQueue())
+                .to(sagaExchange())
+                .with(RabbitConstants.FLIGHT_RESERVATIONS_COMPLETED_QUEUE);
     }
 }
