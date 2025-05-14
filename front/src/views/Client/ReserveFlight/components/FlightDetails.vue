@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import type { Flight } from '@/types/Flight'
+import { formatDateTime } from '@/utils/date/formatDateTime'
 
 defineProps<{
   flight: Flight | null
@@ -29,7 +30,7 @@ defineProps<{
         </li>
         <li class="flex gap-2">
           <b>Data e hora:</b>
-          <p>{{ flight.data }}</p>
+          <p>{{formatDateTime(flight.data)}}</p>
         </li>
         <li class="flex gap-2">
           <b>Preço da poltrona:</b>

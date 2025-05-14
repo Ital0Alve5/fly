@@ -1,5 +1,3 @@
-import { formatFromDate } from '@/utils/date/formatFromDate'
-import { loadCityByAirpoirt } from './airpoirts'
 import type { Flight } from '@/types/Flight'
 
 export const flights: Flight[] = [
@@ -245,114 +243,6 @@ export const flights: Flight[] = [
   },
 ]
 
-export function getFlightByCode(code: string): Flight | undefined {
-  return flights.find((f) => f.codigo === code)
-}
-
-export async function searchFlights(origin: string, destination: string): Promise<Flight[]> {
-  const searchOrigin = origin.toLowerCase().trim()
-  const searchDestination = destination.toLowerCase().trim()
-
-  await new Promise((resolve) => setTimeout(resolve, 2000))
-
-  const now = new Date()
-
-  return flights.filter((flight) => {
-    const flightDate = parseDateTime(flight.data)
-    if (flightDate <= now) return false
-
-    const flightCityOrigin = flight.aeroporto_origem.cidade.toLowerCase()
-    const flightCityDestination = flight.aeroporto_destino.cidade.toLowerCase()
-    const flightCodeOrigin = flight.aeroporto_origem.codigo.toLowerCase()
-    const flightCodeDestination = flight.aeroporto_destino.codigo.toLowerCase()
-
-    return (
-      (flightCityOrigin.includes(searchOrigin) || flightCodeOrigin.includes(searchOrigin)) &&
-      (flightCityDestination.includes(searchDestination) ||
-        flightCodeDestination.includes(searchDestination))
-    )
-  })
-}
-
-function parseDateTime(dateTime: string): Date {
-  const [datePart, timePart] = dateTime.split(' ')
-  const [day, month, year] = datePart.split('/').map(Number)
-  const [hours, minutes] = timePart.split(':').map(Number)
-  return new Date(2000 + year, month - 1, day, hours, minutes)
-}
-
-function sortFlightsByDateTime(flights: Flight[]): Flight[] {
-  return [...flights].sort(
-    (a, b) => parseDateTime(a.data).getTime() - parseDateTime(b.data).getTime(),
-  )
-}
-
-export function getFlightsInNext48Hours(): Flight[] {
-  const now = new Date()
-  const in48h = new Date(now.getTime() + 48 * 60 * 60 * 1000)
-  return sortFlightsByDateTime(
-    flights.filter((flight) => {
-      const flightDate = parseDateTime(flight.data)
-      return flightDate > now && flightDate <= in48h && flight.estado !== 'CANCELADO'
-    }),
-  )
-}
-
-type RegisterFlightFormType = {
-  code: string
-  originAirport: string
-  destinationAirport: string
-  date: Date
-  price: number
-  seatsNumber: number
-}
-
-export async function registerFlight(data: RegisterFlightFormType) {
-  await new Promise((resolve) => setTimeout(resolve, 2000))
-
-  if (flights.some((f) => f.codigo === data.code)) {
-    throw new Error('Código de voo já existe.')
-  }
-
-  const originCity = loadCityByAirpoirt(data.originAirport)
-  const destinationCity = loadCityByAirpoirt(data.destinationAirport)
-
-  flights.push({
-    codigo: data.code,
-    data: formatFromDate(data.date),
-    valor_passagem: data.price,
-    quantidade_poltronas_total: data.seatsNumber,
-    quantidade_poltronas_ocupadas: 0,
-    estado: 'CONFIRMADO',
-    aeroporto_origem: {
-      codigo: data.originAirport,
-      nome: `Aeroporto de ${originCity}`,
-      cidade: originCity,
-      uf: '',
-    },
-    aeroporto_destino: {
-      codigo: data.destinationAirport,
-      nome: `Aeroporto de ${destinationCity}`,
-      cidade: destinationCity,
-      uf: '',
-    },
-  })
-}
-
-export function cancelFlight(code: string): boolean {
-  const flight = flights.find((f) => f.codigo === code)
-  if (flight) {
-    flight.estado = 'CANCELADO'
-    return true
-  }
-  return false
-}
-
-export function performFlight(code: string): void {
-  const flight = flights.find((f) => f.codigo === code)
-  if (flight) flight.estado = 'REALIZADO'
-}
-
 export function reserveSeats(code: string, numberOfSeats: number): void {
   const flight = flights.find((f) => f.codigo === code)
   if (flight) {
@@ -364,10 +254,5 @@ export function reserveSeats(code: string, numberOfSeats: number): void {
 
 export default {
   flights,
-  searchFlights,
-  getFlightsInNext48Hours,
-  cancelFlight,
-  performFlight,
-  registerFlight,
   reserveSeats,
 }

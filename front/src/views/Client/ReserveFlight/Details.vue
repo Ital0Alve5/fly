@@ -16,29 +16,51 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable'
-import { computed, ref } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import { useMilesStore } from '@/stores/miles'
 import FlightDetails from './components/FlightDetails.vue'
-import { getFlightByCode, reserveSeats } from '@/mock/flight'
+import { reserveSeats } from '@/mock/flight'
 import { createNewReservation } from '@/mock/booking'
 import { registerExtract } from '@/mock/extract'
 import { useAuthStore } from '@/stores/auth'
 import { getTodayDate } from '@/utils/date/getTodayDate'
 import type { Flight } from '@/types/Flight'
+import { fetchFlightByCode } from '@/views/Client/FlightListing/services/FlightListingService'
+import { useToast } from '@/components/ui/toast'
 
 const route = useRoute()
 const router = useRouter()
+const { toast } = useToast()
 
 const milesStore = useMilesStore()
 const authStore = useAuthStore()
 
 const code = route.params.code as string
-const flight = ref<Flight | null>(getFlightByCode(code) ?? null)
+const flight = ref<Flight | null>(null)
 const miles = ref(0)
 const seats = ref(1)
 const generatedCode = ref('')
+const loading = ref(false)
+
+onMounted(async () => {
+  try {
+    loading.value = true
+    const response = await fetchFlightByCode(code)
+    flight.value = response
+  } catch (error) {
+      toast({
+        title: 'Erro ao obter voos',
+        description: error instanceof Error ? error.message : 'Erro ao obter voos',
+        variant: 'destructive',
+        duration: 2500,
+      })
+  } finally {
+    loading.value = false
+  }
+})
+
 
 const valueToPay = computed(() => {
   if (!flight.value || flight.value.valor_passagem === undefined) return -1
