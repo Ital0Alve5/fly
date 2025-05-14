@@ -104,6 +104,11 @@ public class RabbitMQConfig {
         return new Queue(RabbitMQConfig.INTERNAL_COMPLETE_FLIGHT_KEY, true);
     }
 
+    @Bean
+    public Queue internalUpdated() {
+        return new Queue(RabbitMQConfig.INTERNAL_UPDATED_KEY, true);
+    }
+
     // binds
     @Bean
     public Binding bindCreate() {
@@ -145,6 +150,13 @@ public class RabbitMQConfig {
         return BindingBuilder.bind(internalCanceled())
                 .to(internalExchange())
                 .with(RabbitMQConfig.INTERNAL_CANCELLED_KEY);
+    }
+
+    @Bean
+    public Binding bindInternalUpdated() {
+        return BindingBuilder.bind(internalUpdated())
+                .to(internalExchange())
+                .with(RabbitMQConfig.INTERNAL_UPDATED_KEY);
     }
 
     @Bean

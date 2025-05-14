@@ -5,11 +5,13 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
 import com.dac.fly.reservationservice.config.RabbitMQConfig;
+import com.dac.fly.reservationservice.dto.events.ReservationStatusUpdatedEventDto;
 import com.dac.fly.reservationservice.service.query.ReservationQueryService;
 import com.dac.fly.shared.dto.events.CancelledReservationEventDto;
 import com.dac.fly.shared.dto.events.FlightReservationsCancelledEventDto;
 import com.dac.fly.shared.dto.response.CreatedReservationResponseDto;
 import com.dac.fly.shared.dto.events.FlightReservationsCompletedEventDto;
+
 @Component
 public class ReservationQueryListener {
 
@@ -59,6 +61,14 @@ public class ReservationQueryListener {
         if (!ok) {
             throw new AmqpRejectAndDontRequeueException(
                     "Erro ao projetar remoção de reserva " + evt.flightCode());
+        }
+    }
+
+    @RabbitListener(queues = RabbitMQConfig.INTERNAL_UPDATED_KEY)
+    public void handleUpdateReservationStatusEvent(ReservationStatusUpdatedEventDto evt) {
+        boolean ok = service.handleUpdateReservationStatus(evt.reservationCode(), evt.newStatus());
+        if (!ok) {
+            throw new AmqpRejectAndDontRequeueException("Erro ao projetar atualização de status de reserva " + evt.reservationCode());
         }
     }
 }

@@ -9,6 +9,7 @@ import com.dac.fly.reservationservice.dto.factory.ReservationResponseFactory;
 import com.dac.fly.reservationservice.dto.response.ReservationResponseDto;
 import com.dac.fly.reservationservice.entity.command.Historico;
 import com.dac.fly.reservationservice.entity.query.Reserva;
+import com.dac.fly.reservationservice.enums.ReservationStatusEnum;
 import com.dac.fly.reservationservice.repository.command.EstadoRepository;
 import com.dac.fly.reservationservice.repository.command.HistoryRepository;
 import com.dac.fly.reservationservice.repository.query.ReservaQueryRepository;
@@ -169,13 +170,13 @@ public class ReservationQueryService {
     public boolean handleFlightReservationsCompleted(FlightReservationsCompletedEventDto evt) {
         try {
             for (String reservaCodigo : evt.reservationCodes()) {
- 
-
                 Reserva view = reservaQueryRepository.findById(reservaCodigo)
                         .orElseThrow(() -> new RuntimeException(
                                 "Projeção de reserva não encontrada: " + reservaCodigo));
 
-                if(view.getEstado() != "CHECK-IN") {
+                System.out.println("Estado atual: " + view.getEstado());
+                System.out.println(view.getEstado().equals("EMBARCADA"));
+                if(!view.getEstado().equals("EMBARCADA")) {
                     continue;
                 }
 
@@ -185,6 +186,23 @@ public class ReservationQueryService {
 
                 reservaQueryRepository.save(view);
             }
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public boolean handleUpdateReservationStatus(String reservaCodigo, ReservationStatusEnum novoEstado) {
+        try {
+            Reserva view = reservaQueryRepository.findById(reservaCodigo)
+                    .orElseThrow(() -> new RuntimeException(
+                            "Projeção de reserva não encontrada: " + reservaCodigo));
+
+            view.setEstado(novoEstado.toString());
+
+            view.setHistorico(buildHistoryJson(reservaCodigo));
+
+            reservaQueryRepository.save(view);
             return true;
         } catch (Exception e) {
             return false;
