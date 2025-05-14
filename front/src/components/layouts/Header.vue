@@ -39,7 +39,7 @@ const managerNavigationLinks: NavigationItem[] = [
   },
   {
     label: 'Funcionários',
-    link: '/todos-funcionarios',
+    link: '/adm/todos-funcionarios',
   },
 ]
 

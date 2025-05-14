@@ -8,9 +8,9 @@ import Next from '@/views/Client/FlightsNext/Next.vue'
 import EmployeesListing from '@/views/Manager/EmployeesListing/index.vue'
 
 import { createRouter, createWebHistory } from 'vue-router'
-import { useAuthStore } from '@/stores/auth'
 import ExtractMiles from '@/views/Client/ExtractMiles/index.vue'
 import NextFlightListing from '@/views/Manager/NextFlightListing/index.vue'
+import { useAuthStore } from '@/stores/auth'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -72,7 +72,7 @@ const router = createRouter({
           component: NextFlightListing,
         },
         {
-          path: '/todos-funcionarios',
+          path: 'todos-funcionarios',
           name: 'todosFuncionarios',
           component: EmployeesListing,
         },
@@ -83,7 +83,7 @@ const router = createRouter({
 
 router.beforeEach((to) => {
   const authStore = useAuthStore()
-
+  console.log(authStore.user)
   if (
     (!authStore.user && to.meta.requiresAuth) ||
     (authStore.user && authStore.user.tipo !== 'FUNCIONARIO' && to.meta.isManager) ||
@@ -95,5 +95,6 @@ router.beforeEach((to) => {
     return { name: 'auth' }
   }
 })
+
 
 export default router

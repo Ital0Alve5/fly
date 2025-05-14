@@ -9,5 +9,8 @@ export default async function addNewEmployee(data: {
   cpf: string
   senha: string
 }): Promise<AxiosResponse<Employee>> {
+  data.cpf = data.cpf.replace(/\D+/g, '')
+  data.telefone = data.telefone.replace(/\D+/g, '')
+
   return await api.post('/funcionarios', data)
 }
