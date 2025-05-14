@@ -169,10 +169,15 @@ public class ReservationQueryService {
     public boolean handleFlightReservationsCompleted(FlightReservationsCompletedEventDto evt) {
         try {
             for (String reservaCodigo : evt.reservationCodes()) {
+ 
 
                 Reserva view = reservaQueryRepository.findById(reservaCodigo)
                         .orElseThrow(() -> new RuntimeException(
                                 "Projeção de reserva não encontrada: " + reservaCodigo));
+
+                if(view.getEstado() != "CHECK-IN") {
+                    continue;
+                }
 
                 view.setEstado("REALIZADA");
 
