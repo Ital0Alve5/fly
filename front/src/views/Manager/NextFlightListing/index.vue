@@ -9,18 +9,10 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
 import { useToast } from '@/components/ui/toast'
 import { Button } from '@/components/ui/button'
 import PerformFlightDialog from './components/PerformFlightDialog.vue'
 import RegisterFlightDialog from './components/RegisterFlightDialog.vue'
-import { cancelReservationByFlightCode } from '@/mock/booking'
 import { formatDateTime } from '@/utils/date/formatDateTime'
 import ConfirmBoardingDialog from '@/views/Manager/NextFlightListing/components/ConfirmBoardingDialog.vue'
 import CancelFlightDialog from './components/CancelFlightDialog.vue'
@@ -100,28 +92,6 @@ async function handelCancelFlight() {
 
 <template>
   <div>
-    <Dialog
-      v-if="createdFlight"
-      :default-open="true"
-      @update:open="
-        (value) => {
-          if (!value) createdFlight = false
-        }
-      "
-    >
-      <DialogContent class="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle>Código do voo</DialogTitle>
-          <DialogDescription>Código gerado unicamente para o voo cadastrado</DialogDescription>
-        </DialogHeader>
-        <div class="flex items-center space-x-2">
-          <div class="grid flex-1 gap-2">
-            <div>{{ generatedCode }}</div>
-          </div>
-        </div>
-      </DialogContent>
-    </Dialog>
-
     <RegisterFlightDialog
       @handle-flight-registered="handleFlightRegistered"
       v-model="isRegisterFlightFormOpen"

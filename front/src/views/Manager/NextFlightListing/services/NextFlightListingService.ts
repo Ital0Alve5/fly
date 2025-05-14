@@ -1,34 +1,32 @@
 import api from '@/lib/axios'
 import type { Flight } from '@/types/Flight'
 import type { Airport } from '@/types/Airpoirt'
+import type { AxiosResponse } from 'axios'
 
 export const cancelFlight = async (code: string): Promise<boolean> => {
-    try {
-      const response = await api.patch(`/voos/${code}/estado`, {
-        estado: 'CANCELADO'
-      })
-  
-      return response.status == 200
-    } catch (error) {
-      console.error('Erro ao cancelar o voo:', error)
-      return false
-    }
+  try {
+    const response = await api.patch(`/voos/${code}/estado`, {
+      estado: 'CANCELADO',
+    })
+
+    return response.status == 200
+  } catch (error) {
+    console.error('Erro ao cancelar o voo:', error)
+    return false
   }
-  
+}
 
 export const performFlight = async (code: string): Promise<boolean> => {
-    try {
-        const response = await api.patch(`/voos/${code}/estado`,
-          {
-            estado: 'REALIZADO'
-          }
-        )
+  try {
+    const response = await api.patch(`/voos/${code}/estado`, {
+      estado: 'REALIZADO',
+    })
 
-        return response.status == 200
-    } catch (error) {
-        console.error('Erro ao realizar o voo:', error)
-        return false
-    }
+    return response.status == 200
+  } catch (error) {
+    console.error('Erro ao realizar o voo:', error)
+    return false
+  }
 }
 
 export const fetchFlightsNext48Hours = async (): Promise<Flight[]> => {
@@ -42,8 +40,8 @@ export const fetchFlightsNext48Hours = async (): Promise<Flight[]> => {
     const formattedEndDate = formatDate(endDate)
 
     const response = await api.get(
-          `/voos?data=${encodeURIComponent(startDate)}&data-fim=${encodeURIComponent(formattedEndDate)}`
-        );
+      `/voos?data=${encodeURIComponent(startDate)}&data-fim=${encodeURIComponent(formattedEndDate)}`,
+    )
 
     return response.data || []
   } catch (error) {
@@ -54,7 +52,7 @@ export const fetchFlightsNext48Hours = async (): Promise<Flight[]> => {
 
 export const loadAllAirpoirts = async (): Promise<Airport[]> => {
   try {
-    const response = await api.get(`/aeroportos`);
+    const response = await api.get(`/aeroportos`)
     return response.data || []
   } catch (error) {
     console.error('Erro ao buscar os aeroportos:', error)
@@ -63,18 +61,12 @@ export const loadAllAirpoirts = async (): Promise<Airport[]> => {
 }
 
 export const registerFlight = async (data: {
-  data: string,
-  valor_passagem: number,
-  quantidade_poltronas_total: number,
-  quantidade_poltronas_ocupadas: number,
-  codigo_aeroporto_origem: string,
+  data: string
+  valor_passagem: number
+  quantidade_poltronas_total: number
+  quantidade_poltronas_ocupadas: number
+  codigo_aeroporto_origem: string
   codigo_aeroporto_destino: string
-}) => {
-  try {
-    const response = await api.post(`/voos`, data);
-    return response.data || []
-  } catch (error) {
-    console.error('Erro ao cadastrar o voo:', error)
-    return []
-  }
+}): Promise<AxiosResponse<Flight>> => {
+  return await api.post(`/voos`, data)
 }

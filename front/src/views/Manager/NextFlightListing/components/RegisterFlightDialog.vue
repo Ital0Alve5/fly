@@ -24,7 +24,6 @@ import { useRegisterFlightForm } from '../composables/useRegisterFlightForm'
 import { extractPriceValue } from '@/utils/currency/extractPriceValue'
 import { currencyMask } from '@/utils/currency/inputMask'
 import { registerFlight } from '../services/NextFlightListingService'
-import { generateFlightCode } from '@/utils/generateFlightCode'
 
 defineProps<{
   modelValue: boolean
@@ -66,7 +65,7 @@ const handleOpenChange = (open: boolean) => {
   emit('update:modelValue', open)
 }
 
-const onSubmit = handleSubmit(async (data) => {
+const onSubmit = handleSubmit(async (formData) => {
   try {
     if (loading.value) {
       return
@@ -74,24 +73,17 @@ const onSubmit = handleSubmit(async (data) => {
 
     loading.value = true
 
-    const generatedCode = generateFlightCode()
-    await registerFlight({
-      data: new Date(data.date).toISOString(),
+    const { data } = await registerFlight({
+      data: new Date(formData.date).toISOString(),
       valor_passagem: price.value,
-      quantidade_poltronas_total: data.seatsNumber,
+      quantidade_poltronas_total: formData.seatsNumber,
       quantidade_poltronas_ocupadas: 0,
-      codigo_aeroporto_origem: data.originAirport,
-      codigo_aeroporto_destino: data.destinationAirport
-})
-
-    globalStore.setNotification({
-      title: 'Voo cadastrado com sucesso',
-      description: 'O voo foi cadastrado com sucesso.',
-      variant: 'default',
+      codigo_aeroporto_origem: formData.originAirport,
+      codigo_aeroporto_destino: formData.destinationAirport,
     })
 
     emit('update:modelValue', false)
-    emit('handleFlightRegistered', generatedCode)
+    emit('handleFlightRegistered', data.codigo)
   } catch (err) {
     globalStore.setNotification({
       title: 'Erro ao cadastrar voo!',
