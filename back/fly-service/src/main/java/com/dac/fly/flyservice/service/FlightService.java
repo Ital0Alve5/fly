@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.dac.fly.flyservice.enums.FlightStatusEnum;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +17,6 @@ import com.dac.fly.flyservice.dto.response.FlightResponseDto;
 import com.dac.fly.flyservice.entity.Aeroporto;
 import com.dac.fly.flyservice.entity.Estado;
 import com.dac.fly.flyservice.entity.Voo;
-import com.dac.fly.flyservice.enums.FlightStatusEnum;
 import com.dac.fly.flyservice.repository.AeroportoRepository;
 import com.dac.fly.flyservice.repository.EstadoRepository;
 import com.dac.fly.flyservice.repository.VooRepository;
@@ -71,6 +71,14 @@ public class FlightService {
                                                 .ok(ApiResponse.success(FlightDetailsResponseDto.fromEntity(v))))
                                 .orElseGet(() -> ResponseEntity.status(404)
                                                 .body(ApiResponse.error("Voo não encontrado", 404)));
+        }
+
+        public ResponseEntity<ApiResponse<String>> findEstadoByCode(String codigo) {
+                return vooRepository.findById(codigo)
+                        .map(v -> ResponseEntity
+                                .ok(ApiResponse.success(v.getEstado().getNome().toString())))
+                        .orElseGet(() -> ResponseEntity.status(404)
+                                .body(ApiResponse.error("Voo não encontrado", 404)));
         }
 
         public ResponseEntity<ApiResponse<FlightResponseDto>> create(CreateNewFlightRequestDto dto) {

@@ -63,6 +63,12 @@ public class FlightSagaOrchestrator {
             throw new IllegalArgumentException("Voo não encontrado: " + flightCode);
         }
 
+
+        String currentState = flightClient.findEstadoByCode(flightCode);
+        if(!currentState.equals("CONFIRMADO")){
+            throw new IllegalArgumentException("Status do voo inválido");
+        }
+
         EnumSet<FlightCancelSagaStep> completed = EnumSet.noneOf(FlightCancelSagaStep.class);
         CancelledFlightEventDto flightEvt = null;
         FlightReservationsCancelledEventDto resEvt = null;
@@ -164,6 +170,11 @@ public class FlightSagaOrchestrator {
     public CompletedFlightResponseDto completeFlight(String flightCode) {
         if (!flightClient.existsByCode(flightCode)) {
             throw new IllegalArgumentException("Voo não encontrado: " + flightCode);
+        }
+
+        String currentState = flightClient.findEstadoByCode(flightCode);
+        if(!currentState.equals("CONFIRMADO")){
+            throw new IllegalArgumentException("Status do voo inválido");
         }
 
         EnumSet<CompleteFlightSagaStep> completed = EnumSet.noneOf(CompleteFlightSagaStep.class);

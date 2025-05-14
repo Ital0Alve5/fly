@@ -41,7 +41,7 @@ export async function updateReservationStateRoute(app: FastifyTypedInstance) {
           },
         )
 
-        return reply.status(HttpStatusCode.NoContent).send(reservationResponse.data.data)
+        return reply.status(reservationResponse.status).send(reservationResponse.data.data)
       } catch (err) {
         if (axios.isAxiosError(err) && err.response) {
           return reply

@@ -27,7 +27,7 @@ public class ReservationCommandService {
         private final EstadoRepository estadoRepository;
         private final HistoryRepository historyRepository;
         private final ReservationResponseFactory responseFactory;
-        private final ReservaQueryRepository reservaQueryRepository;
+        private final ReservaQueryRepository reservaQueryRepository;        
 
         public ReservationCommandService(
                         ReservaCommandRepository repository,
@@ -143,12 +143,11 @@ public class ReservationCommandService {
                 Reserva reserva = repository.findById(codigoReserva)
                                 .orElseThrow(() -> new RuntimeException("Reserva não encontrada: " + codigoReserva));
 
-                Long checkInStatusId = estadoRepository.findByNome(ReservationStatusEnum.CHECK_IN.toString())
-                                .orElseThrow(() -> new RuntimeException("Estado '" + ReservationStatusEnum.CHECK_IN
-                                                + "' não encontrado"))
-                                .getCodigo();
 
-                if (reserva.getEstado() != checkInStatusId) {
+                String estadoAtual = resolveEstadoNome(reserva.getEstado());
+                System.out.println("Estado atual: " + estadoAtual);
+                System.out.println(!"EMBARCADA".equals(estadoAtual));
+                if (!"EMBARCADA".equals(estadoAtual)) {
                    return;
                 }
 
@@ -177,6 +176,10 @@ public class ReservationCommandService {
                 String estadoAtual = resolveEstadoNome(reserva.getEstado());
                 if ("CANCELADA".equals(estadoAtual) || "CANCELADA VOO".equals(estadoAtual)) {
                         throw new RuntimeException("Não é permitido alterar o estado de uma reserva cancelada.");
+                }
+
+                if(!"CHECK-IN".equals(estadoAtual) && novoEstado.estado().equals(ReservationStatusEnum.EMBARCADA)) {
+                        throw new RuntimeException("Não é permitido alterar o estado da reserva para EMBARCADA sem estar no estado CHECK-IN.");
                 }
 
                 Long idNovoEstado = estadoRepository.findByNome(novoEstado.estado().toString())

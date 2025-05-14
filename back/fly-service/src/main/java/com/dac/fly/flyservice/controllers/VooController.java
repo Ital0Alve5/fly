@@ -71,4 +71,9 @@ public class VooController {
         return ResponseEntity.ok(exists);
     }
 
+    @GetMapping("/{codigo}/estado")
+    public ResponseEntity<ApiResponse<String>> findEstadoByCode(@PathVariable("codigo") String codigo) {
+      return  flightService.findEstadoByCode(codigo);
+    }
+
 }

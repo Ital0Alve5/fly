@@ -1,7 +1,6 @@
 package com.dac.fly.flyservice.entity;
 
 import com.dac.fly.flyservice.enums.FlightStatusEnum;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
