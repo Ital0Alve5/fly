@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import {
   Table,
   TableBody,
@@ -25,6 +25,8 @@ import { cancelReservationByFlightCode } from '@/mock/booking'
 
 import ConfirmBoardingDialog from '@/views/Manager/NextFlightListing/components/ConfirmBoardingDialog.vue'
 import CancelFlightDialog from './components/CancelFlightDialog.vue'
+import getFlightsInNext48Hrs from './services/getFlightsInNext48Hrs'
+import type { Flight } from '@/types/Flight'
 
 const isBoardingDialogOpen = ref(false)
 const isCancelDialogOpen = ref(false)
@@ -33,12 +35,16 @@ const isRegisterFlightFormOpen = ref(false)
 const selectedFlight = ref<string>('')
 const generatedCode = ref('')
 const createdFlight = ref(false)
-const flights = ref(getFlightsInNext48Hours())
+const flights = ref<Flight[]>([])
 const { toast } = useToast()
 
-watch([isCancelDialogOpen, isPerformDialogOpen], ([newCancelVal, newPerformVal]) => {
+onMounted(async () => {
+  flights.value = (await getFlightsInNext48Hrs()).data
+})
+
+watch([isCancelDialogOpen, isPerformDialogOpen], async ([newCancelVal, newPerformVal]) => {
   if (!newCancelVal || !newPerformVal) {
-    flights.value = getFlightsInNext48Hours()
+    flights.value = (await getFlightsInNext48Hrs()).data
   }
 })
 
