@@ -14,7 +14,13 @@ const app = fastify().withTypeProvider<ZodTypeProvider>()
 
 app.setValidatorCompiler(validatorCompiler)
 app.setSerializerCompiler(serializerCompiler)
-app.register(fastifyCors)
+app.register(fastifyCors, {
+  origin: true,
+  methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['*'],
+  exposedHeaders: ['*'],
+  credentials: true,
+})
 
 app.register(fastifySwagger, {
   openapi: {
