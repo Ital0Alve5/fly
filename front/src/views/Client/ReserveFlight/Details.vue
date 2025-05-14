@@ -88,7 +88,6 @@ const availableMilesToUse = computed(() => {
 })
 
 async function handleReserveFlight() {
-  milesStore.setTotalMiles(milesStore.totalMiles - miles.value)
 
   generatedCode.value = await createNewReservation({
     flight: flight.value!,
@@ -100,7 +99,7 @@ async function handleReserveFlight() {
   const valorFinal = Math.max(0, valueToPay.value)
 
   registerExtract({
-    codigo_cliente: authStore.user?.usuario.codigo as number,
+    codigo_cliente: authStore.user?.usuario?.codigo as number,
     data: getTodayDate(),
     codigo_reserva: generatedCode.value,
     valor_reais: valorFinal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
@@ -110,6 +109,10 @@ async function handleReserveFlight() {
   })
 
   reserveSeats(flight.value?.codigo || '', seats.value)
+
+  // TODO: A linha abaixo esta comentada pois era a menira antiga de remover milhas. Depois que os apis de reservas forem implementasdos, é para a linha abaixo da comentada dar conta de atualizar as milhas automaticamente. Se funcionar pode remover a linha comentada  
+    // milesStore.setTotalMiles(milesStore.totalMiles - miles.value)
+    await milesStore.refreshMiles()
 }
 </script>
 <template>

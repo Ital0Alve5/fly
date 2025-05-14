@@ -46,12 +46,12 @@ const onSubmit = async () => {
       tipo: 'ENTRADA',
     }
 
-    addMilesToClient(currentCheckoutMiles.value);
+    await addMilesToClient(currentCheckoutMiles.value);
+    await milesStore.refreshMiles()
+    milesStore.setCurrentCheckoutMiles(10)
 
     registerExtract(newExtract) //TODO:  mudar para api /reservas POST
 
-    milesStore.setTotalMiles(totalMiles.value + currentCheckoutMiles.value) // TODO: mudar para usar dados do cliente(analisar ainda)
-    milesStore.setCurrentCheckoutMiles(10) // TODO: mudar para usar dados do cliente(analisar ainda)
 
     toast({
       title: 'Pagamento efetuado com sucesso',

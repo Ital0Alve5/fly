@@ -74,3 +74,30 @@ export const getClientTransactionHistory = async (): Promise<MilesExtractRespons
         return null
     }
 }
+
+export const getClientData = async (): Promise<{
+    codigo: 1010,
+    cpf: string,
+    email: string,
+    nome: string,
+    saldoMilhas: 0,
+    endereco: {
+        cep: string,
+        uf: string,
+        cidade: string,
+        bairro: string,
+        rua: string,
+        numero: number,
+        complemento: string
+    }
+} | null> => {
+    const authStore = useAuthStore()
+    const code = authStore.user?.usuario?.codigo
+    try {
+        const response = await api.get(`/clientes/${code}`)
+        return response.data
+    } catch (error) {
+        console.error('Erro pegar dados do cliente:', error)
+        return null
+    }
+}
