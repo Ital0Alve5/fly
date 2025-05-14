@@ -39,8 +39,8 @@ public class FlightReservationPublisher {
 
     public void publishCompletedFlightReservations(FlightReservationsCompletedEventDto evt) {
         rabbit.convertAndSend(
-            internalExchange.getName(),
-            RabbitConstants.COMPLETE_RESERVATION_BY_FLIGHT_CMD_QUEUE,
+            RabbitConstants.EXCHANGE,
+            RabbitConstants.FLIGHT_RESERVATIONS_COMPLETED_QUEUE,
             evt);
     }
 

@@ -143,6 +143,15 @@ public class ReservationCommandService {
                 Reserva reserva = repository.findById(codigoReserva)
                                 .orElseThrow(() -> new RuntimeException("Reserva não encontrada: " + codigoReserva));
 
+                Long checkInStatusId = estadoRepository.findByNome(ReservationStatusEnum.CHECK_IN.toString())
+                                .orElseThrow(() -> new RuntimeException("Estado '" + ReservationStatusEnum.CHECK_IN
+                                                + "' não encontrado"))
+                                .getCodigo();
+
+                if (reserva.getEstado() != checkInStatusId) {
+                   return;
+                }
+
                 Long oldStatus = reserva.getEstado();
 
                 Long newStatusId = estadoRepository.findByNome(targetStatus.toString())

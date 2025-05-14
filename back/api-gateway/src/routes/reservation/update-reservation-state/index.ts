@@ -3,7 +3,7 @@ import { FastifyTypedInstance } from 'src/shared/types'
 import { FastifyReply, FastifyRequest } from 'fastify'
 import { Env } from 'src/shared/env'
 import { updateReservationStateSchema } from './schema'
-import { employeeAuthMiddleware } from 'src/middlewares/employee-auth'
+import { userAuthMiddleware } from 'src/middlewares/user-auth'
 
 export async function updateReservationStateRoute(app: FastifyTypedInstance) {
   const path = '/reservas/:codigoReserva/estado'
@@ -12,20 +12,21 @@ export async function updateReservationStateRoute(app: FastifyTypedInstance) {
     path,
     {
       schema: updateReservationStateSchema,
-      preHandler: employeeAuthMiddleware,
+      preHandler: userAuthMiddleware,
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
         const { codigoReserva } = request.params as { codigoReserva: string }
         const { estado } = request.body as { estado: string }
 
-        if (estado !== 'CHECK-IN' && request.user?.data.tipo !== 'FUNCIONARIO') {
+        console.log(request.user?.data, request.user?.data.role)
+        if (estado !== 'CHECK-IN' && request.user?.data.role !== 'FUNCIONARIO') {
           return reply
             .status(HttpStatusCode.Forbidden)
             .send({ message: 'Você não tem permissão realizar essa ação' })
         }
 
-        if (estado === 'CHECK-IN' && request.user?.data.tipo !== 'CLIENTE') {
+        if (estado === 'CHECK-IN' && request.user?.data.role !== 'CLIENTE') {
           return reply
             .status(HttpStatusCode.Forbidden)
             .send({ message: 'Você não tem permissão realizar essa ação' })

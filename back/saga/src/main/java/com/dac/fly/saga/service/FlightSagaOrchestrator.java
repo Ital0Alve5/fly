@@ -162,31 +162,24 @@ public class FlightSagaOrchestrator {
     }
 
     public CompletedFlightResponseDto completeFlight(String flightCode) {
-        System.out.println("Validando flight exists");
         if (!flightClient.existsByCode(flightCode)) {
             throw new IllegalArgumentException("Voo não encontrado: " + flightCode);
         }
 
         EnumSet<CompleteFlightSagaStep> completed = EnumSet.noneOf(CompleteFlightSagaStep.class);
-        CompletedFlightEventDto flightEvt = null;
-        FlightReservationsCompletedEventDto resEvt = null;
-
         try {
             var flightFuture = new CompletableFuture<CompletedFlightEventDto>();
             flightCompleteResponses.put(flightCode, flightFuture);
-            flightEvt = getWithTimeout(flightCompleteResponses, flightCode);
 
-            completed.add(CompleteFlightSagaStep.FLIGHT_COMPLETED);
-
-            System.out.println("Completing flight");
             rabbit.convertAndSend(
                     RabbitConstants.EXCHANGE,
                     RabbitConstants.COMPLETE_FLIGHT_CMD_QUEUE,
                     new CompleteFlightDto(flightCode));
+            completed.add(CompleteFlightSagaStep.FLIGHT_COMPLETED);
+            CompletedFlightEventDto flightEvt = getWithTimeout(flightCompleteResponses, flightCode);
 
             var resFuture = new CompletableFuture<FlightReservationsCompletedEventDto>();
 
-            System.out.println("Flight completed - Completing reservations");
             reservationsCompletedResponses.put(flightCode, resFuture);
             rabbit.convertAndSend(
                     RabbitConstants.EXCHANGE,
@@ -194,7 +187,6 @@ public class FlightSagaOrchestrator {
                     new CompleteFlightDto(flightCode));
             getWithTimeout(reservationsCompletedResponses, flightCode);
             completed.add(CompleteFlightSagaStep.RESERVATIONS_COMPLETED);
-            System.out.println("Reservation completed");
 
             return new CompletedFlightResponseDto(
                     flightEvt.codigo(),
@@ -206,7 +198,7 @@ public class FlightSagaOrchestrator {
                     flightEvt.codigo_aeroporto_origem(),
                     flightEvt.codigo_aeroporto_destino());
         } catch (Exception e) {
-            System.out.println("Erro ao completar voo");
+           compensateCompleteFlightSaga(flightCode, completed);
         } finally {
             reservationsCompletedResponses.remove(flightCode);
             flightCompleteResponses.remove(flightCode);
