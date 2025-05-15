@@ -11,8 +11,9 @@ import { Button } from '@/components/ui/button'
 import { useToast } from '@/components/ui/toast'
 import { Input } from '@/components/ui/input'
 
-import { getReservationByCodeAndFlightCode, updateReservationStatus } from '@/mock/booking'
-import { fetchFlightByCode } from '@/views/Client/FlightListing/services/FlightListingService'
+import getReservationDetails from '@/views/Client/Reservation/services/getReservationDetails'
+import { performBoarding } from '@/clientService/ClientService'
+import { AxiosError } from 'axios'
 
 const props = defineProps<{
   modelValue: boolean
@@ -36,49 +37,63 @@ watch(
 )
 
 const handleConfirmBoarding = async () => {
+  if (!props.selectedFlightCode) {
+    throw new Error('Código do voo não informado.')
+  }
+
+  if (!reservationCode.value.trim()) {
+    throw new Error('Digite o código da reserva.')
+  }
+
   try {
-    if (!props.selectedFlightCode) {
-      throw new Error('Código do voo não informado.')
-    }
+    const { data } = await getReservationDetails(reservationCode.value)
 
-    if (!reservationCode.value.trim()) {
-      throw new Error('Digite o código da reserva.')
-    }
-
-    const reservation = await getReservationByCodeAndFlightCode(
-      reservationCode.value,
-      props.selectedFlightCode,
-    )
-
-    if (!reservation) {
+    if (!data) {
       throw new Error('Reserva não encontrada.')
     }
 
-    const flight = await fetchFlightByCode(reservation.voo.codigo)
-    if (!flight) {
+    console.log(data.voo.codigo)
+    console.log(props.selectedFlightCode)
+    if (data.voo.codigo !== props.selectedFlightCode) {
       throw new Error('Esta reserva não pertence a este voo.')
     }
 
-    if (reservation.estado !== 'CHECK-IN') {
+
+
+    if (data.estado !== 'CHECK-IN') {
       throw new Error('A reserva não está no estado CHECK-IN.')
     }
 
-    await updateReservationStatus(reservation.codigo, 'EMBARCADA')
+    try {
+      await performBoarding(data)
 
-    toast({
-      title: 'Embarque confirmado',
-      description: `Reserva ${reservation.codigo} marcada como EMBARCADA.`,
-      variant: 'default',
-      duration: 1000,
-    })
+      toast({
+        title: 'Embarque confirmado',
+        description: `Reserva ${data.codigo} marcada como EMBARCADA.`,
+        variant: 'default',
+        duration: 1000,
+      })
 
-    emit('update:modelValue', false)
+      emit('update:modelValue', false)
+    } catch (error) {
+      toast({
+        title: 'Erro ao confirmar embarque!',
+        description:
+          error instanceof AxiosError
+            ? error.response?.data.message
+            : 'Falha ao tentar confirmar o embarque!',
+        variant: 'destructive',
+        duration: 2500,
+      })
+    }
   } catch (error) {
-    errorMessage.value = error instanceof Error ? error.message : 'Erro ao confirmar embarque.'
-
+    console.log(typeof error)
     toast({
-      title: 'Erro',
-      description: errorMessage.value,
+      title: 'Erro ao buscar dados da reserva!',
+      description:
+        error instanceof AxiosError
+          ? error.response?.data.message
+          : error,
       variant: 'destructive',
       duration: 2500,
     })

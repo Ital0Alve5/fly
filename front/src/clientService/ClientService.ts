@@ -63,6 +63,10 @@ export const performCheckin = async (reserve: Reserve): Promise<AxiosResponse<Re
   return await api.patch(`/reservas/${reserve.codigo}/estado`, { estado: 'CHECK-IN' })
 }
 
+export const performBoarding = async (reserve: Reserve): Promise<AxiosResponse<Reserve>> => {
+  return await api.patch(`/reservas/${reserve.codigo}/estado`, { estado: 'EMBARCADA' })
+}
+
 export const addMilesToClient = async (
   milesQuantity: number,
 ): Promise<{ codigo: number; saldo_milhas: number } | null> => {
