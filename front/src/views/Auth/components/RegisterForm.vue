@@ -15,8 +15,12 @@ import {
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import LoadingSpinner from '@/components/ui/LoadingSpinner.vue'
 import type { Client } from '@/types/Auth/AuthenticatedUserData'
+import { ref } from 'vue'
+import { AxiosError } from 'axios'
 
+const loading = ref(false)
 const authStore = useAuthStore()
 const globalStore = useGlobalStore()
 const emit = defineEmits(['registered'])
@@ -45,7 +49,12 @@ const onSubmit = handleSubmit(async (values) => {
       },
     }
 
+    loading.value = true
+
     await authStore.register(newUserData)
+
+    loading.value = false
+
     globalStore.setNotification({
       title: 'Cadastro realizado!',
       description: 'Verifique seu e-mail para a senha',
@@ -55,7 +64,8 @@ const onSubmit = handleSubmit(async (values) => {
   } catch (error) {
     toast({
       title: 'Erro no cadastro',
-      description: error instanceof Error ? error.message : 'Falha ao tentar cadastrar',
+      description:
+        error instanceof AxiosError ? error.response?.data.message : 'Falha ao tentar cadastrar',
       variant: 'destructive',
       duration: 2500,
     })
@@ -161,7 +171,10 @@ const onSubmit = handleSubmit(async (values) => {
         </p>
 
         <CardFooter class="p-0 pt-4">
-          <Button type="submit" class="w-full">Cadastrar</Button>
+          <Button type="submit" class="w-full" :disabled="loading"
+            ><LoadingSpinner v-if="loading" />
+            <p v-else>Cadastrar</p>
+          </Button>
         </CardFooter>
       </form>
     </CardContent>

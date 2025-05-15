@@ -3,12 +3,12 @@ import type { ReservationListResponse, MilesExtractResponse } from '@/types/Api'
 import api from '@/lib/axios'
 import { formatarUsuario } from '@/utils/clientFormat'
 import { useAuthStore } from '@/stores/auth'
+import type { AxiosResponse } from 'axios'
 
-export const registerClient = async (client: Client): Promise<Client | null> => {
-    try {
+export const registerClient = async (client: Client): Promise<AxiosResponse<Client>> => {
         client = formatarUsuario(client);
 
-        const response = await api.post(`/clientes`,
+        return await api.post(`/clientes`,
             {
                 cpf: client.cpf,
                 email: client.email,
@@ -25,13 +25,6 @@ export const registerClient = async (client: Client): Promise<Client | null> => 
                 }
             }
         )
-
-
-        return response.data
-    } catch (error) {
-        console.error('Erro ao cadastrar cliente:', error)
-        return null
-    }
 }
 
 export const getClientReservationList = async (): Promise<ReservationListResponse | null> => {
