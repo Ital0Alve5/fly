@@ -10,21 +10,50 @@ import {
   TableBody,
   TableCell,
 } from '@/components/ui/table'
-import { getCheckInFlightsInNext48Hrs } from '@/mock/booking'
 import type { Reserve } from '@/types/Reserve'
 import { useToast } from '@/components/ui/toast'
 import CancelReservationDialog from '@/components/dialogs/CancelReservationDialog.vue'
+import { getClientFlightListInNext48hrs, performCheckin } from '@/clientService/ClientService'
+import { formatDateTime } from '@/utils/date/formatDateTime'
+import { AxiosError } from 'axios'
 
 const { toast } = useToast()
 
-const checkin = (reserve: Reserve) => {
-  reserve.estado = 'CHECK-IN'
-  toast({
-    title: 'Status atualizado',
-    description: `O status foi alterado para ${reserve.estado}.`,
-    variant: 'default',
-    duration: 2000,
-  })
+const checkin = async (reserve: Reserve) => {
+  try {
+    const { data } = await performCheckin(reserve)
+
+    toast({
+      title: 'Status atualizado',
+      description: `O status da reserva ${data.codigo} foi alterado para ${data.estado}.`,
+      variant: 'default',
+      duration: 2000,
+    })
+  } catch (error) {
+    toast({
+      title: 'Erro ao realizar checkin!',
+      description:
+        error instanceof AxiosError
+          ? error.response?.data.message
+          : 'Falha ao tentar realizar o checkin!',
+      variant: 'destructive',
+      duration: 2500,
+    })
+  }
+
+  try {
+    await setFlights()
+  } catch (error) {
+    toast({
+      title: 'Erro ao atualizar voos!',
+      description:
+        error instanceof AxiosError
+          ? error.response?.data.message
+          : 'Falha ao tentar atualizar os voos!',
+      variant: 'destructive',
+      duration: 2500,
+    })
+  }
 }
 
 const selectedReservationcode = ref<string | null>(null)
@@ -36,7 +65,7 @@ onMounted(async () => {
 })
 
 async function setFlights() {
-  flights.value = await getCheckInFlightsInNext48Hrs()
+  flights.value = await getClientFlightListInNext48hrs()
 }
 
 function handleCancelFlight(selectedReservation: string) {
@@ -48,6 +77,7 @@ function handleCancelFlight(selectedReservation: string) {
 <template>
   <CancelReservationDialog
     :reservation-code="selectedReservationcode"
+    @success="setFlights"
     v-model="isCancelDialogOpen"
   />
   <div class="flex flex-col justify-center h-screen">
@@ -71,7 +101,7 @@ function handleCancelFlight(selectedReservation: string) {
               <template v-for="reserve in flights" :key="reserve.id">
                 <TableRow>
                   <TableCell class="text-center px-6 py-4 text-lg">{{
-                    reserve.voo.data
+                    formatDateTime(reserve.voo.data)
                   }}</TableCell>
                   <TableCell class="text-center px-6 py-4 text-lg">{{
                     reserve.voo.aeroporto_origem.codigo

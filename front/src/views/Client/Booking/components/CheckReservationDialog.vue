@@ -9,10 +9,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { searchReserves } from '@/mock/booking'
 import type { Reserve } from '@/types/Reserve'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/components/ui/toast'
+import getReservationDetails from '@/views/Client/Reservation/services/getReservationDetails'
+import { AxiosError } from 'axios'
+import { formatDateTime } from '@/utils/date/formatDateTime'
 
 const { toast } = useToast()
 
@@ -24,9 +26,39 @@ const emit = defineEmits<{
   (e: 'update:open', value: boolean): void
 }>()
 
-const reserveCode = ref('')
-const reserveFound = ref<Reserve[]>([])
+const reserveBlank: Reserve = {
+  codigo: '',
+  codigo_cliente: 0,
+  estado: 'CRIADA',
+  data: '',
+  valor: 0,
+  milhas_utilizadas: 0,
+  quantidade_poltronas: 0,
+  voo: {
+    codigo: '',
+    data: '',
+    valor_passagem: 0,
+    quantidade_poltronas_total: 0,
+    quantidade_poltronas_ocupadas: 0,
+    estado: 'CONFIRMADO',
+    aeroporto_origem: {
+      codigo: '',
+      nome: '',
+      cidade: '',
+      uf: '',
+    },
+    aeroporto_destino: {
+      codigo: '',
+      nome: '',
+      cidade: '',
+      uf: '',
+    },
+  },
+}
 
+const reserveCode = ref('')
+const reserveFound = ref<Reserve | null>(null)
+const isWithin48Hours = ref(false)
 const openDialog = ref(props.open)
 
 watch(
@@ -41,7 +73,7 @@ watch(openDialog, (newVal) => {
 
   if (!newVal) {
     reserveCode.value = ''
-    reserveFound.value = []
+    reserveFound.value = reserveBlank
   }
 })
 
@@ -67,21 +99,37 @@ const toCancel = (reserva: Reserve) => {
   })
 }
 
-const isWithin48Hours = (reserva: Reserve): boolean => {
+const setIsWithin48Hours = (reserva: Reserve) => {
+  if (!reserva.codigo) throw new Error()
+
+  const inputDate = new Date(reserva.data)
   const now = new Date()
-  const [datePart, timePart] = reserva.voo.data.split(' ')
-  const [day, month, year] = datePart.split('/').map(Number)
-  const [hours, minutes] = timePart.split(':').map(Number)
-  const reserveDate = new Date(2000 + year, month - 1, day, hours, minutes)
-  const timeDifference = (reserveDate.getTime() - now.getTime()) / (1000 * 60 * 60)
-  return timeDifference <= 48 && timeDifference > 0
+  const timeDifference = inputDate.getTime() - now.getTime()
+  const hours48 = 48 * 60 * 60 * 1000
+
+  isWithin48Hours.value = timeDifference >= 0 && timeDifference <= hours48
 }
 
 const checkReserveCode = async () => {
   if (reserveCode.value.trim()) {
-    reserveFound.value = await searchReserves(reserveCode.value)
+    try {
+      const { data } = await getReservationDetails(reserveCode.value)
+      setIsWithin48Hours(data)
+      reserveFound.value = data
+    } catch (error) {
+      console.log(error)
+      toast({
+        title: 'Erro ao encontrar reserva',
+        description:
+          error instanceof AxiosError
+            ? error.response?.data.message
+            : 'Falha ao tentar encontrar a reserva.',
+        variant: 'destructive',
+        duration: 2500,
+      })
+    }
 
-    if (reserveFound.value.length === 0) {
+    if (reserveFound.value) {
       toast({
         title: 'Reserva não encontrada',
         description: 'Nenhuma reserva foi encontrada com este código.',
@@ -114,54 +162,57 @@ const checkReserveCode = async () => {
         <Input id="codigoReserva" v-model="reserveCode" class="p-2 border rounded" />
         <Button @click="checkReserveCode">Consultar</Button>
       </div>
-      <div v-if="reserveFound.length > 0" class="mt-4">
-        <div v-for="reserva in reserveFound" :key="reserva.codigo">
+      <div v-if="reserveFound" class="mt-4">
+        <div>
           <section>
             <ul class="space-y-2">
               <li class="flex gap-2">
                 <b>Data:</b>
-                <p>{{ reserva.voo.data }}</p>
+                <p>{{ formatDateTime(reserveFound.voo.data) }}</p>
               </li>
               <li class="flex gap-2">
                 <b>Código:</b>
-                <p>{{ reserva.codigo }}</p>
+                <p>{{ reserveFound.codigo }}</p>
               </li>
               <li class="flex gap-2">
                 <b>Origem:</b>
-                <p>{{ reserva.voo.aeroporto_origem.nome }}</p>
+                <p>{{ reserveFound.voo.aeroporto_origem.nome }}</p>
               </li>
               <li class="flex gap-2">
                 <b>Destino:</b>
-                <p>{{ reserva.voo.aeroporto_destino.nome }}</p>
+                <p>{{ reserveFound.voo.aeroporto_destino.nome }}</p>
               </li>
               <li class="flex gap-2">
                 <b>Valor:</b>
                 <p>
                   {{
-                    reserva.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+                    reserveFound.valor.toLocaleString('pt-BR', {
+                      style: 'currency',
+                      currency: 'BRL',
+                    })
                   }}
                 </p>
               </li>
               <li class="flex gap-2">
                 <b>Milhas gastas:</b>
-                <p>{{ reserva.milhas_utilizadas }}</p>
+                <p>{{ reserveFound.milhas_utilizadas }}</p>
               </li>
               <li class="flex gap-2">
                 <b>Estado da reserva:</b>
-                <p>{{ reserva.estado }}</p>
+                <p>{{ reserveFound.estado }}</p>
               </li>
             </ul>
           </section>
           <div class="mt-4 flex justify-center gap-4">
             <Button
-              v-if="reserva.estado === 'CRIADA' && isWithin48Hours(reserva)"
-              @click="checkin(reserva)"
+              v-if="reserveFound.estado === 'CRIADA' && isWithin48Hours"
+              @click="checkin(reserveFound)"
               >Check-in</Button
             >
             <Button
-              v-if="reserva.estado === 'CRIADA'"
+              v-if="reserveFound.estado === 'CRIADA'"
               variant="destructive"
-              @click="toCancel(reserva)"
+              @click="toCancel(reserveFound)"
               >Cancelar</Button
             >
           </div>

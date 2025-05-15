@@ -15,12 +15,12 @@ import { useMilesStore } from '@/stores/miles'
 import CancelReservationDialog from '@/components/dialogs/CancelReservationDialog.vue'
 import CheckReservationDialog from './components/CheckReservationDialog.vue'
 import { getClientReservationList } from '@/clientService/ClientService'
-import type { ReservationListResponse } from '@/types/Api'
 import { formatDateTime } from '@/utils/date/formatDateTime'
+import type { Reserve } from '@/types/Reserve'
 
 const router = useRouter()
 const milesStore = useMilesStore()
-const booking = ref<ReservationListResponse>([])
+const booking = ref<Reserve[]>([])
 
 onMounted(async () => {
   getBooking()
