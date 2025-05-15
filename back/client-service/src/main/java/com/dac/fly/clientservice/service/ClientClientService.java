@@ -3,8 +3,10 @@ package com.dac.fly.clientservice.service;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import com.dac.fly.clientservice.dto.request.AddMilesRequestDTO;
 import com.dac.fly.clientservice.dto.response.ClientResponseDTO;
 import com.dac.fly.clientservice.dto.response.MilesResponseDTO;
@@ -18,12 +20,11 @@ import com.dac.fly.clientservice.util.DocumentUtils;
 import com.dac.fly.shared.dto.command.CreateClientCommandDto;
 
 @Service
-public class ClientService {
-
+public class ClientClientService {
     private final ClientRepository clientRepository;
     private final TransactionsRepository transactionsRepository;
 
-    public ClientService(ClientRepository clientRepository,
+    public ClientClientService(ClientRepository clientRepository,
             TransactionsRepository transactionsRepository) {
         this.clientRepository = clientRepository;
         this.transactionsRepository = transactionsRepository;
@@ -139,6 +140,16 @@ public class ClientService {
                 .toList();
     }
 
+    private MilesStatementResponseDTO.TransactionDTO convertToTransactionDTO(Transactions transaction) {
+        return new MilesStatementResponseDTO.TransactionDTO(
+                transaction.getData(),
+                transaction.getValorReais(),
+                transaction.getQuantidadeMilhas(),
+                transaction.getDescricao(),
+                transaction.getCodigoReserva(),
+                transaction.getTipo());
+    }
+
     public boolean updateMiles(Long clientId, Integer miles) {
         Client client = clientRepository.findById(clientId)
                 .orElseThrow(() -> new RuntimeException("Cliente não encontrado: " + clientId));
@@ -186,4 +197,5 @@ public class ClientService {
     public boolean existsByCpf(String cpf) {
         return clientRepository.existsByCpf(cpf);
     }
+    
 }
