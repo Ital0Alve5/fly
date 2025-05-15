@@ -21,12 +21,12 @@ import { useRoute, useRouter } from 'vue-router'
 
 import { useMilesStore } from '@/stores/miles'
 import FlightDetails from './components/FlightDetails.vue'
-import { getFlightByCode, reserveSeats } from '@/mock/flight'
-import { createNewReservation } from '@/mock/booking'
+import { getFlightByCode } from '@/mock/flight'
 import { registerExtract } from '@/mock/extract'
 import { useAuthStore } from '@/stores/auth'
 import { getTodayDate } from '@/utils/date/getTodayDate'
 import type { Flight } from '@/types/Flight'
+import { createReservation } from '@/views/Client/Reservation/services/reservationService'
 
 const route = useRoute()
 const router = useRouter()
@@ -66,28 +66,26 @@ const availableMilesToUse = computed(() => {
 })
 
 async function handleReserveFlight() {
-  milesStore.setTotalMiles(milesStore.totalMiles - miles.value)
-
-  generatedCode.value = await createNewReservation({
-    flight: flight.value!,
-    price: valueToPay.value,
-    miles: miles.value,
-    seats: seats.value,
+  const response = await createReservation({
+    codigo_cliente: authStore.user!.usuario.codigo,
+    valor: valueToPay.value,
+    milhas_utilizadas: miles.value,
+    quantidade_poltronas: seats.value,
+    codigo_voo: flight.value!.codigo,
+    codigo_aeroporto_origem: flight.value!.aeroporto_origem.codigo,
+    codigo_aeroporto_destino: flight.value!.aeroporto_destino.codigo,
   })
-
-  const valorFinal = Math.max(0, valueToPay.value)
-
+  generatedCode.value = response.data.codigo
+  milesStore.setTotalMiles(milesStore.totalMiles - miles.value)
   registerExtract({
     codigo_cliente: authStore.user?.usuario.codigo as number,
     data: getTodayDate(),
     codigo_reserva: generatedCode.value,
-    valor_reais: valorFinal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
+    valor_reais: valueToPay.value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
     quantidade_milhas: miles.value,
     descricao: `${flight.value?.aeroporto_origem.codigo}->${flight.value?.aeroporto_destino.codigo}`,
     tipo: 'SAÍDA',
   })
-
-  reserveSeats(flight.value?.codigo || '', seats.value)
 }
 </script>
 <template>

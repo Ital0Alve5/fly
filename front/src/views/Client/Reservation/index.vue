@@ -1,22 +1,19 @@
 <script setup lang="ts">
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { ref, onMounted } from 'vue'
-import { getBookingByUserCode } from '@/mock/booking'
 import type { Reserve } from '@/types/Reserve'
 import { useRoute } from 'vue-router'
+import { getReservationByCode } from '@/views/Client/Reservation/services/reservationService'
 
 const route = useRoute()
 const reservation = ref<Reserve | null>(null)
 
 onMounted(async () => {
-  const booking = await getBookingByUserCode()
-
-  const foundReservation = booking.find(
-    (res) => res.codigo.toLowerCase() === (route.params.code as string).toLowerCase(),
-  )
-
-  if (foundReservation) {
-    reservation.value = foundReservation
+  try {
+    const res = await getReservationByCode(route.params.code as string)
+    reservation.value = res.data
+  } catch {
+    reservation.value = null
   }
 })
 </script>

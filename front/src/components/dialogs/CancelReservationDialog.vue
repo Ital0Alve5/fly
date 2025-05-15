@@ -7,8 +7,8 @@ import {
   DialogDescription,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import { cancelReservation } from '@/mock/booking'
 import { useToast } from '@/components/ui/toast'
+import { cancelReservationService } from '@/views/Client/Reservation/services/reservationService'
 
 const props = defineProps<{
   modelValue: boolean
@@ -23,16 +23,18 @@ const handleOpenChange = (open: boolean) => {
   emit('update:modelValue', open)
 }
 
-function handleCancelReservation() {
-  cancelReservation(props.reservationCode as string)
+async function handleCancelReservation() {
+  if (props.reservationCode) {
+    await cancelReservationService(props.reservationCode)
+    toast({
+      title: 'Reserva cancelada',
+      description: 'Seu cancelamento foi processado.',
+      variant: 'default',
+      duration: 1000,
+    })
+    emit('cancelled')
+  }
   emit('update:modelValue', false)
-
-  toast({
-    title: 'Reserva cancelada com sucesso',
-    description: 'Sua reserva foi cancelada!',
-    variant: 'default',
-    duration: 1000,
-  })
 }
 </script>
 

@@ -6,11 +6,11 @@ export async function listReservationsByClient(): Promise<AxiosResponse<Reserve[
   const stored = localStorage.getItem('auth/user')!
   const user = JSON.parse(stored)
   const clientCode = user.usuario.codigo
-  return await api.get<Reserve[]>(`/clientes/${clientCode}/reservas`)
+  return api.get<Reserve[]>(`/clientes/${clientCode}/reservas`)
 }
 
 export async function getReservationByCode(code: string): Promise<AxiosResponse<Reserve>> {
-  return await api.get<Reserve>(`/reservas/${code}`)
+  return api.get<Reserve>(`/reservas/${code}`)
 }
 
 export async function createReservation(data: {
@@ -22,16 +22,16 @@ export async function createReservation(data: {
   codigo_aeroporto_origem: string
   codigo_aeroporto_destino: string
 }): Promise<AxiosResponse<Reserve>> {
-  return await api.post<Reserve>('/reservas', data)
+  return api.post<Reserve>('/reservas', data)
 }
 
 export async function cancelReservationService(code: string): Promise<AxiosResponse<void>> {
-  return await api.delete<void>(`/reservas/${code}`)
+  return api.delete<void>(`/reservas/${code}`)
 }
 
 export async function updateReservationStateService(
   code: string,
-  estado: 'CHECK-IN' | 'EMBARCADA' | 'CANCELADA'
+  estado: 'CRIADA' | 'CHECK-IN' | 'EMBARCADA' | 'CANCELADA',
 ): Promise<AxiosResponse<void>> {
-  return await api.patch<void>(`/reservas/${code}/estado`, { estado })
+  return api.patch<void>(`/reservas/${code}/estado`, { estado })
 }

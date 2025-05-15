@@ -9,10 +9,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { searchReserves } from '@/mock/booking'
 import type { Reserve } from '@/types/Reserve'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/components/ui/toast'
+import { getReservationByCode } from '@/views/Client/Reservation/services/reservationService'
 
 const { toast } = useToast()
 
@@ -77,22 +77,23 @@ const isWithin48Hours = (reserva: Reserve): boolean => {
   return timeDifference <= 48 && timeDifference > 0
 }
 
-const checkReserveCode = async () => {
-  if (reserveCode.value.trim()) {
-    reserveFound.value = await searchReserves(reserveCode.value)
-
-    if (reserveFound.value.length === 0) {
-      toast({
-        title: 'Reserva não encontrada',
-        description: 'Nenhuma reserva foi encontrada com este código.',
-        variant: 'default',
-        duration: 2000,
-      })
-    }
-  } else {
+async function checkReserveCode() {
+  if (!reserveCode.value.trim()) {
     toast({
       title: 'Código inválido',
-      description: 'Por favor, insira um código de reserva válido.',
+      description: 'Insira um código válido.',
+      variant: 'default',
+      duration: 2000,
+    })
+    return
+  }
+  try {
+    const res = await getReservationByCode(reserveCode.value.trim())
+    reserveFound.value = [res.data]
+  } catch {
+    toast({
+      title: 'Reserva não encontrada',
+      description: 'Nenhuma reserva com este código.',
       variant: 'default',
       duration: 2000,
     })

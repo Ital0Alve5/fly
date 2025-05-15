@@ -13,17 +13,19 @@ import {
 import { useRouter } from 'vue-router'
 import { useMilesStore } from '@/stores/miles'
 import CancelReservationDialog from '@/components/dialogs/CancelReservationDialog.vue'
-import { getBookingByUserCode } from '@/mock/booking'
 import CheckReservationDialog from './components/CheckReservationDialog.vue'
 import type { Reserve } from '@/types/Reserve'
+import { listReservationsByClient } from '@/views/Client/Reservation/services/reservationService'
 
 const router = useRouter()
 const milesStore = useMilesStore()
 const booking = ref<Reserve[]>([])
 
-onMounted(async () => {
-  booking.value = await getBookingByUserCode()
-})
+async function refreshBookings() {
+  booking.value = (await listReservationsByClient()).data
+}
+
+onMounted(refreshBookings)
 
 const viewReservation = async (codigo: string) => {
   const reserva = booking.value.find((r) => r.codigo === codigo)
@@ -35,9 +37,9 @@ const selectedReservationCide = ref<string | null>(null)
 const isCancelDialogOpen = ref(false)
 const isCheckReservationDialogOpen = ref(false)
 
-function handleCancelFlight(selectedReservation: string) {
+function handleCancelFlight(code: string) {
   isCancelDialogOpen.value = true
-  selectedReservationCide.value = selectedReservation
+  selectedReservationCide.value = code
 }
 
 function openCheckReservationDialog() {
