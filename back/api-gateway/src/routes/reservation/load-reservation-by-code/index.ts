@@ -6,7 +6,7 @@ import { loadReservationByCodeSchema } from './schema'
 import { userAuthMiddleware } from 'src/middlewares/user-auth'
 
 export async function loadReservationByCodeRoute(app: FastifyTypedInstance) {
-  const path = '/reservas/:codigoReserva'
+  const path = '/reservas/:codigo_reserva'
 
   app.get(
     path,
@@ -16,10 +16,10 @@ export async function loadReservationByCodeRoute(app: FastifyTypedInstance) {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
-        const { codigoReserva } = request.params as { codigoReserva: string }
+        const { codigo_reserva } = request.params as { codigo_reserva: string }
 
         const reservationResponse = await axios.get(
-          `${Env.RESERVATION_SERVICE_URL}/reservas/${codigoReserva}`,
+          `${Env.RESERVATION_SERVICE_URL}/reservas/${codigo_reserva}`,
           {
             headers: {
               Authorization: `Bearer ${request.user?.token}`,

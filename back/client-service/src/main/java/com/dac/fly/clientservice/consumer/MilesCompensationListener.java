@@ -30,13 +30,13 @@ public class MilesCompensationListener {
             rabbit.convertAndSend(
                     RabbitConstants.EXCHANGE,
                     RabbitConstants.UPDATE_MILES_RESP_QUEUE,
-                    new MilesUpdatedEvent(cmd.codigoReserva(), success));
+                    new MilesUpdatedEvent(cmd.codigo_reserva(), success));
 
         } catch (RuntimeException e) {
             rabbit.convertAndSend(
                     RabbitConstants.EXCHANGE,
                     RabbitConstants.UPDATE_MILES_RESP_QUEUE,
-                    new MilesUpdatedEvent(cmd.codigoReserva(), false));
+                    new MilesUpdatedEvent(cmd.codigo_reserva(), false));
 
             throw new RuntimeException("Falha na compensação das milhas", e);
         }

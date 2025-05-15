@@ -26,13 +26,13 @@ public class CompensateCreateReservationConsumer {
 
     @RabbitListener(queues = RabbitConstants.COMPENSATE_CREATE_RESERVATION_CMD_QUEUE)
     public void onCompensateCreate(CompensateCreateReservationCommand cmd) {
-        if (reservationService.exists(cmd.codigoReserva())) {
-            reservationService.removeReservation(cmd.codigoReserva());
+        if (reservationService.exists(cmd.codigo_reserva())) {
+            reservationService.removeReservation(cmd.codigo_reserva());
 
             rabbit.convertAndSend(
                     internalExchange.getName(),
                     RabbitMQConfig.INTERNAL_COMPENSATE_CREATE_KEY,
-                    cmd.codigoReserva());
+                    cmd.codigo_reserva());
         }
     }
 }

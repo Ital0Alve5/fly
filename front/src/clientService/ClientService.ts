@@ -101,7 +101,7 @@ export const getClientData = async (): Promise<{
   cpf: string
   email: string
   nome: string
-  saldoMilhas: 0
+  saldo_milhas: 0
   endereco: {
     cep: string
     uf: string

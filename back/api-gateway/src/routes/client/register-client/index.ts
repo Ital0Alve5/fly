@@ -21,7 +21,7 @@ export async function registerClientRoute(app: FastifyTypedInstance) {
 
         const payload = {
           ...rest,
-          saldoMilhas: saldo_milhas,
+          saldo_milhas: saldo_milhas,
         }
 
         const response = await axios.post(`${Env.SAGA_URL}${path}`, payload)

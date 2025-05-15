@@ -61,7 +61,7 @@ public class ClientService {
 
         updateClientMilesBalance(client, request.quantidade());
 
-        return new MilesResponseDTO(client.getCodigo(), client.getSaldoMilhas());
+        return new MilesResponseDTO(client.getCodigo(), client.getsaldo_milhas());
     }
 
     public MilesStatementResponseDTO getMilesStatement(Long codigoCliente) {
@@ -72,7 +72,7 @@ public class ClientService {
 
         return new MilesStatementResponseDTO(
                 client.getCodigo(),
-                client.getSaldoMilhas(),
+                client.getsaldo_milhas(),
                 transactions);
     }
 
@@ -107,8 +107,8 @@ public class ClientService {
         client.setCpf(DocumentUtils.formatCpf(request.cpf()));
         client.setEmail(request.email());
         client.setNome(request.nome());
-        Integer initialSaldo = request.saldoMilhas();
-        client.setSaldoMilhas(initialSaldo != null ? initialSaldo : 0);
+        Integer initialSaldo = request.saldo_milhas();
+        client.setsaldo_milhas(initialSaldo != null ? initialSaldo : 0);
         client.setEndereco(address);
         return client;
     }
@@ -122,15 +122,15 @@ public class ClientService {
     private Transactions createCreditTransaction(Client client, Integer miles) {
         Transactions transaction = new Transactions();
         transaction.setCliente(client);
-        transaction.setQuantidadeMilhas(miles);
-        transaction.setValorReais(calculateRealValue(miles));
+        transaction.setquantidade_milhas(miles);
+        transaction.setvalor_reais(calculateRealValue(miles));
         transaction.setDescricao("COMPRA DE MILHAS");
         transaction.setTipo("ENTRADA");
         return transaction;
     }
 
     private void updateClientMilesBalance(Client client, Integer miles) {
-        client.setSaldoMilhas(client.getSaldoMilhas() + miles);
+        client.setsaldo_milhas(client.getsaldo_milhas() + miles);
         clientRepository.save(client);
     }
 
@@ -144,10 +144,10 @@ public class ClientService {
     private MilesStatementResponseDTO.TransactionDTO convertToTransactionDTO(Transactions transaction) {
         return new MilesStatementResponseDTO.TransactionDTO(
                 transaction.getData(),
-                transaction.getValorReais(),
-                transaction.getQuantidadeMilhas(),
+                transaction.getvalor_reais(),
+                transaction.getquantidade_milhas(),
                 transaction.getDescricao(),
-                transaction.getCodigoReserva(),
+                transaction.getcodigo_reserva(),
                 transaction.getTipo());
     }
 
@@ -156,10 +156,10 @@ public class ClientService {
                 .orElseThrow(() -> new RuntimeException("Cliente não encontrado: " + clientId));
 
         if (miles < 0) {
-            if (client.getSaldoMilhas() < Math.abs(miles)) {
+            if (client.getsaldo_milhas() < Math.abs(miles)) {
                 return false;
             }
-            client.setSaldoMilhas(client.getSaldoMilhas() + miles);
+            client.setsaldo_milhas(client.getsaldo_milhas() + miles);
             clientRepository.save(client);
 
             Transactions tx = Transactions.createDebitTransaction(
@@ -167,10 +167,10 @@ public class ClientService {
                     Math.abs(miles),
                     "Reserva",
                     "Uso de milhas");
-            tx.setValorReais(calculateRealValue(Math.abs(miles)));
+            tx.setvalor_reais(calculateRealValue(Math.abs(miles)));
             transactionsRepository.save(tx);
         } else {
-            client.setSaldoMilhas(client.getSaldoMilhas() + miles);
+            client.setsaldo_milhas(client.getsaldo_milhas() + miles);
             clientRepository.save(client);
 
             Transactions tx = createCreditTransaction(client, miles);

@@ -28,11 +28,11 @@ public class ReservationQueryController {
         this.responseFactory = responseFactory;
     }
 
-    @GetMapping("/{codigoReserva}")
+    @GetMapping("/{codigo_reserva}")
     public ResponseEntity<ApiResponse<ReservationResponseDto>> getReservationByCode(
-            @PathVariable String codigoReserva) {
+            @PathVariable String codigo_reserva) {
         try {
-            Reserva reserva = reservaQueryRepository.findById(codigoReserva)
+            Reserva reserva = reservaQueryRepository.findById(codigo_reserva)
                     .orElseThrow(() -> new RuntimeException("Reserva não encontrada"));
 
             ReservationResponseDto dto = responseFactory.fromQueryReserva(reserva);

@@ -29,28 +29,28 @@ public class Transactions {
     private LocalDateTime data = LocalDateTime.now();
 
     @Column(name = "valor_reais")
-    private BigDecimal valorReais;
+    private BigDecimal valor_reais;
 
-    private Integer quantidadeMilhas;
+    private Integer quantidade_milhas;
 
     @Column(columnDefinition = "TEXT")
     private String descricao;
 
-    private String codigoReserva;
+    private String codigo_reserva;
 
     private String tipo;
 
     public Transactions() {
     }
 
-    public Transactions(Integer id, Client cliente, LocalDateTime data, BigDecimal valorReais, Integer quantidadeMilhas, String descricao, String codigoReserva, String tipo) {
+    public Transactions(Integer id, Client cliente, LocalDateTime data, BigDecimal valor_reais, Integer quantidade_milhas, String descricao, String codigo_reserva, String tipo) {
         this.id = id;
         this.cliente = cliente;
         this.data = data;
-        this.valorReais = valorReais;
-        this.quantidadeMilhas = quantidadeMilhas;
+        this.valor_reais = valor_reais;
+        this.quantidade_milhas = quantidade_milhas;
         this.descricao = descricao;
-        this.codigoReserva = codigoReserva;
+        this.codigo_reserva = codigo_reserva;
         this.tipo = tipo;
     }
 
@@ -78,20 +78,20 @@ public class Transactions {
         this.data = data;
     }
 
-    public BigDecimal getValorReais() {
-        return valorReais;
+    public BigDecimal getvalor_reais() {
+        return valor_reais;
     }
 
-    public void setValorReais(BigDecimal valorReais) {
-        this.valorReais = valorReais;
+    public void setvalor_reais(BigDecimal valor_reais) {
+        this.valor_reais = valor_reais;
     }
 
-    public Integer getQuantidadeMilhas() {
-        return quantidadeMilhas;
+    public Integer getquantidade_milhas() {
+        return quantidade_milhas;
     }
 
-    public void setQuantidadeMilhas(Integer quantidadeMilhas) {
-        this.quantidadeMilhas = quantidadeMilhas;
+    public void setquantidade_milhas(Integer quantidade_milhas) {
+        this.quantidade_milhas = quantidade_milhas;
     }
 
     public String getDescricao() {
@@ -102,12 +102,12 @@ public class Transactions {
         this.descricao = descricao;
     }
 
-    public String getCodigoReserva() {
-        return codigoReserva;
+    public String getcodigo_reserva() {
+        return codigo_reserva;
     }
 
-    public void setCodigoReserva(String codigoReserva) {
-        this.codigoReserva = codigoReserva;
+    public void setcodigo_reserva(String codigo_reserva) {
+        this.codigo_reserva = codigo_reserva;
     }
 
     public String getTipo() {
@@ -121,8 +121,8 @@ public class Transactions {
     public static Transactions createCreditTransaction(Client client, Integer miles, String description) {
         Transactions transaction = new Transactions();
         transaction.setCliente(client);
-        transaction.setQuantidadeMilhas(miles);
-        transaction.setValorReais(calculateRealValue(miles));
+        transaction.setquantidade_milhas(miles);
+        transaction.setvalor_reais(calculateRealValue(miles));
         transaction.setDescricao(description);
         transaction.setTipo("ENTRADA");
         return transaction;
@@ -131,9 +131,9 @@ public class Transactions {
     public static Transactions createDebitTransaction(Client client, Integer miles, String reservationCode, String description) {
         Transactions transaction = new Transactions();
         transaction.setCliente(client);
-        transaction.setQuantidadeMilhas(miles);
+        transaction.setquantidade_milhas(miles);
         transaction.setDescricao(description);
-        transaction.setCodigoReserva(reservationCode);
+        transaction.setcodigo_reserva(reservationCode);
         transaction.setTipo("SAIDA");
         return transaction;
     }

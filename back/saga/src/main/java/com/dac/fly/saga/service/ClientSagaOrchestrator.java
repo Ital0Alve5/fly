@@ -72,7 +72,7 @@ public class ClientSagaOrchestrator {
                             dto.cpf(),
                             dto.email(),
                             dto.nome(),
-                            dto.saldoMilhas(),
+                            dto.saldo_milhas(),
                             new CreateClientCommandDto.AddressDTO(
                                     dto.endereco().cep(),
                                     dto.endereco().uf(),
@@ -105,7 +105,7 @@ public class ClientSagaOrchestrator {
                     dto.cpf(),
                     dto.email(),
                     dto.nome(),
-                    dto.saldoMilhas(),
+                    dto.saldo_milhas(),
                     new ClientCreatedResponseDto.AddressDTO(
                             dto.endereco().cep(),
                             dto.endereco().uf(),

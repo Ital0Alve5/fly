@@ -148,7 +148,7 @@ function handleCancelFlight(selectedReservation: string) {
       </DialogHeader>
       <Label for="reserveCode" class="flex gap-4">Código da Reserva</Label>
       <div class="flex items-center space-x-2">
-        <Input id="codigoReserva" v-model="reserveCode" class="p-2 border rounded" />
+        <Input id="codigo_reserva" v-model="reserveCode" class="p-2 border rounded" />
         <Button @click="checkReserveCode">Consultar</Button>
       </div>
       <div v-if="reserveFound" class="mt-4">

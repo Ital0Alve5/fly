@@ -6,15 +6,15 @@ import java.util.List;
 
 public record MilesStatementResponseDTO(
     Long codigo,
-    Integer saldoMilhas,
+    Integer saldo_milhas,
     List<TransactionDTO> transacoes
 ) {
     public record TransactionDTO(
         LocalDateTime data,
-        BigDecimal valorReais,
-        Integer quantidadeMilhas,
+        BigDecimal valor_reais,
+        Integer quantidade_milhas,
         String descricao,
-        String codigoReserva,
+        String codigo_reserva,
         String tipo
     ) {}
 }

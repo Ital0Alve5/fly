@@ -33,7 +33,7 @@ public class MilesCommandListener {
                 success = clientService.updateMiles(cmd.codigoCliente(), -cmd.milhasUtilizadas());
             }
 
-            publisher.publishMilesUpdateResponse(cmd.codigoReserva(), success);
+            publisher.publishMilesUpdateResponse(cmd.codigo_reserva(), success);
 
         } catch (RuntimeException e) {
             System.err.println("Erro ao atualizar milhas: " + e.getMessage());

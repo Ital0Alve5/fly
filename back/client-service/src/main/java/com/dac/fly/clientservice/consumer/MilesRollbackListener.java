@@ -30,9 +30,9 @@ public class MilesRollbackListener {
 
         } catch (Exception e) {
             throw new RuntimeException(
-                    "Falha ao rollback de milhas para reserva " + cmd.codigoReserva());
+                    "Falha ao rollback de milhas para reserva " + cmd.codigo_reserva());
         } finally {
-            publisher.publishMilesUpdateResponse(cmd.codigoReserva(), success);
+            publisher.publishMilesUpdateResponse(cmd.codigo_reserva(), success);
         }
     }
 }

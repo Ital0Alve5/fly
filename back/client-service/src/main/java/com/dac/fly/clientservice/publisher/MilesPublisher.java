@@ -15,10 +15,10 @@ public class MilesPublisher {
         this.rabbit = rabbit;
     }
 
-    public void publishMilesUpdateResponse(String codigoReserva, boolean success) {
+    public void publishMilesUpdateResponse(String codigo_reserva, boolean success) {
         rabbit.convertAndSend(
                 RabbitConstants.EXCHANGE,
                 RabbitConstants.UPDATE_MILES_RESP_QUEUE,
-                new MilesUpdatedEvent(codigoReserva, success));
+                new MilesUpdatedEvent(codigo_reserva, success));
     }
 }

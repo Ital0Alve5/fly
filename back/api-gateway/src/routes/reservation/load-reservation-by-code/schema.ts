@@ -11,6 +11,6 @@ export const loadReservationByCodeSchema: FastifySchema = {
     },
   ],
   params: z.object({
-    codigoReserva: z.string().describe('Código da reserva'),
+    codigo_reserva: z.string().describe('Código da reserva'),
   }),
 } 

@@ -32,7 +32,7 @@ public class Client {
     private String nome;
 
     @Column(name = "saldo_milhas", nullable = false)
-    private Integer saldoMilhas = 0;
+    private Integer saldo_milhas = 0;
 
     public Client() {
     }
@@ -77,11 +77,11 @@ public class Client {
         this.nome = nome;
     }
 
-    public Integer getSaldoMilhas() {
-        return saldoMilhas;
+    public Integer getsaldo_milhas() {
+        return saldo_milhas;
     }
 
-    public void setSaldoMilhas(Integer saldoMilhas) {
-        this.saldoMilhas = saldoMilhas;
+    public void setsaldo_milhas(Integer saldo_milhas) {
+        this.saldo_milhas = saldo_milhas;
     }
 }

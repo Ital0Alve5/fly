@@ -24,15 +24,15 @@ public class SeatsRollbackListener {
     public void handleRollbackSeats(UpdateSeatsCommand cmd) {
         boolean success = false;
         try {
-            success = flightService.updateSeats(cmd.codigoVoo(), cmd.quantidadePoltronas());
+            success = flightService.updateSeats(cmd.codigoVoo(), cmd.quantidade_poltronas());
         } catch (Exception e) {
             throw new RuntimeException(
-                    "Falha no rollback de assentos para reserva " + cmd.codigoReserva());
+                    "Falha no rollback de assentos para reserva " + cmd.codigo_reserva());
         } finally {
             rabbit.convertAndSend(
                     RabbitConstants.EXCHANGE,
                     RabbitConstants.UPDATE_SEATS_RESP_QUEUE,
-                    new SeatsUpdatedEvent(cmd.codigoReserva(), success));
+                    new SeatsUpdatedEvent(cmd.codigo_reserva(), success));
         }
     }
 }

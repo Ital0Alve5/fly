@@ -12,8 +12,8 @@ public class ReservationResponseFactory {
     public ReservationResponseDto fromCommandReserva(
             Reserva reserva,
             ReservationStatusEnum estado,
-            String aeroportoOrigem,
-            String aeroportoDestino) {
+            String aeroporto_origem,
+            String aeroporto_destino) {
 
         return new ReservationResponseDto(
                 reserva.getCodigo(),
@@ -24,8 +24,8 @@ public class ReservationResponseFactory {
                 reserva.getCodigoCliente(),
                 estado.toString(),
                 reserva.getCodigoVoo(),
-                aeroportoOrigem,
-                aeroportoDestino
+                aeroporto_origem,
+                aeroporto_destino
         );
     }
 

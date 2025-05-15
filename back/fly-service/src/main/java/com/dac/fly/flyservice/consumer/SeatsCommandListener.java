@@ -28,12 +28,12 @@ public class SeatsCommandListener {
             boolean success;
 
             if (cmd.isCompensate()) {
-                success = flightService.updateSeats(cmd.codigoVoo(), -cmd.quantidadePoltronas());
+                success = flightService.updateSeats(cmd.codigoVoo(), -cmd.quantidade_poltronas());
             } else {
-                success = flightService.updateSeats(cmd.codigoVoo(), +cmd.quantidadePoltronas());
+                success = flightService.updateSeats(cmd.codigoVoo(), +cmd.quantidade_poltronas());
             }
 
-            publisher.publishSeatsUpdated(new SeatsUpdatedEvent(cmd.codigoReserva(), success));
+            publisher.publishSeatsUpdated(new SeatsUpdatedEvent(cmd.codigo_reserva(), success));
 
         } catch (Exception e) {
             System.err.println("Erro ao processar assentos: " + e.getMessage());

@@ -2,8 +2,8 @@
 package com.dac.fly.shared.dto.command;
 
 public record UpdateSeatsCommand(
-        String codigoReserva,
+        String codigo_reserva,
         String codigoVoo,
-        Integer quantidadePoltronas,
+        Integer quantidade_poltronas,
         boolean isCompensate) {
 }

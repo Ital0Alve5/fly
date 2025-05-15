@@ -28,16 +28,16 @@ public class ReservationCommandController {
         this.rabbitTemplate = rabbitTemplate;
     }
 
-    @PatchMapping("/{codigoReserva}/estado")
+    @PatchMapping("/{codigo_reserva}/estado")
     public ResponseEntity<ApiResponse<ReservationResponseDto>> updateReservationStatus(
-            @PathVariable String codigoReserva,
+            @PathVariable String codigo_reserva,
             @RequestBody ReservationUpdateStatusDto newStatus) {
         try {
-            ReservationResponseDto response = reservationService.updateReservationStatusByCode(codigoReserva,
+            ReservationResponseDto response = reservationService.updateReservationStatusByCode(codigo_reserva,
                     newStatus);
 
             rabbitTemplate.convertAndSend(RabbitMQConfig.INTERNAL_UPDATED_KEY,
-                    new ReservationStatusUpdatedEventDto(codigoReserva, newStatus.estado()));
+                    new ReservationStatusUpdatedEventDto(codigo_reserva, newStatus.estado()));
 
             return ResponseEntity.ok(ApiResponse.success(response));
         } catch (RuntimeException e) {

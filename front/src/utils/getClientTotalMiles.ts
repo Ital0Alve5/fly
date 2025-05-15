@@ -4,7 +4,7 @@ export const getClientMiles = async (): Promise<number | undefined> => {
     try {
         const response = await getClientData()
 
-        return response?.saldoMilhas;
+        return response?.saldo_milhas;
     } catch (error) {
         console.error('Erro pegar milhas do cliente:', error)
         return -1

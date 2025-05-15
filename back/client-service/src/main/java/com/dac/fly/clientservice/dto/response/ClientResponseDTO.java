@@ -9,7 +9,7 @@ public class ClientResponseDTO {
     private final String cpf;
     private final String email;
     private final String nome;
-    private final Integer saldoMilhas;
+    private final Integer saldo_milhas;
     private final AddressDTO endereco;
 
     public ClientResponseDTO(Client client) {
@@ -17,7 +17,7 @@ public class ClientResponseDTO {
         this.cpf = client.getCpf();
         this.email = client.getEmail();
         this.nome = client.getNome();
-        this.saldoMilhas = client.getSaldoMilhas();
+        this.saldo_milhas = client.getsaldo_milhas();
         this.endereco = client.getEndereco() != null ? new AddressDTO(client.getEndereco()) : null;
     }
 
@@ -37,8 +37,8 @@ public class ClientResponseDTO {
         return nome;
     }
 
-    public Integer getSaldoMilhas() {
-        return saldoMilhas;
+    public Integer getsaldo_milhas() {
+        return saldo_milhas;
     }
 
     public AddressDTO getEndereco() {

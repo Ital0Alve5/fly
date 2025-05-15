@@ -1,7 +1,7 @@
 package com.dac.fly.shared.dto.command;
 
 public record CompensateCreateReservationCommand(
-        String codigoReserva) {
+        String codigo_reserva) {
     public static record DeleteClientCommandDto() {
     }
 }

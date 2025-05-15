@@ -152,7 +152,7 @@ public class FlightSagaOrchestrator {
                         RabbitConstants.EXCHANGE,
                         RabbitConstants.COMPENSATE_CANCEL_RESERVATION_CMD_QUEUE,
                         new CompensateCancelReservationCommand(
-                                cm.codigoReserva(),
+                                cm.codigo_reserva(),
                                 cm.estadoAnterior()));
             }
         }

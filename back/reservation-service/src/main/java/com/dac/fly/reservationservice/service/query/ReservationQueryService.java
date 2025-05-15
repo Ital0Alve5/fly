@@ -98,7 +98,7 @@ public class ReservationQueryService {
     public boolean handleFlightReservationsCancelled(FlightReservationsCancelledEventDto evt) {
         try {
             for (ClientMilesDto cm : evt.refunds()) {
-                String reservaCodigo = cm.codigoReserva();
+                String reservaCodigo = cm.codigo_reserva();
 
                 Reserva view = reservaQueryRepository.findById(reservaCodigo)
                         .orElseThrow(() -> new RuntimeException(

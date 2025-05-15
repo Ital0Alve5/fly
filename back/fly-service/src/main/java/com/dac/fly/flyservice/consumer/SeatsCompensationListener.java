@@ -26,18 +26,18 @@ public class SeatsCompensationListener {
         try {
             flightService.updateSeats(
                     cmd.codigoVoo(),
-                    -cmd.quantidadePoltronas());
+                    -cmd.quantidade_poltronas());
 
             rabbit.convertAndSend(
                     RabbitConstants.EXCHANGE,
                     RabbitConstants.UPDATE_SEATS_RESP_QUEUE,
-                    new SeatsUpdatedEvent(cmd.codigoReserva(), true));
+                    new SeatsUpdatedEvent(cmd.codigo_reserva(), true));
 
         } catch (AmqpException e) {
             rabbit.convertAndSend(
                     RabbitConstants.EXCHANGE,
                     RabbitConstants.UPDATE_SEATS_RESP_QUEUE,
-                    new SeatsUpdatedEvent(cmd.codigoReserva(), false));
+                    new SeatsUpdatedEvent(cmd.codigo_reserva(), false));
 
             throw new RuntimeException("Falha na compensação dos assentos.", e);
         }

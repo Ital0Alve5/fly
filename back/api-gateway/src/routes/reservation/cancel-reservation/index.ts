@@ -5,7 +5,7 @@ import { Env } from 'src/shared/env'
 import { cancelReservationSchema } from './schema'
 
 export async function cancelReservationRoute(app: FastifyTypedInstance) {
-  const path = '/reservas/:codigoReserva'
+  const path = '/reservas/:codigo_reserva'
 
   app.delete(
     path,
@@ -14,10 +14,10 @@ export async function cancelReservationRoute(app: FastifyTypedInstance) {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
-        const { codigoReserva } = request.params as { codigoReserva: string }
+        const { codigo_reserva } = request.params as { codigo_reserva: string }
 
         const reservationResponse = await axios.delete(
-          `${Env.SAGA_URL}/reservations/cancela/${codigoReserva}`,
+          `${Env.SAGA_URL}/reservations/cancela/${codigo_reserva}`,
         )
 
         return reply.status(reservationResponse.status).send(reservationResponse.data.data)

@@ -57,16 +57,16 @@ public class CancelReservationConsumer {
     @RabbitListener(queues = RabbitConstants.COMPENSATE_CANCEL_RESERVATION_CMD_QUEUE)
     public void handle(CompensateCancelReservationCommand cmd) {
         reservationCommandService.revertReservationStatus(
-                cmd.codigoReserva(),
+                cmd.codigo_reserva(),
                 cmd.estadoAnterior());
 
         Reserva reservaCmd = reservaCommandRepository
-                .findById(cmd.codigoReserva())
-                .orElseThrow(() -> new RuntimeException("Reserva (command) não encontrada: " + cmd.codigoReserva()));
+                .findById(cmd.codigo_reserva())
+                .orElseThrow(() -> new RuntimeException("Reserva (command) não encontrada: " + cmd.codigo_reserva()));
 
         com.dac.fly.reservationservice.entity.query.Reserva reservaQuery = reservaQueryRepository
-                .findById(cmd.codigoReserva())
-                .orElseThrow(() -> new RuntimeException("Reserva (query) não encontrada: " + cmd.codigoReserva()));
+                .findById(cmd.codigo_reserva())
+                .orElseThrow(() -> new RuntimeException("Reserva (query) não encontrada: " + cmd.codigo_reserva()));
 
         var resp = new CancelledReservationEventDto(
                 reservaCmd.getCodigo(),

@@ -17,7 +17,6 @@ import com.dac.fly.reservationservice.repository.command.ReservaCommandRepositor
 import com.dac.fly.reservationservice.repository.query.ReservaQueryRepository;
 import com.dac.fly.shared.dto.command.CreateReservationCommand;
 import com.dac.fly.shared.dto.events.CancelledReservationEventDto;
-import com.dac.fly.shared.dto.events.FlightReservationsCompletedEventDto;
 import com.dac.fly.shared.dto.response.CreatedReservationResponseDto;
 
 @Service
@@ -82,22 +81,22 @@ public class ReservationCommandService {
                 return responseDto;
         }
 
-        public CancelledReservationEventDto cancelReservationByCode(String codigoReserva) {
-                return doCancel(codigoReserva, ReservationStatusEnum.CANCELADA);
+        public CancelledReservationEventDto cancelReservationByCode(String codigo_reserva) {
+                return doCancel(codigo_reserva, ReservationStatusEnum.CANCELADA);
         }
 
-        public CancelledReservationEventDto cancelReservationByFlight(String codigoReserva) {
-                return doCancel(codigoReserva, ReservationStatusEnum.CANCELADA_VOO);
+        public CancelledReservationEventDto cancelReservationByFlight(String codigo_reserva) {
+                return doCancel(codigo_reserva, ReservationStatusEnum.CANCELADA_VOO);
         }
 
-        public void completeReservationByFlight(String codigoReserva) {
-                doComplete(codigoReserva);
+        public void completeReservationByFlight(String codigo_reserva) {
+                doComplete(codigo_reserva);
         }
 
-        public CancelledReservationEventDto doCancel(String codigoReserva,
+        public CancelledReservationEventDto doCancel(String codigo_reserva,
                         ReservationStatusEnum targetStatus) {
-                Reserva reservation = repository.findById(codigoReserva)
-                                .orElseThrow(() -> new RuntimeException("Reserva não encontrada: " + codigoReserva));
+                Reserva reservation = repository.findById(codigo_reserva)
+                                .orElseThrow(() -> new RuntimeException("Reserva não encontrada: " + codigo_reserva));
 
                 Long oldStatus = reservation.getEstado();
                 String oldStateName = estadoRepository.findById(oldStatus)
@@ -120,8 +119,8 @@ public class ReservationCommandService {
                 historyRepository.save(historyEntity);
 
                 com.dac.fly.reservationservice.entity.query.Reserva reservationQuery = reservaQueryRepository
-                                .findById(codigoReserva)
-                                .orElseThrow(() -> new RuntimeException("Reserva não encontrada: " + codigoReserva));
+                                .findById(codigo_reserva)
+                                .orElseThrow(() -> new RuntimeException("Reserva não encontrada: " + codigo_reserva));
 
                 CancelledReservationEventDto cancelDto = new CancelledReservationEventDto(
                                 reservation.getCodigo(),
@@ -139,9 +138,9 @@ public class ReservationCommandService {
                 return cancelDto;
         }
 
-        public void doComplete(String codigoReserva) {
-                Reserva reserva = repository.findById(codigoReserva)
-                                .orElseThrow(() -> new RuntimeException("Reserva não encontrada: " + codigoReserva));
+        public void doComplete(String codigo_reserva) {
+                Reserva reserva = repository.findById(codigo_reserva)
+                                .orElseThrow(() -> new RuntimeException("Reserva não encontrada: " + codigo_reserva));
 
                 String estadoAtual = resolveEstadoNome(reserva.getEstado());
                 ReservationStatusEnum targetStatus;
@@ -173,9 +172,9 @@ public class ReservationCommandService {
                 historyRepository.save(historyEntity);
         }
 
-        public ReservationResponseDto updateReservationStatusByCode(String codigoReserva,
+        public ReservationResponseDto updateReservationStatusByCode(String codigo_reserva,
                         ReservationUpdateStatusDto novoEstado) {
-                Reserva reserva = repository.findById(codigoReserva)
+                Reserva reserva = repository.findById(codigo_reserva)
                                 .orElseThrow(() -> new RuntimeException("Reserva não encontrada"));
 
                 String estadoAtual = resolveEstadoNome(reserva.getEstado());
@@ -205,7 +204,7 @@ public class ReservationCommandService {
 
                 String origem = null;
                 String destino = null;
-                var reservaOptional = reservaQueryRepository.findById(codigoReserva);
+                var reservaOptional = reservaQueryRepository.findById(codigo_reserva);
                 if (reservaOptional.isPresent()) {
                         var query = reservaOptional.get();
                         origem = query.getAeroportoOrigem();
@@ -231,9 +230,9 @@ public class ReservationCommandService {
                 repository.deleteById(reservationId);
         }
 
-        public void revertReservationStatus(String codigoReserva, String previousState) {
-                Reserva reserva = repository.findById(codigoReserva)
-                                .orElseThrow(() -> new RuntimeException("Reserva não encontrada: " + codigoReserva));
+        public void revertReservationStatus(String codigo_reserva, String previousState) {
+                Reserva reserva = repository.findById(codigo_reserva)
+                                .orElseThrow(() -> new RuntimeException("Reserva não encontrada: " + codigo_reserva));
 
                 Estado prevEstado = estadoRepository.findByNome(previousState)
                                 .orElseThrow(() -> new RuntimeException(

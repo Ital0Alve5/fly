@@ -6,6 +6,6 @@ export const cancelReservationSchema: FastifySchema = {
   summary: 'Cancelar a reserva',
   description: 'Cancela uma reserva, alterando seu estado para CANCELADA',
   params: z.object({
-    codigoReserva: z.string().describe('Código da reserva a ser cancelada'),
+    codigo_reserva: z.string().describe('Código da reserva a ser cancelada'),
   }),
 } 

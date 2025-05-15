@@ -6,7 +6,7 @@ import { updateReservationStateSchema } from './schema'
 import { userAuthMiddleware } from 'src/middlewares/user-auth'
 
 export async function updateReservationStateRoute(app: FastifyTypedInstance) {
-  const path = '/reservas/:codigoReserva/estado'
+  const path = '/reservas/:codigo_reserva/estado'
 
   app.patch(
     path,
@@ -16,7 +16,7 @@ export async function updateReservationStateRoute(app: FastifyTypedInstance) {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
-        const { codigoReserva } = request.params as { codigoReserva: string }
+        const { codigo_reserva } = request.params as { codigo_reserva: string }
         const { estado } = request.body as { estado: string }
 
         if (estado !== 'CHECK-IN' && request.user?.data.role !== 'FUNCIONARIO') {
@@ -32,7 +32,7 @@ export async function updateReservationStateRoute(app: FastifyTypedInstance) {
         }
 
         const reservationResponse = await axios.patch(
-          `${Env.RESERVATION_SERVICE_URL}/reservas/${codigoReserva}/estado`,
+          `${Env.RESERVATION_SERVICE_URL}/reservas/${codigo_reserva}/estado`,
           { estado },
           {
             headers: {

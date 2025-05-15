@@ -4,7 +4,7 @@ public record CreateClientRequestDto(
         String cpf,
         String email,
         String nome,
-        Integer saldoMilhas,
+        Integer saldo_milhas,
         AddressDTO endereco
 ) {
     public record AddressDTO(

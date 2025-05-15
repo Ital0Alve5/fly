@@ -6,6 +6,7 @@ import { useRoute } from 'vue-router'
 import getReservationDetails from './services/getReservationDetails'
 import { AxiosError } from 'axios'
 import { toast } from '@/components/ui/toast'
+import { formatDateTime } from '@/utils/date/formatDateTime'
 
 const route = useRoute()
 const reservation = ref<Reserve>({
@@ -71,7 +72,7 @@ onMounted(async () => {
           <ul class="space-y-2">
             <li class="flex gap-2">
               <b>Data:</b>
-              <p>{{ reservation.data }}</p>
+              <p>{{ formatDateTime(reservation.data) }}</p>
             </li>
             <li class="flex gap-2">
               <b>Código:</b>
