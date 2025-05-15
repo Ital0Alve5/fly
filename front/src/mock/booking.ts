@@ -1,12 +1,10 @@
 import type { Reserve } from '@/types/Reserve'
 import { ref, type Ref } from 'vue'
 import { getTodayDate } from '@/utils/date/getTodayDate'
-import { generateUniqueCode } from '@/utils/generateRandomCode'
 import { useAuthStore } from '@/stores/auth'
 import { useMilesStore } from '@/stores/miles'
 import { registerExtract, type ExtractItem } from './extract'
-import type { Flight } from '@/types/Flight'
-import { flights, reserveSeats } from './flight'
+import { flights } from './flight'
 
 export const booking: Ref<Reserve[]> = ref([
   {
@@ -81,7 +79,7 @@ export async function getBookingByUserCode(): Promise<Reserve[]> {
   const authStore = useAuthStore()
 
   const reservas = booking.value.filter(
-    (reservation) => reservation.codigo_cliente === authStore.user?.usuario.codigo,
+    (reservation) => reservation.codigo_cliente === authStore.user?.usuario?.codigo,
   )
 
   reservas.forEach((reservation) => {
@@ -141,7 +139,7 @@ export async function cancelReservation(reservationCode: string) {
     const valorDevolvido = Math.max(0, milesStore.pricePerMile * reservation.milhas_utilizadas)
 
     const newExtract: ExtractItem = {
-      codigo_cliente: authStore.user?.usuario.codigo || 0,
+      codigo_cliente: authStore.user?.usuario?.codigo || 0,
       data: getTodayDate(),
       codigo_reserva: null,
       valor_reais: valorDevolvido.toLocaleString('pt-BR', {
@@ -227,31 +225,3 @@ export async function updateReservationStatus(
   }
 }
 
-export async function createNewReservation(data: {
-  flight: Flight
-  price: number
-  miles: number
-  seats: number
-}): Promise<string> {
-  const authStore = useAuthStore()
-
-  const code = generateUniqueCode()
-
-  reserveSeats(data.flight.codigo, data.seats)
-
-  booking.value.push({
-    codigo: code,
-    codigo_cliente: authStore.user!.usuario.codigo,
-    estado: 'CRIADA',
-    data: getTodayDate(),
-    valor: data.price,
-    milhas_utilizadas: data.miles,
-    quantidade_poltronas: data.seats,
-    voo: {
-      ...data.flight,
-      quantidade_poltronas_ocupadas: data.flight.quantidade_poltronas_ocupadas + data.seats,
-    },
-  })
-
-  return code
-}

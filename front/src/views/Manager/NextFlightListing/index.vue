@@ -19,6 +19,7 @@ import CancelFlightDialog from './components/CancelFlightDialog.vue'
 import getFlightsInNext48Hrs from './services/getFlightsInNext48Hrs'
 import { cancelFlight } from '@/views/Manager/NextFlightListing/services/NextFlightListingService.ts'
 import type { Flight } from '@/types/Flight'
+import { useAuthStore } from '@/stores/auth'
 
 const isBoardingDialogOpen = ref(false)
 const isCancelDialogOpen = ref(false)
@@ -29,37 +30,40 @@ const generatedCode = ref('')
 const createdFlight = ref(false)
 const flights = ref<Flight[]>([])
 const { toast } = useToast()
+const authStore = useAuthStore()
 
 onMounted(async () => {
-  flights.value = (await getFlightsInNext48Hrs()).data
+  if (!authStore.user?.usuario?.codigo) return
+
+  flights.value = await getFlightsInNext48Hrs()
 })
 
 watch([isCancelDialogOpen, isPerformDialogOpen], async ([newCancelVal, newPerformVal]) => {
   if (!newCancelVal || !newPerformVal) {
-    flights.value = (await getFlightsInNext48Hrs()).data
+    flights.value = await getFlightsInNext48Hrs()
   }
 })
 
 async function handleConfirmBoarding(selectedFlightCode: string) {
-  flights.value = (await getFlightsInNext48Hrs()).data
+  flights.value = await getFlightsInNext48Hrs()
   selectedFlight.value = selectedFlightCode
   isBoardingDialogOpen.value = true
 }
 
 async function handleCancelFlightDialog(selectedFlightCode: string) {
-  flights.value = (await getFlightsInNext48Hrs()).data
+  flights.value = await getFlightsInNext48Hrs()
   selectedFlight.value = selectedFlightCode
   isCancelDialogOpen.value = true
 }
 
 async function handlePerformFlight(selectedFlightCode: string) {
-  flights.value = (await getFlightsInNext48Hrs()).data
+  flights.value = await getFlightsInNext48Hrs()
   selectedFlight.value = selectedFlightCode
   isPerformDialogOpen.value = true
 }
 
 async function handleFlightRegistered(code: string) {
-  flights.value = (await getFlightsInNext48Hrs()).data
+  flights.value = await getFlightsInNext48Hrs()
   generatedCode.value = code
   createdFlight.value = true
 }
