@@ -1,62 +1,46 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref } from 'vue'
 import { useToast } from '@/components/ui/toast'
 import { useForm } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import * as z from 'zod'
-import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form'
+
+import {
+  FormField, FormItem, FormLabel, FormControl, FormMessage,
+} from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle,
+} from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 
 import { isValidCPF } from '@/lib/utils'
 
 const { toast } = useToast()
 
-
 const formSchema = toTypedSchema(
   z.object({
     nome: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres'),
     email: z.string().email('E-mail inválido'),
-    telefone: z.string().min(14, 'Telefone inválido').max(15, 'Telefone inválido'),
+    telefone: z.string().regex(/^\(\d{2}\) \d{5}-\d{4}$/, 'Telefone inválido'),
     cpf: z.string().refine((cpf) => isValidCPF(cpf), 'CPF inválido'),
     senha: z.string().regex(/^\d{1,6}$/, 'Senha deve conter apenas números e até 6 dígitos'),
-  }),
+  })
 )
 
-const { handleSubmit, resetForm } = useForm({
-  validationSchema: formSchema,
-})
+type FormValues = z.infer<typeof formSchema>
 
-const props = defineProps<{
-  open: boolean
-}>()
-
+const model = defineModel<boolean>('open')
 const emit = defineEmits<{
-  (e: 'update:open', value: boolean): void
-  (
-    e: 'added',
-    payload: {
-      nome: string
-      email: string
-      telefone: string
-      cpf: string
-      senha: string
-    },
-  ): void
+  (e: 'added', payload: FormValues): void
 }>()
 
-const openDialog = ref(props.open)
-
-watch(
-  () => props.open,
-  (newVal) => {
-    openDialog.value = newVal
-  },
-)
-
-watch(openDialog, (newVal) => {
-  emit('update:open', newVal)
+const {
+  handleSubmit,
+  resetForm,
+  isSubmitting,
+} = useForm({
+  validationSchema: formSchema,
 })
 
 const onSubmit = handleSubmit((values) => {
@@ -68,18 +52,19 @@ const onSubmit = handleSubmit((values) => {
     variant: 'default',
     duration: 500,
   })
-  openDialog.value = false
+
+  resetForm()
+  model.value = false
 })
 
-
 const cancel = () => {
-  openDialog.value = false
+  model.value = false
   resetForm()
 }
 </script>
 
 <template>
-  <Dialog v-model:open="openDialog">
+  <Dialog v-model:open="model">
     <DialogContent>
       <DialogHeader>
         <DialogTitle>Adicionar Funcionário</DialogTitle>
@@ -90,7 +75,7 @@ const cancel = () => {
           <FormItem>
             <FormLabel>Nome</FormLabel>
             <FormControl>
-              <Input v-bind="componentField" type="text" />
+              <Input v-bind="componentField" type="text" autocomplete="name" autofocus />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -100,7 +85,7 @@ const cancel = () => {
           <FormItem>
             <FormLabel>E-mail</FormLabel>
             <FormControl>
-              <Input v-bind="componentField" type="email" />
+              <Input v-bind="componentField" type="email" autocomplete="email" />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -110,7 +95,13 @@ const cancel = () => {
           <FormItem>
             <FormLabel>CPF</FormLabel>
             <FormControl>
-              <Input v-bind="componentField" type="text" v-mask="'###.###.###-##'" />
+              <Input
+                v-bind="componentField"
+                type="text"
+                v-mask="'###.###.###-##'"
+                autocomplete="off"
+                aria-label="CPF"
+              />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -120,7 +111,13 @@ const cancel = () => {
           <FormItem>
             <FormLabel>Telefone</FormLabel>
             <FormControl>
-              <Input v-bind="componentField" type="text" v-mask="'(##) #####-####'" />
+              <Input
+                v-bind="componentField"
+                type="text"
+                v-mask="'(##) #####-####'"
+                autocomplete="tel"
+                aria-label="Telefone"
+              />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -130,15 +127,25 @@ const cancel = () => {
           <FormItem>
             <FormLabel>Senha</FormLabel>
             <FormControl>
-              <Input v-bind="componentField" type="password" inputmode="numeric" maxlength="6" />
+              <Input
+                v-bind="componentField"
+                type="text"
+                inputmode="numeric"
+                maxlength="6"
+                pattern="\d{1,6}"
+                autocomplete="new-password"
+              />
             </FormControl>
             <FormMessage />
           </FormItem>
         </FormField>
 
         <div class="flex justify-end gap-2 mt-4">
-          <Button variant="destructive" type="button" @click="cancel"> Cancelar </Button>
-          <Button type="submit"> Salvar </Button>
+          <Button variant="destructive" type="button" @click="cancel">Cancelar</Button>
+          <Button type="submit" :disabled="isSubmitting">
+            <span v-if="isSubmitting">Salvando...</span>
+            <span v-else>Salvar</span>
+          </Button>
         </div>
       </form>
     </DialogContent>
