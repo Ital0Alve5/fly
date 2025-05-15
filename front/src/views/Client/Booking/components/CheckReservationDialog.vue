@@ -78,7 +78,7 @@ const checkin = async (reserve: Reserve) => {
 const setIsWithin48Hours = (reserva: Reserve) => {
   if (!reserva.codigo) throw new Error()
 
-  const inputDate = new Date(reserva.data)
+  const inputDate = new Date(reserva.voo.data)
   const now = new Date()
   const timeDifference = inputDate.getTime() - now.getTime()
   const hours48 = 48 * 60 * 60 * 1000

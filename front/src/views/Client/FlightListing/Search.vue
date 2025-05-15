@@ -22,7 +22,7 @@ async function handleSearch(originAirport: string, destinationAirport: string) {
     }
 
     loading.value = true
-    
+
     let flights;
 
     if (originAirport === '' && destinationAirport === '') {
@@ -51,7 +51,7 @@ async function handleSearch(originAirport: string, destinationAirport: string) {
     <section class="w-11/12 max-w-2xl">
       <div class="flex flex-col gap-1">
         <h1 class="text-4xl font-bold">
-          Qual será a próxima, {{ authStore.user?.usuario.nome.split(' ')?.[0] }}?
+          Qual será a próxima, {{ authStore.user?.usuario?.nome.split(' ')?.[0] }}?
         </h1>
         <p class="text-xl">
           Insira o aeroporto de origem e destino e descubra sua próxima aventura!
