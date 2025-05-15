@@ -58,7 +58,7 @@ watch(
       setFieldValue('email', props.employee.email)
       setFieldValue('telefone', props.employee.telefone)
       setFieldValue('cpf', props.employee.cpf)
-      setFieldValue('senha', props.employee.senha ?? '')
+      setFieldValue('senha', '')
     } else {
       resetForm()
     }
@@ -123,7 +123,7 @@ const onSubmit = handleSubmit((values) => {
           <FormItem>
             <FormLabel>CPF</FormLabel>
             <FormControl>
-              <Input v-bind="componentField" type="text" v-mask="'###.###.###-##'" />
+              <Input v-bind="componentField" type="text" v-mask="'###.###.###-##'" disabled />
             </FormControl>
             <FormMessage />
           </FormItem>
