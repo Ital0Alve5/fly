@@ -28,7 +28,6 @@ import {
 import { ArrowUpDown } from 'lucide-vue-next'
 import { h, ref } from 'vue'
 import { useAuthStore } from '@/stores/auth'
-import { getExtractByUserCode, type ExtractItem } from '@/mock/extract'
 import { getClientTransactionHistory } from '@/clientService/ClientService'
 import type { MilesExtractResponse, MilesExtractItem } from '@/types/Api'
 
@@ -156,7 +155,7 @@ const columns: ColumnDef<MilesExtractItem>[] = [
   {
     accessorKey: 'descricao',
     header: 'Descrição',
-    cell: ({ row }) => h('div', row.getValue('descricao')),
+    cell: ({ row }) => h('div', (row.getValue('descricao') as string).toUpperCase()),
   },
   {
     accessorKey: 'tipo',
