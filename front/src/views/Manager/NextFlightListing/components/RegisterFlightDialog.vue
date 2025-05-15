@@ -16,15 +16,14 @@ import SelectGroup from '@/components/ui/select/SelectGroup.vue'
 import SelectItem from '@/components/ui/select/SelectItem.vue'
 import SelectTrigger from '@/components/ui/select/SelectTrigger.vue'
 import SelectValue from '@/components/ui/select/SelectValue.vue'
-import { loadAllAirpoirts } from '@/mock/airpoirts'
+import { loadAllAirpoirts } from '../services/NextFlightListingService'
 import { useGlobalStore } from '@/stores/global'
 import type { Airport } from '@/types/Airpoirt'
 import { computed, onMounted, ref } from 'vue'
 import { useRegisterFlightForm } from '../composables/useRegisterFlightForm'
 import { extractPriceValue } from '@/utils/currency/extractPriceValue'
 import { currencyMask } from '@/utils/currency/inputMask'
-import { registerFlight } from '@/mock/flight'
-import { generateFlightCode } from '@/utils/generateFlightCode'
+import { registerFlight } from '../services/NextFlightListingService'
 
 defineProps<{
   modelValue: boolean
@@ -66,7 +65,7 @@ const handleOpenChange = (open: boolean) => {
   emit('update:modelValue', open)
 }
 
-const onSubmit = handleSubmit(async (data) => {
+const onSubmit = handleSubmit(async (formData) => {
   try {
     if (loading.value) {
       return
@@ -74,21 +73,17 @@ const onSubmit = handleSubmit(async (data) => {
 
     loading.value = true
 
-    const generatedCode = generateFlightCode()
-    await registerFlight({
-      ...data,
-      code: generatedCode,
-      price: price.value,
-    })
-
-    globalStore.setNotification({
-      title: 'Voo cadastrado com sucesso',
-      description: 'O voo foi cadastrado com sucesso.',
-      variant: 'default',
+    const { data } = await registerFlight({
+      data: new Date(formData.date).toISOString(),
+      valor_passagem: price.value,
+      quantidade_poltronas_total: formData.seatsNumber,
+      quantidade_poltronas_ocupadas: 0,
+      codigo_aeroporto_origem: formData.originAirport,
+      codigo_aeroporto_destino: formData.destinationAirport,
     })
 
     emit('update:modelValue', false)
-    emit('handleFlightRegistered', generatedCode)
+    emit('handleFlightRegistered', data.codigo)
   } catch (err) {
     globalStore.setNotification({
       title: 'Erro ao cadastrar voo!',

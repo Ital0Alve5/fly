@@ -1,11 +1,3 @@
-// export type AuthenticatedUserData = {
-//   userId: number
-//   name: string
-//   email: string
-//   isManager: boolean
-//   miles: number
-// }
-
 export type Client = {
   codigo: number
   cpf: string
@@ -36,5 +28,5 @@ export type AuthenticatedUserData = {
   token_type: string
   tipo: 'CLIENTE' | 'FUNCIONARIO'
   senha: string
-  usuario: Client | Employee
+  usuario: Client | Employee | null
 }

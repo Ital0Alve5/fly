@@ -1,13 +1,9 @@
 <script setup lang="ts">
-import { useRouter } from 'vue-router'
 import { useRegisterForm } from '../composables/useRegisterForm'
 import { useAddressByCep } from '../composables/useAddressByCep'
 import { useAuthStore } from '@/stores/auth'
 import { useGlobalStore } from '@/stores/global'
 import { useToast } from '@/components/ui/toast'
-
-const { toast } = useToast()
-
 import {
   Card,
   CardHeader,
@@ -19,11 +15,16 @@ import {
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import LoadingSpinner from '@/components/ui/LoadingSpinner.vue'
 import type { Client } from '@/types/Auth/AuthenticatedUserData'
+import { ref } from 'vue'
+import { AxiosError } from 'axios'
 
-const router = useRouter()
+const loading = ref(false)
 const authStore = useAuthStore()
 const globalStore = useGlobalStore()
+const emit = defineEmits(['registered'])
+const { toast } = useToast()
 
 const { handleSubmit, name, registerEmail, cpf, cep } = useRegisterForm()
 
@@ -32,33 +33,39 @@ const { street, neighborhood, city, state, number, complement } = useAddressByCe
 const onSubmit = handleSubmit(async (values) => {
   try {
     const newUserData: Client = {
-      codigo: Date.now(),
-      nome: values.name,
-      email: values.registerEmail,
+      codigo: -1,
       cpf: values.cpf,
+      email: values.registerEmail,
+      nome: values.name,
       saldo_milhas: 0,
       endereco: {
         cep: values.cep,
-        rua: street.value,
-        bairro: neighborhood.value,
-        cidade: city.value,
         uf: state.value,
-        complemento: complement.value,
+        cidade: city.value,
+        bairro: neighborhood.value,
+        rua: street.value,
         numero: number.value,
+        complemento: complement.value,
       },
     }
 
+    loading.value = true
+
     await authStore.register(newUserData)
+
+    loading.value = false
+
     globalStore.setNotification({
       title: 'Cadastro realizado!',
       description: 'Verifique seu e-mail para a senha',
       variant: 'default',
     })
-    router.push('/reservas')
+    emit('registered')
   } catch (error) {
     toast({
       title: 'Erro no cadastro',
-      description: error instanceof Error ? error.message : 'Falha ao tentar cadastrar',
+      description:
+        error instanceof AxiosError ? error.response?.data.message : 'Falha ao tentar cadastrar',
       variant: 'destructive',
       duration: 2500,
     })
@@ -164,7 +171,10 @@ const onSubmit = handleSubmit(async (values) => {
         </p>
 
         <CardFooter class="p-0 pt-4">
-          <Button type="submit" class="w-full">Cadastrar</Button>
+          <Button type="submit" class="w-full" :disabled="loading"
+            ><LoadingSpinner v-if="loading" />
+            <p v-else>Cadastrar</p>
+          </Button>
         </CardFooter>
       </form>
     </CardContent>

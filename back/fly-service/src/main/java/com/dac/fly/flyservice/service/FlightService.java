@@ -168,10 +168,23 @@ public class FlightService {
         public ResponseEntity<ApiResponse<FlightGroupedResponseDto>> findByAirport(
                         OffsetDateTime data, String origem, String destino) {
                 OffsetDateTime inicio = data.toLocalDate().atStartOfDay().atOffset(ZoneOffset.UTC);
-                OffsetDateTime fim = inicio.plusDays(1);
+                OffsetDateTime fim = inicio.plusYears(10);
 
-                List<Voo> voos = vooRepository.findByDataBetweenAndAeroportoOrigemCodigoAndAeroportoDestinoCodigo(
-                                inicio, fim, origem, destino);
+                List<Voo> voos;
+
+                if (origem != null && destino != null) {
+                    voos = vooRepository.findByDataBetweenAndAeroportoOrigemCodigoAndAeroportoDestinoCodigo(
+                            inicio, fim, origem, destino);
+                } else if (origem != null) {
+                    voos = vooRepository.findByDataBetweenAndAeroportoOrigemCodigo(
+                            inicio, fim, origem);
+                } else if (destino != null) {
+                    voos = vooRepository.findByDataBetweenAndAeroportoDestinoCodigo(
+                            inicio, fim, destino);
+                } else {
+                    voos = vooRepository.findByDataBetween(inicio, fim);
+                }
+
                 List<FlightDetailsResponseDto> detalhes = voos.stream()
                                 .map(FlightDetailsResponseDto::fromEntity)
                                 .collect(Collectors.toList());

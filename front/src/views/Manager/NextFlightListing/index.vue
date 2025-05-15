@@ -9,23 +9,15 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
 import { useToast } from '@/components/ui/toast'
 import { Button } from '@/components/ui/button'
 import PerformFlightDialog from './components/PerformFlightDialog.vue'
 import RegisterFlightDialog from './components/RegisterFlightDialog.vue'
-import { getFlightsInNext48Hours, cancelFlight } from '@/mock/flight'
-import { cancelReservationByFlightCode } from '@/mock/booking'
-import formatDateTime from '@/utils/date/formatDateTime'
+import { formatDateTime } from '@/utils/date/formatDateTime'
 import ConfirmBoardingDialog from '@/views/Manager/NextFlightListing/components/ConfirmBoardingDialog.vue'
 import CancelFlightDialog from './components/CancelFlightDialog.vue'
 import getFlightsInNext48Hrs from './services/getFlightsInNext48Hrs'
+import { cancelFlight } from '@/views/Manager/NextFlightListing/services/NextFlightListingService.ts'
 import type { Flight } from '@/types/Flight'
 
 const isBoardingDialogOpen = ref(false)
@@ -48,66 +40,58 @@ watch([isCancelDialogOpen, isPerformDialogOpen], async ([newCancelVal, newPerfor
   }
 })
 
-function handleConfirmBoarding(selectedFlightCode: string) {
+async function handleConfirmBoarding(selectedFlightCode: string) {
+  flights.value = (await getFlightsInNext48Hrs()).data
   selectedFlight.value = selectedFlightCode
   isBoardingDialogOpen.value = true
 }
 
-function handleCancelFlightDialog(selectedFlightCode: string) {
+async function handleCancelFlightDialog(selectedFlightCode: string) {
+  flights.value = (await getFlightsInNext48Hrs()).data
   selectedFlight.value = selectedFlightCode
   isCancelDialogOpen.value = true
 }
 
-function handlePerformFlight(selectedFlightCode: string) {
+async function handlePerformFlight(selectedFlightCode: string) {
+  flights.value = (await getFlightsInNext48Hrs()).data
   selectedFlight.value = selectedFlightCode
   isPerformDialogOpen.value = true
 }
 
-function handleFlightRegistered(code: string) {
-  flights.value = getFlightsInNext48Hours()
+async function handleFlightRegistered(code: string) {
+  flights.value = (await getFlightsInNext48Hrs()).data
   generatedCode.value = code
   createdFlight.value = true
 }
 
-function handelCancelFlight() {
-  cancelFlight(selectedFlight.value)
-  cancelReservationByFlightCode(selectedFlight.value)
-  flights.value = getFlightsInNext48Hours()
-  isCancelDialogOpen.value = false
+async function handelCancelFlight() {
+  try {
+    const success = await cancelFlight(selectedFlight.value)
+    if (success) {
+      isCancelDialogOpen.value = false
 
-  toast({
-    title: 'Voo cancelado com sucesso',
-    description: 'Todas as reservas deste voo foram canceladas.',
-    variant: 'default',
-    duration: 1000,
-  })
+      toast({
+        title: 'Voo cancelado com sucesso',
+        description: 'Todas as reservas deste voo foram canceladas.',
+        variant: 'default',
+        duration: 1000,
+      })
+    } else {
+      throw new Error('Erro ao cancelar voo')
+    }
+  } catch (error) {
+    toast({
+      title: 'Erro ao cancelar voo',
+      description: error instanceof Error ? error.message : 'Erro ao cancelar voo',
+      variant: 'destructive',
+      duration: 2500,
+    })
+  }
 }
 </script>
 
 <template>
   <div>
-    <Dialog
-      v-if="createdFlight"
-      :default-open="true"
-      @update:open="
-        (value) => {
-          if (!value) createdFlight = false
-        }
-      "
-    >
-      <DialogContent class="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle>Código do voo</DialogTitle>
-          <DialogDescription>Código gerado unicamente para o voo cadastrado</DialogDescription>
-        </DialogHeader>
-        <div class="flex items-center space-x-2">
-          <div class="grid flex-1 gap-2">
-            <div>{{ generatedCode }}</div>
-          </div>
-        </div>
-      </DialogContent>
-    </Dialog>
-
     <RegisterFlightDialog
       @handle-flight-registered="handleFlightRegistered"
       v-model="isRegisterFlightFormOpen"
@@ -124,6 +108,7 @@ function handelCancelFlight() {
         <TableHeader>
           <TableRow>
             <TableHead> Data/hora </TableHead>
+            <TableHead>Código</TableHead>
             <TableHead>Origem</TableHead>
             <TableHead>Destino</TableHead>
             <TableHead>Status</TableHead>
@@ -134,6 +119,9 @@ function handelCancelFlight() {
           <TableRow v-for="flight in flights" :key="flight.codigo">
             <TableCell>
               {{ formatDateTime(flight.data) }}
+            </TableCell>
+            <TableCell>
+              {{ flight.codigo }}
             </TableCell>
             <TableCell> {{ flight.aeroporto_origem.codigo }} </TableCell>
             <TableCell>{{ flight.aeroporto_destino.codigo }}</TableCell>

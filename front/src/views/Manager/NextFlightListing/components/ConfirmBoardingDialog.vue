@@ -12,7 +12,7 @@ import { useToast } from '@/components/ui/toast'
 import { Input } from '@/components/ui/input'
 
 import { getReservationByCodeAndFlightCode, updateReservationStatus } from '@/mock/booking'
-import { getFlightByCode } from '@/mock/flight'
+import { fetchFlightByCode } from '@/views/Client/FlightListing/services/FlightListingService'
 
 const props = defineProps<{
   modelValue: boolean
@@ -54,7 +54,8 @@ const handleConfirmBoarding = async () => {
       throw new Error('Reserva não encontrada.')
     }
 
-    if (!getFlightByCode(reservation.voo.codigo)) {
+    const flight = await fetchFlightByCode(reservation.voo.codigo)
+    if (!flight) {
       throw new Error('Esta reserva não pertence a este voo.')
     }
 

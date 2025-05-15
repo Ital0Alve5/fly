@@ -1,17 +1,8 @@
 import { defineStore } from 'pinia'
 import { useLocalStorage } from '@vueuse/core'
-import type { AuthenticatedUserData, Client, Employee } from '@/types/Auth/AuthenticatedUserData'
-import clientsMock from '@/mock/clients'
-import employeesMock from '@/mock/employees'
-import { addEmployeePassword, addClientPassword } from '@/mock/auth'
-
-function generatedRandomPassword(): string {
-  return Math.floor(1000 + Math.random() * 9000).toString()
-}
-
-function sendPasswordOnEmail(email: string, senha: string): void {
-  console.log(`Senha enviada para ${email}: ${senha}`)
-}
+import type { AuthenticatedUserData, Client } from '@/types/Auth/AuthenticatedUserData'
+import { registerClient } from '@/clientService/ClientService'
+import type { AxiosResponse } from 'axios'
 
 export const useAuthStore = defineStore('auth', () => {
   const isAuthenticated = useLocalStorage('auth/isAuthenticated', false)
@@ -34,40 +25,11 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  async function register(newUser: Client): Promise<AuthenticatedUserData | null> {
+  async function register(newUser: Client): Promise<AxiosResponse<Client>> {
     if (!newUser.nome || !newUser.email || !newUser.cpf || !newUser.endereco.cep) {
       throw new Error('Todos os campos são obrigatórios.')
     }
-
-    const senha = generatedRandomPassword()
-
-    clientsMock.registerClient(newUser)
-
-    sendPasswordOnEmail(newUser.email, senha)
-
-    isAuthenticated.value = true
-
-    user.value = {
-      access_token: '',
-      token_type: '',
-      tipo: 'CLIENTE',
-      senha: senha,
-      usuario: newUser,
-    }
-
-    addClientPassword(newUser.email, senha)
-
-    return user.value
-  }
-
-  async function registerEmployee(newEmployee: Employee) {
-    const senha = generatedRandomPassword()
-
-    employeesMock.registerEmployee(newEmployee)
-
-    sendPasswordOnEmail(newEmployee.email, senha)
-
-    addEmployeePassword(newEmployee.email, senha)
+    return await registerClient(newUser)
   }
 
   function logout() {
@@ -81,6 +43,5 @@ export const useAuthStore = defineStore('auth', () => {
     login,
     register,
     logout,
-    registerEmployee,
   }
 })

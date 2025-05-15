@@ -69,7 +69,7 @@ function handleLogout() {
         </RouterLink>
       </li>
     </ul>
-    <p class="ml-auto font-semibold">Olá, {{ authStore.user?.usuario.nome.split(' ')[0] }}!</p>
+    <p class="ml-auto font-semibold">Olá, {{ authStore.user?.usuario?.nome.split(' ')[0] }}!</p>
     <LogOut @click="handleLogout" class="ml-6 cursor-pointer" />
   </header>
 </template>
