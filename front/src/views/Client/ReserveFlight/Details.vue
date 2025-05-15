@@ -21,14 +21,12 @@ import { useRoute, useRouter } from 'vue-router'
 
 import { useMilesStore } from '@/stores/miles'
 import FlightDetails from './components/FlightDetails.vue'
-import { reserveSeats } from '@/mock/flight'
-import { createNewReservation } from '@/mock/booking'
-import { registerExtract } from '@/mock/extract'
 import { useAuthStore } from '@/stores/auth'
-import { getTodayDate } from '@/utils/date/getTodayDate'
 import type { Flight } from '@/types/Flight'
 import { fetchFlightByCode } from '@/views/Client/FlightListing/services/FlightListingService'
 import { useToast } from '@/components/ui/toast'
+import createReservation from './services/createReservation'
+import { AxiosError } from 'axios'
 
 const route = useRoute()
 const router = useRouter()
@@ -38,7 +36,26 @@ const milesStore = useMilesStore()
 const authStore = useAuthStore()
 
 const code = route.params.code as string
-const flight = ref<Flight | null>(null)
+const flight = ref<Flight>({
+  codigo: '',
+  data: '',
+  valor_passagem: 0,
+  quantidade_poltronas_total: 0,
+  quantidade_poltronas_ocupadas: 0,
+  estado: 'CONFIRMADO',
+  aeroporto_origem: {
+    codigo: '',
+    nome: '',
+    cidade: '',
+    uf: '',
+  },
+  aeroporto_destino: {
+    codigo: '',
+    nome: '',
+    cidade: '',
+    uf: '',
+  },
+})
 const miles = ref(0)
 const seats = ref(1)
 const generatedCode = ref('')
@@ -50,17 +67,16 @@ onMounted(async () => {
     const response = await fetchFlightByCode(code)
     flight.value = response
   } catch (error) {
-      toast({
-        title: 'Erro ao obter voos',
-        description: error instanceof Error ? error.message : 'Erro ao obter voos',
-        variant: 'destructive',
-        duration: 2500,
-      })
+    toast({
+      title: 'Erro ao obter voos',
+      description: error instanceof Error ? error.message : 'Erro ao obter voos',
+      variant: 'destructive',
+      duration: 2500,
+    })
   } finally {
     loading.value = false
   }
 })
-
 
 const valueToPay = computed(() => {
   if (!flight.value || flight.value.valor_passagem === undefined) return -1
@@ -88,31 +104,31 @@ const availableMilesToUse = computed(() => {
 })
 
 async function handleReserveFlight() {
+  try {
+    const { data } = await createReservation({
+      codigo_cliente: authStore.user?.usuario?.codigo as number,
+      valor: valueToPay.value,
+      milhas_utilizadas: miles.value,
+      quantidade_poltronas: seats.value,
+      codigo_voo: flight.value.codigo,
+      codigo_aeroporto_origem: flight.value.aeroporto_origem.codigo,
+      codigo_aeroporto_destino: flight.value.aeroporto_destino.codigo,
+    })
 
-  generatedCode.value = await createNewReservation({
-    flight: flight.value!,
-    price: valueToPay.value,
-    miles: miles.value,
-    seats: seats.value,
-  })
+    generatedCode.value = data.codigo
+  } catch (error) {
+    toast({
+      title: 'Erro ao criar reserva!',
+      description:
+        error instanceof AxiosError
+          ? error.response?.data.message
+          : 'Falha ao tentar criar reserva,',
+      variant: 'destructive',
+      duration: 2500,
+    })
+  }
 
-  const valorFinal = Math.max(0, valueToPay.value)
-
-  registerExtract({
-    codigo_cliente: authStore.user?.usuario?.codigo as number,
-    data: getTodayDate(),
-    codigo_reserva: generatedCode.value,
-    valor_reais: valorFinal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
-    quantidade_milhas: miles.value,
-    descricao: `${flight.value?.aeroporto_origem.codigo}->${flight.value?.aeroporto_destino.codigo}`,
-    tipo: 'SAÍDA',
-  })
-
-  reserveSeats(flight.value?.codigo || '', seats.value)
-
-  // TODO: A linha abaixo esta comentada pois era a menira antiga de remover milhas. Depois que os apis de reservas forem implementasdos, é para a linha abaixo da comentada dar conta de atualizar as milhas automaticamente. Se funcionar pode remover a linha comentada  
-    // milesStore.setTotalMiles(milesStore.totalMiles - miles.value)
-    await milesStore.refreshMiles()
+  await milesStore.refreshMiles()
 }
 </script>
 <template>
