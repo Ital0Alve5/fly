@@ -18,11 +18,11 @@ import com.dac.fly.clientservice.service.ClientService;
 
 @RestController
 @RequestMapping("/clientes")
-public class ClientController {
 
+public class ControllerClientClient {
     private final ClientService clientService;
 
-    public ClientController(ClientService clientService) {
+    public ControllerClientClient(ClientService clientService) {
         this.clientService = clientService;
     }
 
@@ -71,4 +71,5 @@ public class ClientController {
         boolean exists = clientService.existsByCpf(DocumentUtils.formatCpf(cpf));
         return ResponseEntity.ok(exists);
     }
+    
 }
