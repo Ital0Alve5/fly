@@ -7,7 +7,8 @@ import java.util.List;
 import com.dac.fly.clientservice.entity.Address;
 import com.dac.fly.clientservice.entity.Client;
 
-public class responses (Long codigo,
+public class responses (
+    Long codigo,
     Integer saldoMilhas, 
     Long codigo,
     Integer saldoMilhas,

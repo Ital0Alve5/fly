@@ -2,7 +2,6 @@ package com.dac.fly.clientservice.consumer;
 
 import java.util.Objects;
 
-import com.dac.fly.shared.dto.command.CompensateCreateReservationCommand;
 import com.dac.fly.shared.dto.command.DeleteClientCommandDto;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;

@@ -14,12 +14,10 @@ public class MilesCommandListener {
 
     private final ClientService clientService;
     private final MilesPublisher publisher;
-    private final RabbitTemplate rabbit;
 
     public MilesCommandListener(ClientService clientService, MilesPublisher publisher, RabbitTemplate rabbit) {
         this.clientService = clientService;
         this.publisher = publisher;
-        this.rabbit = rabbit;
     }
 
     @RabbitListener(queues = RabbitConstants.UPDATE_MILES_CMD_QUEUE)
