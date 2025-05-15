@@ -10,9 +10,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button'
 
 import { isValidCPF } from '@/lib/utils'
+import LoadingSpinner from '@/components/ui/LoadingSpinner.vue'
+import addNewEmployee from '../services/addNewEmployee'
 
 const { toast } = useToast()
-
+const isLoading = ref(false)
 
 const formSchema = toTypedSchema(
   z.object({
@@ -34,16 +36,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: 'update:open', value: boolean): void
-  (
-    e: 'added',
-    payload: {
-      nome: string
-      email: string
-      telefone: string
-      cpf: string
-      senha: string
-    },
-  ): void
+  (e: 'added'): void
 }>()
 
 const openDialog = ref(props.open)
@@ -59,18 +52,26 @@ watch(openDialog, (newVal) => {
   emit('update:open', newVal)
 })
 
-const onSubmit = handleSubmit((values) => {
-  emit('added', values)
+const onSubmit = handleSubmit(async (values) => {
+  try {
+    isLoading.value = true
+    await addNewEmployee(values)
+    isLoading.value = false
 
-  toast({
-    title: 'Funcionário adicionado',
-    description: `Acesse sua senha no email ${values.email}.`,
-    variant: 'default',
-    duration: 500,
-  })
+    emit('added')
+
+    toast({
+      title: 'Funcionário adicionado',
+      description: `Acesse sua senha no email ${values.email}.`,
+      variant: 'default',
+      duration: 500,
+    })
+  } catch (error) {
+    console.error('Erro ao adicionar funcionário:', error)
+  }
+
   openDialog.value = false
 })
-
 
 const cancel = () => {
   openDialog.value = false
@@ -138,7 +139,10 @@ const cancel = () => {
 
         <div class="flex justify-end gap-2 mt-4">
           <Button variant="destructive" type="button" @click="cancel"> Cancelar </Button>
-          <Button type="submit"> Salvar </Button>
+          <Button type="submit" :disabled="isLoading"
+            ><LoadingSpinner v-if="isLoading" />
+            <p v-else>Salvar</p>
+          </Button>
         </div>
       </form>
     </DialogContent>

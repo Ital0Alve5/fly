@@ -15,7 +15,6 @@ import AddEmployeeDialog from './components/AddEmployeeDialog.vue'
 import type { Employee } from '@/types/Auth/AuthenticatedUserData'
 import { useAuthStore } from '@/stores/auth'
 import getAllEmployees from './services/getAllEmployees'
-import addNewEmployee from './services/addNewEmployee'
 import deleteEmployee from './services/deleteEmployee'
 import updateEmployee from './services/updateEmployee'
 
@@ -70,20 +69,6 @@ async function handleDeleteEmployee(employee: Employee) {
     console.error('Erro ao excluir funcionário:', error)
   }
 }
-async function handleAddEmployee(data: {
-  nome: string
-  email: string
-  telefone: string
-  cpf: string
-  senha: string
-}) {
-  try {
-    await addNewEmployee(data)
-    await fetchEmployees()
-  } catch (error) {
-    console.error('Erro ao adicionar funcionário:', error)
-  }
-}
 </script>
 
 <template>
@@ -93,7 +78,7 @@ async function handleAddEmployee(data: {
     @updated="handleUpdateEmployee"
   />
 
-  <AddEmployeeDialog v-model:open="isAddEmployeeDialog" @added="handleAddEmployee" />
+  <AddEmployeeDialog v-model:open="isAddEmployeeDialog" @added="fetchEmployees" />
 
   <div class="min-h-screen flex flex-col justify-center gap-10 items-end">
     <Button class="w-52 h-9" @click="goToCreate">
@@ -122,7 +107,7 @@ async function handleAddEmployee(data: {
               <Pencil class="h-4 w-4" />
             </Button>
             <Button
-              v-if="employee.codigo !== authStore.user?.usuario.codigo"
+              v-if="employee.codigo !== authStore.user?.usuario?.codigo"
               size="icon"
               variant="destructive"
               @click="handleDeleteEmployee(employee)"
