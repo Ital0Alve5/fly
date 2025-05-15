@@ -7,8 +7,9 @@ import {
   DialogDescription,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import { cancelReservation } from '@/mock/booking'
 import { useToast } from '@/components/ui/toast'
+import { AxiosError } from 'axios'
+import cancelReservation from '@/views/Client/Booking/services/cancelReservation'
 
 const props = defineProps<{
   modelValue: boolean
@@ -17,22 +18,36 @@ const props = defineProps<{
 
 const { toast } = useToast()
 
-const emit = defineEmits(['update:modelValue'])
+const emit = defineEmits(['update:modelValue', 'success'])
 
 const handleOpenChange = (open: boolean) => {
   emit('update:modelValue', open)
 }
 
-function handleCancelReservation() {
-  cancelReservation(props.reservationCode as string)
-  emit('update:modelValue', false)
+async function handleCancelReservation() {
+  if (!props.reservationCode) return
 
-  toast({
-    title: 'Reserva cancelada com sucesso',
-    description: 'Sua reserva foi cancelada!',
-    variant: 'default',
-    duration: 1000,
-  })
+  try {
+    await cancelReservation(props.reservationCode)
+
+    toast({
+      title: 'Reserva cancelada com sucesso',
+      description: 'Sua reserva foi cancelada!',
+      variant: 'default',
+      duration: 1000,
+    })
+
+    emit('success')
+  } catch (error) {
+    toast({
+      title: 'Erro ao cancelar reserva!',
+      description:
+        error instanceof AxiosError ? error.response?.data.message : 'Falha ao tentar cancelar!',
+      variant: 'destructive',
+      duration: 2500,
+    })
+  }
+  emit('update:modelValue', false)
 }
 </script>
 

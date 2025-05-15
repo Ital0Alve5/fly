@@ -13,10 +13,8 @@ import {
 import { useRouter } from 'vue-router'
 import { useMilesStore } from '@/stores/miles'
 import CancelReservationDialog from '@/components/dialogs/CancelReservationDialog.vue'
-import { getBookingByUserCode } from '@/mock/booking'
 import CheckReservationDialog from './components/CheckReservationDialog.vue'
 import { getClientReservationList } from '@/clientService/ClientService'
-import type { Reserve } from '@/types/Reserve'
 import type { ReservationListResponse } from '@/types/Api'
 import { formatDateTime } from '@/utils/date/formatDateTime'
 
@@ -25,9 +23,13 @@ const milesStore = useMilesStore()
 const booking = ref<ReservationListResponse>([])
 
 onMounted(async () => {
-  const result = await getClientReservationList();
-  booking.value = result ?? [];
+  getBooking()
 })
+
+async function getBooking() {
+  const result = await getClientReservationList()
+  booking.value = result ?? []
+}
 
 const viewReservation = async (codigo: string) => {
   const reserva = booking.value.find((r) => r.codigo === codigo)
@@ -53,6 +55,7 @@ function openCheckReservationDialog() {
   <div>
     <CancelReservationDialog
       :reservation-code="selectedReservationCide as string"
+      @success="getBooking"
       v-model="isCancelDialogOpen"
     />
     <CheckReservationDialog v-model:open="isCheckReservationDialogOpen" />
