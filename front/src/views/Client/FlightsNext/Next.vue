@@ -16,6 +16,7 @@ import CancelReservationDialog from '@/components/dialogs/CancelReservationDialo
 import { getClientFlightListInNext48hrs, performCheckin } from '@/clientService/ClientService'
 import { formatDateTime } from '@/utils/date/formatDateTime'
 import { AxiosError } from 'axios'
+import { useAuthStore } from '@/stores/auth'
 
 const { toast } = useToast()
 
@@ -59,8 +60,11 @@ const checkin = async (reserve: Reserve) => {
 const selectedReservationcode = ref<string | null>(null)
 const isCancelDialogOpen = ref(false)
 const flights = ref<Reserve[]>([])
+const authStore = useAuthStore()
 
 onMounted(async () => {
+  if (!authStore.user?.usuario?.codigo) return
+
   setFlights()
 })
 

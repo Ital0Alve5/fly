@@ -17,12 +17,16 @@ import CheckReservationDialog from './components/CheckReservationDialog.vue'
 import { getClientReservationList } from '@/clientService/ClientService'
 import { formatDateTime } from '@/utils/date/formatDateTime'
 import type { Reserve } from '@/types/Reserve'
+import { useAuthStore } from '@/stores/auth'
 
 const router = useRouter()
 const milesStore = useMilesStore()
 const booking = ref<Reserve[]>([])
+const authStore = useAuthStore()
 
 onMounted(async () => {
+  if (!authStore.user?.usuario?.codigo) return
+
   getBooking()
 })
 

@@ -83,7 +83,7 @@ const router = createRouter({
 
 router.beforeEach((to) => {
   const authStore = useAuthStore()
-  console.log(authStore.user)
+
   if (
     (!authStore.user && to.meta.requiresAuth) ||
     (authStore.user && authStore.user.tipo !== 'FUNCIONARIO' && to.meta.isManager) ||
