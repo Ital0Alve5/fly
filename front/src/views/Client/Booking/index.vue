@@ -58,7 +58,7 @@ function openCheckReservationDialog() {
       @success="getBooking"
       v-model="isCancelDialogOpen"
     />
-    <CheckReservationDialog v-model:open="isCheckReservationDialogOpen" />
+    <CheckReservationDialog v-model:open="isCheckReservationDialogOpen" @refresh="getBooking" />
     <div class="flex flex-col justify-center h-screen">
       <nav class="p-1 shadow-md mt-6">
         <div class="container mx-auto flex justify-between items-center">

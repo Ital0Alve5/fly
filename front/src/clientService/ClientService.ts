@@ -51,7 +51,7 @@ export const getClientFlightListInNext48hrs = async (): Promise<Reserve[]> => {
       const timeDifference = inputDate.getTime() - now.getTime()
       const hours48 = 48 * 60 * 60 * 1000
 
-      return timeDifference >= 0 && timeDifference <= hours48
+      return timeDifference >= 0 && timeDifference <= hours48 && res.estado === "CRIADA"
     })
   } catch (error) {
     console.error('Erro ao pegar lista de reserva do cliente:', error)

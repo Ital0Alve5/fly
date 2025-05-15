@@ -15,6 +15,8 @@ import { useToast } from '@/components/ui/toast'
 import getReservationDetails from '@/views/Client/Reservation/services/getReservationDetails'
 import { AxiosError } from 'axios'
 import { formatDateTime } from '@/utils/date/formatDateTime'
+import { performCheckin } from '@/clientService/ClientService'
+import CancelReservationDialog from '@/components/dialogs/CancelReservationDialog.vue'
 
 const { toast } = useToast()
 
@@ -22,44 +24,14 @@ const props = defineProps<{
   open: boolean
 }>()
 
-const emit = defineEmits<{
-  (e: 'update:open', value: boolean): void
-}>()
-
-const reserveBlank: Reserve = {
-  codigo: '',
-  codigo_cliente: 0,
-  estado: 'CRIADA',
-  data: '',
-  valor: 0,
-  milhas_utilizadas: 0,
-  quantidade_poltronas: 0,
-  voo: {
-    codigo: '',
-    data: '',
-    valor_passagem: 0,
-    quantidade_poltronas_total: 0,
-    quantidade_poltronas_ocupadas: 0,
-    estado: 'CONFIRMADO',
-    aeroporto_origem: {
-      codigo: '',
-      nome: '',
-      cidade: '',
-      uf: '',
-    },
-    aeroporto_destino: {
-      codigo: '',
-      nome: '',
-      cidade: '',
-      uf: '',
-    },
-  },
-}
+const emit = defineEmits(['update:open', 'refresh'])
 
 const reserveCode = ref('')
 const reserveFound = ref<Reserve | null>(null)
 const isWithin48Hours = ref(false)
 const openDialog = ref(props.open)
+const isCancelDialogOpen = ref(false)
+const selectedReservationCode = ref<string | null>(null)
 
 watch(
   () => props.open,
@@ -73,30 +45,34 @@ watch(openDialog, (newVal) => {
 
   if (!newVal) {
     reserveCode.value = ''
-    reserveFound.value = reserveBlank
+    reserveFound.value = null
   }
 })
 
-const checkin = (reserva: Reserve) => {
-  reserva.estado = 'CHECK-IN'
-  openDialog.value = false
-  toast({
-    title: 'Status atualizado',
-    description: `O status foi alterado para ${reserva.estado}.`,
-    variant: 'default',
-    duration: 2000,
-  })
-}
+const checkin = async (reserve: Reserve) => {
+  try {
+    const { data } = await performCheckin(reserve)
 
-const toCancel = (reserva: Reserve) => {
-  reserva.estado = 'CANCELADA'
-  openDialog.value = false
-  toast({
-    title: 'Status atualizado',
-    description: `O status foi alterado para ${reserva.estado}.`,
-    variant: 'default',
-    duration: 2000,
-  })
+    toast({
+      title: 'Status atualizado',
+      description: `O status da reserva ${data.codigo} foi alterado para ${data.estado}.`,
+      variant: 'default',
+      duration: 2000,
+    })
+
+    openDialog.value = false
+    emit('refresh')
+  } catch (error) {
+    toast({
+      title: 'Erro ao realizar checkin!',
+      description:
+        error instanceof AxiosError
+          ? error.response?.data.message
+          : 'Falha ao tentar realizar o checkin!',
+      variant: 'destructive',
+      duration: 2500,
+    })
+  }
 }
 
 const setIsWithin48Hours = (reserva: Reserve) => {
@@ -129,7 +105,7 @@ const checkReserveCode = async () => {
       })
     }
 
-    if (reserveFound.value) {
+    if (!reserveFound.value) {
       toast({
         title: 'Reserva não encontrada',
         description: 'Nenhuma reserva foi encontrada com este código.',
@@ -146,9 +122,22 @@ const checkReserveCode = async () => {
     })
   }
 }
+
+function handleCancelFlight(selectedReservation: string) {
+  openDialog.value = false
+  isCancelDialogOpen.value = true
+  selectedReservationCode.value = selectedReservation
+}
 </script>
 
 <template>
+  <CancelReservationDialog
+    :reservation-code="selectedReservationCode"
+    @success="emit('refresh')"
+    @update:modelValue="openDialog = true"
+    v-model="isCancelDialogOpen"
+  />
+
   <Dialog v-model:open="openDialog">
     <DialogContent>
       <DialogHeader>
@@ -212,7 +201,7 @@ const checkReserveCode = async () => {
             <Button
               v-if="reserveFound.estado === 'CRIADA'"
               variant="destructive"
-              @click="toCancel(reserveFound)"
+              @click="handleCancelFlight(reserveFound.codigo)"
               >Cancelar</Button
             >
           </div>
