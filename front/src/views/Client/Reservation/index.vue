@@ -1,22 +1,57 @@
 <script setup lang="ts">
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { ref, onMounted } from 'vue'
-import { getBookingByUserCode } from '@/mock/booking'
 import type { Reserve } from '@/types/Reserve'
 import { useRoute } from 'vue-router'
+import getReservationDetails from './services/getReservationDetails'
+import { AxiosError } from 'axios'
+import { toast } from '@/components/ui/toast'
 
 const route = useRoute()
-const reservation = ref<Reserve | null>(null)
+const reservation = ref<Reserve>({
+  codigo: '',
+  codigo_cliente: 0,
+  estado: 'CRIADA',
+  data: '',
+  valor: 0,
+  milhas_utilizadas: 0,
+  quantidade_poltronas: 0,
+  voo: {
+    codigo: '',
+    data: '',
+    valor_passagem: 0,
+    quantidade_poltronas_total: 0,
+    quantidade_poltronas_ocupadas: 0,
+    estado: 'CONFIRMADO',
+    aeroporto_origem: {
+      codigo: '',
+      nome: '',
+      cidade: '',
+      uf: '',
+    },
+    aeroporto_destino: {
+      codigo: '',
+      nome: '',
+      cidade: '',
+      uf: '',
+    },
+  },
+})
 
 onMounted(async () => {
-  const booking = await getBookingByUserCode()
-
-  const foundReservation = booking.find(
-    (res) => res.codigo.toLowerCase() === (route.params.code as string).toLowerCase(),
-  )
-
-  if (foundReservation) {
-    reservation.value = foundReservation
+  try {
+    const { data } = await getReservationDetails(route.params.code.toString())
+    reservation.value = data
+  } catch (error) {
+    toast({
+      title: 'Erro ao acessar reserva',
+      description:
+        error instanceof AxiosError
+          ? error.response?.data.message
+          : 'Falha ao tentar acessar a reserva',
+      variant: 'destructive',
+      duration: 2500,
+    })
   }
 })
 </script>
