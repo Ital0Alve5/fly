@@ -31,7 +31,7 @@ async function handleSearch(originAirport: string, destinationAirport: string) {
       flights = await fetchFilteredFlights(originAirport, destinationAirport);
     }
 
-    flightsList.value = flights
+    flightsList.value = flights.sort((a: Flight, b: Flight) => new Date(a.data).getTime() - new Date(b.data).getTime())
     fetchedFlights.value = true
   } catch (error) {
     console.log(error)
