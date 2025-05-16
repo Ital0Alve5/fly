@@ -51,6 +51,8 @@ export async function loadReservationsByClientRoute(app: FastifyTypedInstance) {
           }),
         )
 
+        if(enrichedReservations.length === 0) return reply.status(HttpStatusCode.NoContent).send(enrichedReservations)
+
         return reply.send(enrichedReservations)
       } catch (err) {
         if (axios.isAxiosError(err) && err.response) {
