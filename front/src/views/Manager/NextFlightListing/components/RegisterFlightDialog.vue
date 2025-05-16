@@ -24,6 +24,7 @@ import { useRegisterFlightForm } from '../composables/useRegisterFlightForm'
 import { extractPriceValue } from '@/utils/currency/extractPriceValue'
 import { currencyMask } from '@/utils/currency/inputMask'
 import { registerFlight } from '../services/NextFlightListingService'
+import { useToast } from '@/components/ui/toast'
 
 defineProps<{
   modelValue: boolean
@@ -31,6 +32,7 @@ defineProps<{
 
 const emit = defineEmits(['update:modelValue', 'handleFlightRegistered'])
 
+const { toast } = useToast()
 const globalStore = useGlobalStore()
 const { handleSubmit, originAirport, destinationAirport, seatsNumber, priceField, date } =
   useRegisterFlightForm()
@@ -80,6 +82,13 @@ const onSubmit = handleSubmit(async (formData) => {
       quantidade_poltronas_ocupadas: 0,
       codigo_aeroporto_origem: formData.originAirport,
       codigo_aeroporto_destino: formData.destinationAirport,
+    })
+
+    toast({
+      title: 'Voo cadastrado!',
+      description: `O voo ${data.codigo} foi cadastrado.`,
+      variant: 'default',
+      duration: 2000,
     })
 
     emit('update:modelValue', false)
