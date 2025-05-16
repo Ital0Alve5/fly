@@ -121,8 +121,9 @@ public class AuthService {
             throw new RuntimeException("Unauthorized");
         }
         Claims claims = jwtUtil.parseClaims(token);
-        String email = claims.getSubject();
-        return authRepository.findByEmailAndDeletedAtIsNull(email)
+        Long codigoExterno = claims.get("codigoExterno", Long.class);
+        String role        = claims.get("role", String.class);
+        return authRepository.findByCodigoExternoAndRoleAndDeletedAtIsNull(codigoExterno, role)
                 .orElseThrow(() -> new RuntimeException("Unauthorized"));
     }
 

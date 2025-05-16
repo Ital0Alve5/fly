@@ -14,7 +14,7 @@ export const updateEmployeeSchema: FastifySchema = {
     codigoFuncionario: z.string(),
   }),
   body: z.object({
-    codigo: z.number(),
+    codigo: z.number().optional(),
     cpf: z.string().refine(
       (value) => {
         const digitsRegex = /^\d{11}$/
