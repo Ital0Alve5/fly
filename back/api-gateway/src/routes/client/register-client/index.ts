@@ -26,7 +26,9 @@ export async function registerClientRoute(app: FastifyTypedInstance) {
 
         const response = await axios.post(`${Env.SAGA_URL}${path}`, payload)
 
-        return reply.send(response.data.data)
+        return reply
+        .status(HttpStatusCode.Created)
+        .send(response.data.data)
       } catch (err) {
         if (axios.isAxiosError(err) && err.response) {
           console.log('Register client error: ', err.response.data)
