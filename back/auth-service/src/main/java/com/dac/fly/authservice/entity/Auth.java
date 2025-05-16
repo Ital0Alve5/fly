@@ -17,6 +17,7 @@ public class Auth {
     private Long codigoExterno;
     private LocalDateTime criadoEm;
     private LocalDateTime atualizadoEm;
+    private LocalDateTime deletedAt;
 
     public Auth() {
     }
@@ -86,5 +87,13 @@ public class Auth {
 
     public void setAtualizadoEm(LocalDateTime atualizadoEm) {
         this.atualizadoEm = atualizadoEm;
+    }
+
+    public LocalDateTime getDeletedAt() {
+        return deletedAt;
+    }
+
+    public void setDeletedAt(LocalDateTime deletedAt) {
+        this.deletedAt = deletedAt;
     }
 }

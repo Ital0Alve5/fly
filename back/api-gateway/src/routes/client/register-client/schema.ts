@@ -23,7 +23,7 @@ export const registerSchema: FastifySchema = {
         bairro: z.string().nonempty('Bairro é obrigatório'),
         rua: z.string().nonempty('Rua é obrigatória'),
         numero: z.string().nonempty('Número é obrigatório'),
-        complemento: z.string().nonempty('Complemento é obrigatório'),
+        complemento: z.string(),
       }),
   }),
 }

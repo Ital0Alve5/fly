@@ -1,9 +1,15 @@
 package com.dac.fly.employeeservice.entity;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "funcionario")
+@SQLDelete(sql = "UPDATE funcionario SET deleted_at = now() WHERE codigo = ?")
+@Where(clause = "deleted_at IS NULL")
 public class Funcionario {
 
     @Id
@@ -21,6 +27,9 @@ public class Funcionario {
 
     @Column(length = 15)
     private String telefone;
+
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
 
     public Long getCodigo() {
         return codigo;
@@ -61,4 +70,8 @@ public class Funcionario {
     public void setTelefone(String telefone) {
         this.telefone = telefone;
     }
+
+    public LocalDateTime getDeletedAt() { return deletedAt; }
+
+    public void setDeletedAt(LocalDateTime deletedAt) { this.deletedAt = deletedAt; }
 }

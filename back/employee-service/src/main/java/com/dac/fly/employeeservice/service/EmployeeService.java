@@ -62,12 +62,12 @@ public class EmployeeService {
         return EmployeeDto.fromEntity(employee);
     }
 
-    public EmployeeDto deleteEmployee(Long employeeCode) {
-        Optional<Funcionario> optionalFuncionario = repository.findById(employeeCode);
+    public EmployeeDto deleteEmployee(Long codigo) {
+        Funcionario emp = repository.findById(codigo)
+                .orElseThrow(() -> new RuntimeException("Funcionário não encontrado."));
 
-        optionalFuncionario.ifPresent(repository::delete);
-
-        return EmployeeDto.fromEntity(optionalFuncionario.get());
+        repository.delete(emp);
+        return EmployeeDto.fromEntity(emp);
     }
 
     public EmployeeDto updateEmployee(Long employeeCode, UpdateEmployeeCommandDto employeeDto) {
