@@ -14,13 +14,19 @@ public class DocumentUtils {
     }
 
     public static String formatTelefone(String telefone) {
-        if (telefone == null)
+        if (telefone == null) {
             return null;
+        }
 
         String onlyDigits = telefone.replaceAll("\\D", "");
-        if (onlyDigits.length() != 11)
-            throw new IllegalArgumentException("Telefone inválido");
-
-        return onlyDigits.replaceFirst("(\\d{2})(\\d{5})(\\d{4})", "($1) $2-$3");
+        switch (onlyDigits.length()) {
+            case 10:
+                return onlyDigits.replaceFirst("(\\d{2})(\\d{4})(\\d{4})", "($1) $2-$3");
+            case 11:
+                return onlyDigits.replaceFirst("(\\d{2})(\\d{5})(\\d{4})", "($1) $2-$3");
+            default:
+                throw new IllegalArgumentException("Telefone inválido: deve ter 10 ou 11 dígitos");
+        }
     }
+
 }

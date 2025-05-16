@@ -39,7 +39,7 @@ export async function createReservationRoute(app: FastifyTypedInstance) {
         if (axios.isAxiosError(err) && err.response) {
           return reply
             .status(err.response.status)
-            .send({ message: err.response.data.message })
+            .send({ message: err.response.data.message, erro: "Saldo de milhas insuficiente" })
         }
 
         return reply

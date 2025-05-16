@@ -25,7 +25,8 @@ public class EmployeeSagaController {
         try {
             EmployeeDto employee = orchestrator.createEmployeeSaga(dto);
             return ResponseEntity
-                    .ok(ApiResponse.success(employee));
+                    .status(HttpStatus.CREATED)
+                    .body(ApiResponse.success(employee));
         } catch (IllegalArgumentException e) {
             return ResponseEntity
                     .status(HttpStatus.CONFLICT)

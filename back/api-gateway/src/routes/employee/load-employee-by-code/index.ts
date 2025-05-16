@@ -2,26 +2,33 @@ import axios, { HttpStatusCode } from 'axios'
 import { FastifyTypedInstance } from 'src/shared/types'
 import { FastifyReply, FastifyRequest } from 'fastify'
 import { Env } from 'src/shared/env'
-import { registerEmployeeSchema } from './schema'
+import { loadEmployeeByCodeSchema } from './schema'
 import { employeeAuthMiddleware } from 'src/middlewares/employee-auth'
 
-export async function registerEmployeeRoute(app: FastifyTypedInstance) {
-  const path = '/funcionarios'
+export async function loadEmployeeByCodeRoute(app: FastifyTypedInstance) {
+  const path = '/funcionarios/:codigoFuncionario'
 
-  app.post(
+  app.get(
     path,
     {
-      schema: registerEmployeeSchema,
+      schema: loadEmployeeByCodeSchema,
       preHandler: employeeAuthMiddleware,
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
-        const response = await axios.post(Env.SAGA_URL + path, request.body, {
-          headers: {
-            Authorization: `Bearer ${request.user?.token}`,
+        const { codigoFuncionario } = request.params as {
+          codigoFuncionario: string
+        }
+
+        const response = await axios.get(
+          `${Env.EMPLOYEE_SERVICE_URL}/funcionarios/${codigoFuncionario}`,
+          {
+            headers: {
+              Authorization: `Bearer ${request.user?.token}`,
+            },
           },
-        })
-        return reply.status(response.status).send(response.data.data)
+        )
+        return reply.send(response.data.data)
       } catch (err) {
         if (axios.isAxiosError(err) && err.response) {
           return reply
