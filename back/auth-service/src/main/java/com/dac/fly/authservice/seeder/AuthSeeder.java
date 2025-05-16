@@ -37,7 +37,7 @@ public class AuthSeeder implements CommandLineRunner {
 
             repository.save(new Auth(
                     "func_pre@gmail.com",
-                    passwordEncoder.encode("1234"),
+                    passwordEncoder.encode("TADS"),
                     "Razer",
                     "FUNCIONARIO",
                     1L,
