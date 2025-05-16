@@ -1,8 +1,7 @@
 package com.dac.fly.authservice.service;
 
-import java.time.LocalDateTime;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.security.SecureRandom;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -70,8 +69,8 @@ public class AuthService {
                 dto.nome(),
                 dto.role(),
                 dto.codigoExterno(),
-                LocalDateTime.now(),
-                LocalDateTime.now()
+                OffsetDateTime.now(ZoneOffset.of("-03:00")),
+                OffsetDateTime.now(ZoneOffset.of("-03:00"))
         );
         Auth saved = authRepository.save(user);
         try {
@@ -100,7 +99,7 @@ public class AuthService {
         if (dto.email() != null && !dto.email().isBlank()) {
             user.setEmail(dto.email());
         }
-        user.setAtualizadoEm(LocalDateTime.now());
+        user.setAtualizadoEm(OffsetDateTime.now(ZoneOffset.of("-03:00")));
         return authRepository.save(user);
     }
 
@@ -109,7 +108,7 @@ public class AuthService {
                 .orElseThrow(() -> new IllegalArgumentException(
                         "Não existe usuário cadastrado com o e-mail: " + email
                 ));
-        user.setDeletedAt(LocalDateTime.now());
+        user.setDeletedAt(OffsetDateTime.now(ZoneOffset.of("-03:00")));
         authRepository.save(user);
     }
 

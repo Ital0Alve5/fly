@@ -1,6 +1,7 @@
 package com.dac.fly.authservice.seeder;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -24,16 +25,16 @@ public class AuthSeeder implements CommandLineRunner {
     public void run(String... args) throws Exception {
         if (repository.findByEmailAndDeletedAtIsNull("heitor@gmail.com").isEmpty()) {
             System.out.println("Inserindo usuários iniciais no MongoDB...");
-
+            OffsetDateTime now = OffsetDateTime.now(ZoneOffset.of("-03:00"));
+            
             repository.save(new Auth(
                     "heitor@gmail.com",
                     passwordEncoder.encode("1234"),
                     "Heitor",
                     "CLIENTE",
                     1L,
-                    LocalDateTime.now(),
-                    LocalDateTime.now()
-            ));
+                    now,
+                    now));
 
             repository.save(new Auth(
                     "func_pre@gmail.com",
@@ -41,10 +42,8 @@ public class AuthSeeder implements CommandLineRunner {
                     "Razer",
                     "FUNCIONARIO",
                     1L,
-                    LocalDateTime.now(),
-                    LocalDateTime.now()
-            ));
+                    now,
+                    now));
         }
     }
 }
-

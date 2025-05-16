@@ -1,7 +1,5 @@
 package com.dac.fly.saga.feign;
 
-import com.dac.fly.shared.dto.response.ApiResponse;
-import com.dac.fly.shared.dto.response.EmployeeDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

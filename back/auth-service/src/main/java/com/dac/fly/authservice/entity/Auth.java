@@ -1,6 +1,6 @@
 package com.dac.fly.authservice.entity;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -15,15 +15,15 @@ public class Auth {
     private String nome;
     private String role;
     private Long codigoExterno;
-    private LocalDateTime criadoEm;
-    private LocalDateTime atualizadoEm;
-    private LocalDateTime deletedAt;
+    private OffsetDateTime criadoEm;
+    private OffsetDateTime atualizadoEm;
+    private OffsetDateTime deletedAt;
 
     public Auth() {
     }
 
-    public Auth(String email, String senha, String nome, String role, Long codigoExterno, LocalDateTime criadoEm,
-            LocalDateTime atualizadoEm) {
+    public Auth(String email, String senha, String nome, String role, Long codigoExterno, OffsetDateTime criadoEm,
+            OffsetDateTime atualizadoEm) {
         this.email = email;
         this.senha = senha;
         this.nome = nome;
@@ -73,27 +73,27 @@ public class Auth {
         this.role = role;
     }
 
-    public LocalDateTime getCriadoEm() {
+    public OffsetDateTime getCriadoEm() {
         return criadoEm;
     }
 
-    public void setCriadoEm(LocalDateTime criadoEm) {
+    public void setCriadoEm(OffsetDateTime criadoEm) {
         this.criadoEm = criadoEm;
     }
 
-    public LocalDateTime getAtualizadoEm() {
+    public OffsetDateTime getAtualizadoEm() {
         return atualizadoEm;
     }
 
-    public void setAtualizadoEm(LocalDateTime atualizadoEm) {
+    public void setAtualizadoEm(OffsetDateTime atualizadoEm) {
         this.atualizadoEm = atualizadoEm;
     }
 
-    public LocalDateTime getDeletedAt() {
+    public OffsetDateTime getDeletedAt() {
         return deletedAt;
     }
 
-    public void setDeletedAt(LocalDateTime deletedAt) {
+    public void setDeletedAt(OffsetDateTime deletedAt) {
         this.deletedAt = deletedAt;
     }
 }

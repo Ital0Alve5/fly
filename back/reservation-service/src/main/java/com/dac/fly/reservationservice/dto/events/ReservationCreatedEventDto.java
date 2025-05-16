@@ -1,6 +1,6 @@
 package com.dac.fly.reservationservice.dto.events;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 import com.dac.fly.reservationservice.dto.HistoryDto;
@@ -8,7 +8,7 @@ import com.dac.fly.reservationservice.dto.HistoryDto;
 public record ReservationCreatedEventDto(
         String codigo,
         Long codigo_cliente,
-        LocalDateTime data_reserva,
+        OffsetDateTime data_reserva,
         Double valor,
         Integer milhas_utilizadas,
         Integer quantidade_poltronas,
@@ -19,7 +19,7 @@ public record ReservationCreatedEventDto(
     public static ReservationCreatedEventDto from(
             String codigo,
             Long codigo_cliente,
-            LocalDateTime data_reserva,
+            OffsetDateTime data_reserva,
             Double valor,
             Integer milhas_utilizadas,
             Integer quantidade_poltronas,

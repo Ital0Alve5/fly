@@ -1,7 +1,6 @@
 package com.dac.fly.authservice.controllers;
 
 import com.dac.fly.authservice.dto.request.LoginRequestDto;
-import com.dac.fly.shared.dto.command.CreateUserCommandDto;
 import com.dac.fly.shared.dto.response.ApiResponse;
 
 import com.dac.fly.authservice.dto.response.LoginResponseDto;
@@ -47,12 +46,5 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(ApiResponse.error(e.getMessage(), 401));
         }
-    }
-
-    private String extractToken(String authHeader) {
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            throw new RuntimeException("Unauthorized");
-        }
-        return authHeader.substring(7);
     }
 }

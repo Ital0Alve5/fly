@@ -2,8 +2,6 @@ package com.dac.fly.employeeservice.service;
 
 import com.dac.fly.shared.dto.command.CreateEmployeeCommandDto;
 import com.dac.fly.shared.dto.command.UpdateEmployeeCommandDto;
-import com.dac.fly.shared.dto.request.CreateNewEmployeeDto;
-import com.dac.fly.shared.dto.request.UpdateEmployeeDto;
 import org.springframework.stereotype.Service;
 
 import com.dac.fly.employeeservice.dto.response.EmployeeDto;

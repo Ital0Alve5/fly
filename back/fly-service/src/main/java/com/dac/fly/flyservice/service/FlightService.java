@@ -51,7 +51,7 @@ public class FlightService {
                 if (data != null && dataFim != null) {
                         voos = vooRepository.findByDataBetween(data, dataFim);
                 } else if (data != null && origem != null && destino != null) {
-                        OffsetDateTime inicio = data.toLocalDate().atStartOfDay().atOffset(ZoneOffset.UTC);
+                        OffsetDateTime inicio = data.toLocalDate().atStartOfDay().atOffset(ZoneOffset.of("-03:00"));
                         OffsetDateTime fim = inicio.plusDays(1);
                         voos = vooRepository.findByDataBetweenAndAeroportoOrigemCodigoAndAeroportoDestinoCodigo(
                                         inicio, fim, origem, destino);
@@ -167,7 +167,7 @@ public class FlightService {
 
         public ResponseEntity<ApiResponse<FlightGroupedResponseDto>> findByAirport(
                         OffsetDateTime data, String origem, String destino) {
-                OffsetDateTime inicio = data.toLocalDate().atStartOfDay().atOffset(ZoneOffset.UTC);
+                OffsetDateTime inicio = data.toLocalDate().atStartOfDay().atOffset(ZoneOffset.of("-03:00"));
                 OffsetDateTime fim = inicio.plusYears(10);
 
                 List<Voo> voos;

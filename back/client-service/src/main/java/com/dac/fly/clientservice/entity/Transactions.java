@@ -1,7 +1,8 @@
 package com.dac.fly.clientservice.entity;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -26,7 +27,7 @@ public class Transactions {
     private Client cliente;
 
     @Column(nullable = false)
-    private LocalDateTime data = LocalDateTime.now();
+    private OffsetDateTime data = OffsetDateTime.now(ZoneOffset.of("-03:00"));
 
     @Column(name = "valor_reais")
     private BigDecimal valor_reais;
@@ -43,7 +44,7 @@ public class Transactions {
     public Transactions() {
     }
 
-    public Transactions(Integer id, Client cliente, LocalDateTime data, BigDecimal valor_reais, Integer quantidade_milhas, String descricao, String codigo_reserva, String tipo) {
+    public Transactions(Integer id, Client cliente, OffsetDateTime data, BigDecimal valor_reais, Integer quantidade_milhas, String descricao, String codigo_reserva, String tipo) {
         this.id = id;
         this.cliente = cliente;
         this.data = data;
@@ -70,11 +71,11 @@ public class Transactions {
         this.cliente = cliente;
     }
 
-    public LocalDateTime getData() {
+    public OffsetDateTime getData() {
         return data;
     }
 
-    public void setData(LocalDateTime data) {
+    public void setData(OffsetDateTime data) {
         this.data = data;
     }
 

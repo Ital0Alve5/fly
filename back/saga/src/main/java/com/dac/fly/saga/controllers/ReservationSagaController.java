@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.dac.fly.saga.service.ReservationSagaOrchestrator;
-import com.dac.fly.shared.dto.events.CancelledReservationEventDto;
 import com.dac.fly.shared.dto.request.CreateReservationDto;
 import com.dac.fly.shared.dto.response.ApiResponse;
 import com.dac.fly.shared.dto.response.CancelledReservationResponseDto;

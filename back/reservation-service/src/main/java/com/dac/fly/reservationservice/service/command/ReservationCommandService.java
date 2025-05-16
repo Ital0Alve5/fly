@@ -1,6 +1,7 @@
 package com.dac.fly.reservationservice.service.command;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 
 import org.springframework.stereotype.Service;
 
@@ -45,7 +46,7 @@ public class ReservationCommandService {
                 Reserva reserva = new Reserva();
                 reserva.setCodigo(requestDto.codigo());
 
-                LocalDateTime now = LocalDateTime.now();
+                OffsetDateTime now = OffsetDateTime.now(ZoneOffset.of("-03:00"));
                 reserva.setDataReserva(now);
                 reserva.setCodigoCliente(requestDto.codigo_cliente());
                 reserva.setQuantidadePoltronas(requestDto.quantidade_poltronas());
@@ -61,7 +62,7 @@ public class ReservationCommandService {
 
                 Historico historyEntity = new Historico(
                                 reserva.getCodigo(),
-                                LocalDateTime.now(),
+                                OffsetDateTime.now(ZoneOffset.of("-03:00")),
                                 null,
                                 createdStatusId);
                 historyRepository.save(historyEntity);
@@ -113,7 +114,7 @@ public class ReservationCommandService {
 
                 Historico historyEntity = new Historico(
                                 reservation.getCodigo(),
-                                LocalDateTime.now(),
+                                OffsetDateTime.now(ZoneOffset.of("-03:00")),
                                 oldStatus,
                                 newStatusId);
                 historyRepository.save(historyEntity);
@@ -166,7 +167,7 @@ public class ReservationCommandService {
 
                 Historico historyEntity = new Historico(
                                 reserva.getCodigo(),
-                                LocalDateTime.now(),
+                                OffsetDateTime.now(ZoneOffset.of("-03:00")),
                                 oldStatus,
                                 newStatusId);
                 historyRepository.save(historyEntity);
@@ -197,7 +198,7 @@ public class ReservationCommandService {
 
                 Historico historico = new Historico(
                                 reserva.getCodigo(),
-                                LocalDateTime.now(),
+                                OffsetDateTime.now(ZoneOffset.of("-03:00")),
                                 idEstadoAnterior,
                                 idNovoEstado);
                 historyRepository.save(historico);
@@ -246,7 +247,7 @@ public class ReservationCommandService {
 
                 Historico historico = new Historico(
                                 reserva.getCodigo(),
-                                LocalDateTime.now(),
+                                OffsetDateTime.now(ZoneOffset.of("-03:00")),
                                 currentId,
                                 prevId);
                 historyRepository.save(historico);

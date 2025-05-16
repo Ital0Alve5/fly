@@ -208,7 +208,7 @@ public class FlightSagaOrchestrator {
                     flightEvt.estado(),
                     flightEvt.codigo_aeroporto_origem(),
                     flightEvt.codigo_aeroporto_destino());
-        } catch (Exception e) {
+        } catch (AmqpException e) {
            compensateCompleteFlightSaga(flightCode, completed);
         } finally {
             reservationsCompletedResponses.remove(flightCode);

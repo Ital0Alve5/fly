@@ -4,7 +4,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.dac.fly.shared.dto.events.ClientCreatedEventDto;
-import com.dac.fly.shared.dto.response.ClientCreatedResponseDto;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 

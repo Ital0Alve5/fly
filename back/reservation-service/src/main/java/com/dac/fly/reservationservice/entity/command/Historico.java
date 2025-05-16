@@ -1,6 +1,6 @@
 package com.dac.fly.reservationservice.entity.command;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 import jakarta.persistence.*;
 
@@ -16,7 +16,7 @@ public class Historico {
     private String codigoReserva;
 
     @Column(name = "data", nullable = false)
-    private LocalDateTime data;
+    private OffsetDateTime data;
 
     @Column(name = "estado_origem")
     private Long estadoOrigem;
@@ -27,7 +27,7 @@ public class Historico {
     public Historico() {
     }
 
-    public Historico(String codigoReserva, LocalDateTime data, Long estadoOrigem, Long estadoDestino) {
+    public Historico(String codigoReserva, OffsetDateTime data, Long estadoOrigem, Long estadoDestino) {
         this.codigoReserva = codigoReserva;
         this.data = data;
         this.estadoOrigem = estadoOrigem;
@@ -46,11 +46,11 @@ public class Historico {
         this.codigoReserva = codigoReserva;
     }
 
-    public LocalDateTime getData() {
+    public OffsetDateTime getData() {
         return data;
     }
 
-    public void setData(LocalDateTime data) {
+    public void setData(OffsetDateTime data) {
         this.data = data;
     }
 

@@ -1,10 +1,10 @@
 package com.dac.fly.shared.dto.events;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 public record CancelledReservationEventDto(
         String codigo,
-        LocalDateTime data,
+        OffsetDateTime data,
         Double valor,
         Integer milhas_utilizadas,
         Integer quantidade_poltronas,

@@ -41,11 +41,11 @@ public class VooController {
         OffsetDateTime fim = null;
 
         if (data != null) {
-            inicio = data.atStartOfDay().atOffset(ZoneOffset.UTC);
+            inicio = data.atStartOfDay().atOffset(ZoneOffset.of("-03:00"));
         }
 
         if (dataFim != null) {
-            fim = dataFim.plusDays(1).atStartOfDay().atOffset(ZoneOffset.UTC);
+            fim = dataFim.plusDays(1).atStartOfDay().atOffset(ZoneOffset.of("-03:00"));
         }
 
         if (origem != null || destino != null) {

@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.dac.fly.saga.service.FlightSagaOrchestrator;
-import com.dac.fly.shared.dto.events.CancelledFlightEventDto;
 import com.dac.fly.shared.dto.response.ApiResponse;
 import com.dac.fly.shared.dto.response.CancelledFlightResponseDto;
 

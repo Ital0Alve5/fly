@@ -1,9 +1,9 @@
 package com.dac.fly.reservationservice.dto.response;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 public record ReservationResponseDto(String codigo,
-        LocalDateTime data,
+        OffsetDateTime data,
         Double valor,
         Integer milhas_utilizadas,
         Integer quantidade_poltronas,

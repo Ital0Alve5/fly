@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 @Entity
 @Table(name = "funcionario")
@@ -29,7 +29,7 @@ public class Funcionario {
     private String telefone;
 
     @Column(name = "deleted_at")
-    private LocalDateTime deletedAt;
+    private OffsetDateTime deletedAt;
 
     public Long getCodigo() {
         return codigo;
@@ -71,7 +71,7 @@ public class Funcionario {
         this.telefone = telefone;
     }
 
-    public LocalDateTime getDeletedAt() { return deletedAt; }
+    public OffsetDateTime getDeletedAt() { return deletedAt; }
 
-    public void setDeletedAt(LocalDateTime deletedAt) { this.deletedAt = deletedAt; }
+    public void setDeletedAt(OffsetDateTime deletedAt) { this.deletedAt = deletedAt; }
 }

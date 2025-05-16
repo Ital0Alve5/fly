@@ -1,17 +1,17 @@
 package com.dac.fly.reservationservice.dto;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 public class HistoryDto {
     private Long id;
     private String codigo_reserva;
-    private LocalDateTime data;
+    private OffsetDateTime data;
     private String estado_origem;
     private String estado_destino;
 
     public HistoryDto() {}
 
-    public HistoryDto(Long id, String codigo_reserva, LocalDateTime data, String estado_origem, String estado_destino) {
+    public HistoryDto(Long id, String codigo_reserva, OffsetDateTime data, String estado_origem, String estado_destino) {
         this.id = id;
         this.codigo_reserva = codigo_reserva;
         this.data = data;
@@ -35,11 +35,11 @@ public class HistoryDto {
         this.codigo_reserva = codigo_reserva;
     }
 
-    public LocalDateTime getData() {
+    public OffsetDateTime getData() {
         return data;
     }
 
-    public void setData(LocalDateTime data) {
+    public void setData(OffsetDateTime data) {
         this.data = data;
     }
 
