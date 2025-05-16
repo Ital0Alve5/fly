@@ -28,7 +28,6 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     private final EmailService emailService;
-    private final Set<String> tokenBlacklist = ConcurrentHashMap.newKeySet();
 
     public AuthService(AuthRepository authRepository,
                        PasswordEncoder passwordEncoder,
@@ -130,15 +129,11 @@ public class AuthService {
     }
 
     public void logout(String token) {
-        tokenBlacklist.add(token);
     }
 
-    public boolean isBlacklisted(String token) {
-        return tokenBlacklist.contains(token);
-    }
 
     public Auth getUserFromToken(String token) {
-        if (isBlacklisted(token) || jwtUtil.isTokenExpired(token)) {
+        if (jwtUtil.isTokenExpired(token)) {
             throw new RuntimeException("Unauthorized");
         }
 
