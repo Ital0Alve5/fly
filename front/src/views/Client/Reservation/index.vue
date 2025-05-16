@@ -72,7 +72,7 @@ onMounted(async () => {
           <ul class="space-y-2">
             <li class="flex gap-2">
               <b>Data:</b>
-              <p>{{ formatDateTime(reservation.data) }}</p>
+              <p>{{ formatDateTime(reservation.voo.data) }}</p>
             </li>
             <li class="flex gap-2">
               <b>Código:</b>
