@@ -151,7 +151,7 @@ public class ClientService {
                 transaction.getTipo());
     }
 
-    public boolean updateMiles(Long clientId, Integer miles) {
+    public boolean updateMiles(Long clientId, Integer miles, String reservationCode) {
         Client client = clientRepository.findById(clientId)
                 .orElseThrow(() -> new RuntimeException("Cliente não encontrado: " + clientId));
 
@@ -165,7 +165,7 @@ public class ClientService {
             Transactions tx = Transactions.createDebitTransaction(
                     client,
                     Math.abs(miles),
-                    "Reserva",
+                    reservationCode,
                     "Uso de milhas");
             tx.setvalor_reais(calculateRealValue(Math.abs(miles)));
             transactionsRepository.save(tx);

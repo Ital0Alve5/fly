@@ -25,9 +25,9 @@ public class MilesCommandListener {
             boolean success;
 
             if (cmd.isCompensate()) {
-                success = clientService.updateMiles(cmd.codigoCliente(), +cmd.milhasUtilizadas());
+                success = clientService.updateMiles(cmd.codigoCliente(), +cmd.milhasUtilizadas(), cmd.codigo_reserva());
             } else {
-                success = clientService.updateMiles(cmd.codigoCliente(), -cmd.milhasUtilizadas());
+                success = clientService.updateMiles(cmd.codigoCliente(), -cmd.milhasUtilizadas(), cmd.codigo_reserva());
             }
 
             publisher.publishMilesUpdateResponse(cmd.codigo_reserva(), success);

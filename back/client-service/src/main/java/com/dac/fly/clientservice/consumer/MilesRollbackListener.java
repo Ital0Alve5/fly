@@ -26,7 +26,7 @@ public class MilesRollbackListener {
         try {
             success = clientService.updateMiles(
                     cmd.codigoCliente(),
-                    -cmd.milhasUtilizadas());
+                    -cmd.milhasUtilizadas(), cmd.codigo_reserva());
 
         } catch (Exception e) {
             throw new RuntimeException(
