@@ -31,7 +31,8 @@ async function handleSearch(originAirport: string, destinationAirport: string) {
       flights = await fetchFilteredFlights(originAirport, destinationAirport);
     }
 
-    flightsList.value = flights.sort((a: Flight, b: Flight) => new Date(a.data).getTime() - new Date(b.data).getTime())
+    flightsList.value = flights.filter((flight: Flight) => flight.estado !== 'CANCELADO').sort((a: Flight, b: Flight) => new Date(a.data).getTime() - new Date(b.data).getTime())
+
     fetchedFlights.value = true
   } catch (error) {
     console.log(error)
