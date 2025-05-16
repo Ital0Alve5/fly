@@ -3,6 +3,8 @@ package com.dac.fly.authservice.util;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import com.dac.fly.authservice.entity.Auth;
@@ -29,6 +31,7 @@ public class JwtUtil {
         claims.put("role", user.getRole());
 
         return Jwts.builder()
+                .setId(UUID.randomUUID().toString())
                 .setClaims(claims)
                 .setSubject(user.getEmail())
                 .setIssuedAt(now)

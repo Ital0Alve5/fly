@@ -21,22 +21,20 @@ public class SecurityConfig {
             JwtAuthenticationFilter jwtAuthenticationFilter
     ) throws Exception {
         http
-                .csrf().disable()
-                .logout().disable()
-                .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
-                .authorizeHttpRequests()
-                .requestMatchers("/login").permitAll()
-                .requestMatchers("/usuarios/**").permitAll()
-                .requestMatchers("/cliente").hasAuthority("CLIENTE")
-                .requestMatchers("/funcionario").hasAuthority("FUNCIONARIO")
-                .requestMatchers("/usuario", "/logout").authenticated()
-                .anyRequest().authenticated()
-                .and()
+                .csrf(csrf -> csrf.disable())
+                .logout(logout -> logout.disable())
+                .sessionManagement(management -> management
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(requests -> requests
+                        .requestMatchers("/login").permitAll()
+                        .requestMatchers("/usuarios/**").permitAll()
+                        .requestMatchers("/cliente").hasAuthority("CLIENTE")
+                        .requestMatchers("/funcionario").hasAuthority("FUNCIONARIO")
+                        .requestMatchers("/usuario", "/logout").authenticated()
+                        .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                .formLogin().disable()
-                .httpBasic().disable();
+                .formLogin(login -> login.disable())
+                .httpBasic(basic -> basic.disable());
 
         return http.build();
     }
