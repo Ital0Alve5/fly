@@ -21,7 +21,7 @@ export const registerClient = async (client: Client): Promise<AxiosResponse<Clie
       bairro: client.endereco.bairro,
       rua: client.endereco.rua,
       numero: client.endereco.numero,
-      complemento: client.endereco.complemento,
+      complemento: client.endereco.complemento || '',
     },
   })
 }
