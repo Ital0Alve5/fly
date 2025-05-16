@@ -1,20 +1,17 @@
 export function formatDateTime(datetime: string): string {
-  if (datetime.includes('Z')) {
-    const [datePart, timePart] = datetime.split('T');
-    const [year, month, day] = datePart.split('-');
-    const [time] = timePart.split('Z');
-    const [hours, minutes] = time.split(':');
-    return `${day}/${month}/${year} ${hours}:${minutes}`;
+  const date = new Date(datetime)
+
+  if (isNaN(date.getTime())) {
+    return 'Data inválida'
   }
 
-  if (datetime.includes('T')) {
-    const [datePart, timePart] = datetime.split('T');
-    const [year, month, day] = datePart.split('-');
-    const [hours, minutes] = timePart.split(':');
-    return `${day}/${month}/${year} ${hours}:${minutes}`;
-  }
-
-  const [datePart, timePart] = datetime.split(' ');
-  const [year, month, day] = datePart.split('-');
-  return `${day}/${month}/${year} ${timePart}`;
+  return date.toLocaleString('pt-BR', {
+    timeZone: 'America/Sao_Paulo',
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false
+  })
 }
