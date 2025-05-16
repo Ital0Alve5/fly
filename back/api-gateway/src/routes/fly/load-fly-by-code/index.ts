@@ -5,7 +5,7 @@ import { Env } from 'src/shared/env'
 import { loadFlyByCodeSchema } from './schema'
 
 export async function loadFlyByCodeRoute(app: FastifyTypedInstance) {
-  const path = '/voo/:codigoVoo'
+  const path = '/voos/:codigoVoo'
 
   app.get(
     path,

@@ -39,7 +39,7 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
-      path: '/voos/voo/:code',
+      path: '/voos/voos/:code',
       name: 'flightDetails',
       component: Details,
       meta: { requiresAuth: true },
