@@ -22,12 +22,12 @@ public class AuthSeeder implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        if (repository.findByEmail("heitor@gmail.com").isEmpty()) {
+        if (repository.findByEmailAndDeletedAtIsNull("heitor@gmail.com").isEmpty()) {
             System.out.println("Inserindo usuários iniciais no MongoDB...");
 
             repository.save(new Auth(
                     "heitor@gmail.com",
-                    passwordEncoder.encode("123456"),
+                    passwordEncoder.encode("1234"),
                     "Heitor",
                     "CLIENTE",
                     1L,
@@ -37,7 +37,7 @@ public class AuthSeeder implements CommandLineRunner {
 
             repository.save(new Auth(
                     "func_pre@gmail.com",
-                    passwordEncoder.encode("123456"),
+                    passwordEncoder.encode("1234"),
                     "Razer",
                     "FUNCIONARIO",
                     1L,

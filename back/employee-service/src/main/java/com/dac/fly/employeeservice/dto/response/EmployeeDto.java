@@ -2,7 +2,7 @@ package com.dac.fly.employeeservice.dto.response;
 
 import com.dac.fly.employeeservice.entity.Funcionario;
 
-public record EmployeeDto(Long codigo, String cpf, String email, String nome, String telefone) {
+public record EmployeeDto(Long codigo, String cpf, String email, String nome, String telefone, String tipo) {
 
     public static EmployeeDto fromEntity(Funcionario employee) {
         return new EmployeeDto(
@@ -10,6 +10,8 @@ public record EmployeeDto(Long codigo, String cpf, String email, String nome, St
                 employee.getCpf(),
                 employee.getEmail(),
                 employee.getNome(),
-                employee.getTelefone());
+                employee.getTelefone(),
+                "FUNCIONARIO"
+        );
     }
 }

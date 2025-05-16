@@ -105,7 +105,14 @@ public class EmployeeSagaOrchestrator {
             completedSteps.add(CreateEmployeeSagaStep.USER_CREATED);
 
             System.out.println("Returning dto");
-            return new EmployeeDto(employeeCreated.codigo(), dto.cpf(), dto.email(), dto.nome(), dto.telefone());
+            return new EmployeeDto(
+                    employeeCreated.codigo(),
+                    dto.cpf(),
+                    dto.email(),
+                    dto.nome(),
+                    dto.telefone(),
+                    "FUNCIONARIO"
+            );
         } catch (Exception e) {
             compensateCreateEmployee(createdCode, completedSteps);
         } finally {
@@ -118,7 +125,7 @@ public class EmployeeSagaOrchestrator {
     }
 
     private void compensateCreateEmployee(Long codigo, EnumSet<CreateEmployeeSagaStep> completedSteps) {
-        if(completedSteps.contains(CreateEmployeeSagaStep.EMPLOYEE_CREATED)) {
+        if (completedSteps.contains(CreateEmployeeSagaStep.EMPLOYEE_CREATED)) {
             rabbit.convertAndSend(
                     RabbitConstants.EXCHANGE,
                     RabbitConstants.DELETE_EMPLOYEE_CMD_QUEUE,
@@ -134,7 +141,7 @@ public class EmployeeSagaOrchestrator {
         }
         AuthDTO emailExists = authClient.findUserByEmail(dto.email());
         if (Objects.nonNull(emailExists)
-                && ( !emailExists.codigoExterno().equals(dto.codigo())
+                && (!emailExists.codigoExterno().equals(dto.codigo())
                 || emailExists.role().equals("CLIENTE"))) {
             throw new IllegalArgumentException("Email já cadastrado");
         }
@@ -184,7 +191,8 @@ public class EmployeeSagaOrchestrator {
                     dto.cpf(),
                     dto.email(),
                     dto.nome(),
-                    dto.telefone()
+                    dto.telefone(),
+                    "FUNCIONARIO"
             );
 
         } catch (Exception e) {
@@ -249,7 +257,8 @@ public class EmployeeSagaOrchestrator {
                     empDeleted.cpf(),
                     empDeleted.email(),
                     empDeleted.nome(),
-                    empDeleted.telefone()
+                    empDeleted.telefone(),
+                    "FUNCIONARIO"
             );
 
         } catch (Exception e) {

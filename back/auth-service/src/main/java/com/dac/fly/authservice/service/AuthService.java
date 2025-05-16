@@ -1,19 +1,17 @@
 package com.dac.fly.authservice.service;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-
 import java.security.SecureRandom;
+
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
 
 import com.dac.fly.authservice.dto.email.EmailDto;
 import com.dac.fly.authservice.dto.response.LoginResponseDto;
 import com.dac.fly.shared.dto.command.CreateUserCommandDto;
 import com.dac.fly.shared.dto.command.UpdateUserCommandDto;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-
 import com.dac.fly.authservice.entity.Auth;
 import com.dac.fly.authservice.repository.AuthRepository;
 import com.dac.fly.authservice.util.JwtUtil;
@@ -40,33 +38,30 @@ public class AuthService {
     }
 
     public Auth findByEmail(String email){
-        Auth user = authRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Usuario não encontrado com email: " + email));
-
-        return user;
+        return authRepository.findByEmailAndDeletedAtIsNull(email)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado com email: " + email));
     }
 
     public LoginResponseDto login(String email, String senha) {
-        Auth user = authRepository.findByEmail(email)
+        Auth user = authRepository.findByEmailAndDeletedAtIsNull(email)
                 .orElseThrow(() -> new RuntimeException("Unauthorized"));
 
         if (!passwordEncoder.matches(senha, user.getSenha())) {
             throw new RuntimeException("Unauthorized");
         }
-        return new LoginResponseDto(user.getCodigoExterno(), jwtUtil.generateToken(user), "bearer", user.getRole());
+        return new LoginResponseDto(
+                user.getCodigoExterno(),
+                jwtUtil.generateToken(user),
+                "bearer",
+                user.getRole()
+        );
     }
 
     public Auth registerUser(CreateUserCommandDto dto) {
-        if (authRepository.findByEmail(dto.email()).isPresent()) {
-            System.out.println("Erro: email já cadatrado");
-            return null;
+        if (authRepository.findByEmailAndDeletedAtIsNull(dto.email()).isPresent()) {
+            throw new RuntimeException("Erro: email já cadastrado");
         }
-
-        String password = dto.password();
-        if (dto.password() == null) {
-            password = generateRandomPassword();
-        }
-
+        String password = dto.password() != null ? dto.password() : generateRandomPassword();
         String encoded = passwordEncoder.encode(password);
 
         Auth user = new Auth(
@@ -79,53 +74,43 @@ public class AuthService {
                 LocalDateTime.now()
         );
         Auth saved = authRepository.save(user);
-
         try {
             emailService.sendPasswordEmail(new EmailDto(user.getNome(), user.getEmail(), password));
         } catch (Exception e) {
             System.out.println("Error sending password email " + e.getMessage());
         }
-
-
         return saved;
     }
 
     public Auth updateUser(UpdateUserCommandDto dto) {
-        System.out.println(dto.role());
-        Auth user = authRepository.findByCodigoExternoAndRole(dto.codigoExterno(), dto.role())
+        Auth user = authRepository
+                .findByCodigoExternoAndRoleAndDeletedAtIsNull(dto.codigoExterno(), dto.role())
                 .orElseThrow(() ->
-                        new IllegalArgumentException("Não existe usuário com código externo: "
-                                + dto.codigoExterno() + " e role: " + dto.role())
+                        new IllegalArgumentException(
+                                "Não existe usuário com código externo: " + dto.codigoExterno() + " e role: " + dto.role()
+                        )
                 );
 
         if (dto.nome() != null && !dto.nome().isBlank()) {
             user.setNome(dto.nome());
         }
-
         if (dto.senha() != null && !dto.senha().isBlank()) {
-            String encoded = passwordEncoder.encode(dto.senha());
-            user.setSenha(encoded);
+            user.setSenha(passwordEncoder.encode(dto.senha()));
         }
-
         if (dto.email() != null && !dto.email().isBlank()) {
             user.setEmail(dto.email());
         }
-
         user.setAtualizadoEm(LocalDateTime.now());
-
         return authRepository.save(user);
     }
 
     public void deleteUser(String email) {
-        Optional<Auth> optionalUser = authRepository.findByEmail(email);
-
-        if (optionalUser.isPresent()) {
-            Auth user = optionalUser.get();
-            authRepository.delete(user);
-            System.out.println("Usuário com e-mail " + email + " removido com sucesso.");
-        } else {
-            throw new IllegalArgumentException("Não existe usuário cadastrado com o e-mail: " + email);
-        }
+        Auth user = authRepository.findByEmailAndDeletedAtIsNull(email)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Não existe usuário cadastrado com o e-mail: " + email
+                ));
+        user.setDeletedAt(LocalDateTime.now());
+        authRepository.save(user);
     }
 
     public void logout(String token) {
@@ -136,13 +121,11 @@ public class AuthService {
         if (jwtUtil.isTokenExpired(token)) {
             throw new RuntimeException("Unauthorized");
         }
-
         Claims claims = jwtUtil.parseClaims(token);
         String email = claims.getSubject();
-        return authRepository.findByEmail(email)
+        return authRepository.findByEmailAndDeletedAtIsNull(email)
                 .orElseThrow(() -> new RuntimeException("Unauthorized"));
     }
-
 
     private String generateRandomPassword() {
         StringBuilder password = new StringBuilder(6);
