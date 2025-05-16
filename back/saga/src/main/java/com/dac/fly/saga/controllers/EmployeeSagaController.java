@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.nio.file.Path;
+
 @RestController
 @RequestMapping("/sagas/funcionarios")
 public class EmployeeSagaController {
@@ -39,10 +41,20 @@ public class EmployeeSagaController {
 
     @PutMapping("/{codigoFuncionario}")
     public ResponseEntity<ApiResponse<EmployeeDto>> updateEmployee(
-            @RequestBody UpdateEmployeeDto dto
+            @RequestBody UpdateEmployeeDto dto,
+            @PathVariable String codigoFuncionario
     ){
         try {
-            EmployeeDto employee = orchestrator.updateEmployeeSaga(dto);
+            Long codigo = Long.parseLong(codigoFuncionario);
+            UpdateEmployeeDto dtoComCodigo = new UpdateEmployeeDto(
+                    codigo,
+                    dto.cpf(),
+                    dto.email(),
+                    dto.nome(),
+                    dto.telefone(),
+                    dto.senha()
+            );
+            EmployeeDto employee = orchestrator.updateEmployeeSaga(dtoComCodigo);
             return ResponseEntity
                     .ok(ApiResponse.success(employee));
         }catch (RuntimeException e){
