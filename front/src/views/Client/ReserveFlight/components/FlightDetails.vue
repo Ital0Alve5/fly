@@ -5,6 +5,7 @@ import { formatDateTime } from '@/utils/date/formatDateTime'
 
 defineProps<{
   flight: Flight | null
+  valueToPay?: number
 }>()
 </script>
 
@@ -39,6 +40,10 @@ defineProps<{
               flight.valor_passagem.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
             }}
           </p>
+        </li>
+        <li class="flex gap-2">
+          <b>Quantidade de milhas necessárias:</b>
+          <p>{{ Math.floor((valueToPay ?? 0) / 5) }}</p>
         </li>
       </ul>
     </CardContent>
