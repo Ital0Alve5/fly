@@ -1,7 +1,9 @@
 package com.dac.fly.flyservice.service;
 
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -75,10 +77,10 @@ public class FlightService {
 
         public ResponseEntity<ApiResponse<String>> findEstadoByCode(String codigo) {
                 return vooRepository.findById(codigo)
-                        .map(v -> ResponseEntity
-                                .ok(ApiResponse.success(v.getEstado().getNome().toString())))
-                        .orElseGet(() -> ResponseEntity.status(404)
-                                .body(ApiResponse.error("Voo não encontrado", 404)));
+                                .map(v -> ResponseEntity
+                                                .ok(ApiResponse.success(v.getEstado().getNome().toString())))
+                                .orElseGet(() -> ResponseEntity.status(404)
+                                                .body(ApiResponse.error("Voo não encontrado", 404)));
         }
 
         public ResponseEntity<ApiResponse<FlightResponseDto>> create(CreateNewFlightRequestDto dto) {
@@ -91,9 +93,13 @@ public class FlightService {
                                         .body(ApiResponse.error("Dados inválidos para criar voo", 400));
                 }
 
+                LocalDateTime local = LocalDateTime.parse(dto.data(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+
+                OffsetDateTime offsetDate = local.atOffset(ZoneOffset.of("-03:00"));
+
                 Voo voo = new Voo();
                 voo.setCodigo(FlightCodeGenerator.generateReservationCode());
-                voo.setData(OffsetDateTime.parse(dto.data()));
+                voo.setData(offsetDate);
                 voo.setValorPassagem(dto.valor_passagem());
                 voo.setQuantidadePoltronasTotal(dto.quantidade_poltronas_total());
                 voo.setQuantidadePoltronasOcupadas(dto.quantidade_poltronas_ocupadas());
@@ -173,16 +179,16 @@ public class FlightService {
                 List<Voo> voos;
 
                 if (origem != null && destino != null) {
-                    voos = vooRepository.findByDataBetweenAndAeroportoOrigemCodigoAndAeroportoDestinoCodigo(
-                            inicio, fim, origem, destino);
+                        voos = vooRepository.findByDataBetweenAndAeroportoOrigemCodigoAndAeroportoDestinoCodigo(
+                                        inicio, fim, origem, destino);
                 } else if (origem != null) {
-                    voos = vooRepository.findByDataBetweenAndAeroportoOrigemCodigo(
-                            inicio, fim, origem);
+                        voos = vooRepository.findByDataBetweenAndAeroportoOrigemCodigo(
+                                        inicio, fim, origem);
                 } else if (destino != null) {
-                    voos = vooRepository.findByDataBetweenAndAeroportoDestinoCodigo(
-                            inicio, fim, destino);
+                        voos = vooRepository.findByDataBetweenAndAeroportoDestinoCodigo(
+                                        inicio, fim, destino);
                 } else {
-                    voos = vooRepository.findByDataBetween(inicio, fim);
+                        voos = vooRepository.findByDataBetween(inicio, fim);
                 }
 
                 List<FlightDetailsResponseDto> detalhes = voos.stream()
