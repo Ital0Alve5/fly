@@ -52,7 +52,7 @@ public class EmployeeService {
     public EmployeeDto createNewEmployee(CreateEmployeeCommandDto newEmployeeDto) {
         Funcionario employee = new Funcionario();
 
-        employee.setCpf(formatCpf(newEmployeeDto.cpf()));
+        employee.setCpf(newEmployeeDto.cpf());
         employee.setEmail(newEmployeeDto.email());
         employee.setNome(newEmployeeDto.nome());
         employee.setTelefone(formatTelefone(newEmployeeDto.telefone()));
@@ -76,7 +76,7 @@ public class EmployeeService {
         return optionalFuncionario
                 .map(employee -> {
                     if (employeeDto.cpf() != null)
-                        employee.setCpf(formatCpf(employeeDto.cpf()));
+                        employee.setCpf(employeeDto.cpf());
                     if (employeeDto.email() != null)
                         employee.setEmail(employeeDto.email());
                     if (employeeDto.nome() != null)

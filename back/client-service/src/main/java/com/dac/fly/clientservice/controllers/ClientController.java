@@ -71,7 +71,7 @@ public class ClientController {
 
     @GetMapping("/{cpf}/exists/cpf")
     public ResponseEntity<Boolean> existsByCpf(@PathVariable("cpf") String cpf) {
-        boolean exists = clientService.existsByCpf(DocumentUtils.formatCpf(cpf));
+        boolean exists = clientService.existsByCpf(cpf);
         return ResponseEntity.ok(exists);
     }
 }

@@ -9,4 +9,4 @@ CREATE TABLE IF NOT EXISTS funcionario (
 );
 
 INSERT INTO funcionario (cpf, email, nome, telefone)
-VALUES ('907.692.810-01', 'func_pre@gmail.com', 'Razer', '(41) 91234-5678');
+VALUES ('90769281001', 'func_pre@gmail.com', 'Razer', '(41) 91234-5678');

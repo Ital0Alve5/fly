@@ -14,8 +14,7 @@ export const registerEmployeeSchema: FastifySchema = {
     cpf: z.string().refine(
       (value) => {
         const digitsRegex = /^\d{11}$/
-        const maskedRegex = /^\d{3}\.\d{3}\.\d{3}\-\d{2}$/
-        return digitsRegex.test(value) || maskedRegex.test(value)
+        return digitsRegex.test(value)
       },
       { message: 'CPF inválido' },
     ),

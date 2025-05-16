@@ -59,7 +59,7 @@ public class EmployeeController {
     @GetMapping("/{cpf}/cpf")
     public ResponseEntity<ApiResponse<EmployeeDto>> getEmployeeByCpf(@PathVariable("cpf") String cpf) {
         try {
-            EmployeeDto employee = employeeService.findEmployeeByCpf(DocumentUtils.formatCpf(cpf));
+            EmployeeDto employee = employeeService.findEmployeeByCpf(cpf);
             return ResponseEntity.ok(ApiResponse.success(employee));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ApiResponse.error(e.getMessage(), 404));

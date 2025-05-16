@@ -104,7 +104,7 @@ public class ClientService {
 
     private Client createClientEntity(CreateClientCommandDto request, Address address) {
         Client client = new Client();
-        client.setCpf(DocumentUtils.formatCpf(request.cpf()));
+        client.setCpf(request.cpf());
         client.setEmail(request.email());
         client.setNome(request.nome());
         Integer initialSaldo = request.saldo_milhas();

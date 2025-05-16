@@ -60,7 +60,7 @@ VALUES (
 INSERT INTO cliente (endereco_id, cpf, email, nome, saldo_milhas)
 VALUES (
   1,
-  '961.785.470-80',
+  '96178547080',
   'heitor@gmail.com',
   'Heitor',
   0
