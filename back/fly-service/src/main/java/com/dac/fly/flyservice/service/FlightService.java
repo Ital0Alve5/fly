@@ -1,14 +1,11 @@
 package com.dac.fly.flyservice.service;
 
-import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import com.dac.fly.flyservice.enums.FlightStatusEnum;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +16,7 @@ import com.dac.fly.flyservice.dto.response.FlightResponseDto;
 import com.dac.fly.flyservice.entity.Aeroporto;
 import com.dac.fly.flyservice.entity.Estado;
 import com.dac.fly.flyservice.entity.Voo;
+import com.dac.fly.flyservice.enums.FlightStatusEnum;
 import com.dac.fly.flyservice.repository.AeroportoRepository;
 import com.dac.fly.flyservice.repository.EstadoRepository;
 import com.dac.fly.flyservice.repository.VooRepository;
@@ -93,13 +91,9 @@ public class FlightService {
                                         .body(ApiResponse.error("Dados inválidos para criar voo", 400));
                 }
 
-                LocalDateTime local = LocalDateTime.parse(dto.data(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-
-                OffsetDateTime offsetDate = local.atOffset(ZoneOffset.of("-03:00"));
-
                 Voo voo = new Voo();
                 voo.setCodigo(FlightCodeGenerator.generateReservationCode());
-                voo.setData(offsetDate);
+                voo.setData(dto.data());
                 voo.setValorPassagem(dto.valor_passagem());
                 voo.setQuantidadePoltronasTotal(dto.quantidade_poltronas_total());
                 voo.setQuantidadePoltronasOcupadas(dto.quantidade_poltronas_ocupadas());
@@ -146,9 +140,13 @@ public class FlightService {
         }
 
         private FlightResponseDto toDto(Voo voo) {
+
+                OffsetDateTime dt = voo.getData()
+                                .withOffsetSameInstant(ZoneOffset.of("-03:00"));
+
                 return new FlightResponseDto(
                                 voo.getCodigo(),
-                                voo.getData().toString(),
+                                dt,
                                 voo.getValorPassagem(),
                                 voo.getQuantidadePoltronasTotal(),
                                 voo.getQuantidadePoltronasOcupadas(),
@@ -172,7 +170,8 @@ public class FlightService {
         }
 
         public ResponseEntity<ApiResponse<FlightGroupedResponseDto>> findByAirport(
-                        OffsetDateTime data, String origem, String destino) {
+                        OffsetDateTime data,
+                        String origem, String destino) {
                 OffsetDateTime inicio = data.toLocalDate().atStartOfDay().atOffset(ZoneOffset.of("-03:00"));
                 OffsetDateTime fim = inicio.plusYears(10);
 
@@ -196,7 +195,7 @@ public class FlightService {
                                 .collect(Collectors.toList());
 
                 FlightGroupedResponseDto resposta = FlightGroupedResponseDto.of(
-                                data.toString(), origem, destino, detalhes);
+                                data, origem, destino, detalhes);
                 return ResponseEntity.ok(ApiResponse.success(resposta));
         }
 

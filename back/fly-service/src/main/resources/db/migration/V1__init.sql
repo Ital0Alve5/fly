@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS estado (
 
 CREATE TABLE IF NOT EXISTS voos (
   codigo VARCHAR(6) PRIMARY KEY,
-  data TIMESTAMP WITH TIME ZONE NOT NULL,
+  data TIMESTAMP WITHOUT TIME ZONE NOT NULL,
   valor_passagem FLOAT,
   quantidade_poltronas_total INTEGER,
   quantidade_poltronas_ocupadas INTEGER,
