@@ -64,7 +64,7 @@ const onSubmit = handleSubmit(async (values) => {
           <FormItem>
             <FormLabel>Senha</FormLabel>
             <FormControl>
-              <Input v-bind="componentField" type="password" placeholder="Senha (6 dígitos)" />
+              <Input v-bind="componentField" type="password" placeholder="Senha (4 dígitos)" />
             </FormControl>
             <FormMessage>{{ password.errorMessage.value }}</FormMessage>
           </FormItem>

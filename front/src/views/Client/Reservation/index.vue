@@ -7,7 +7,9 @@ import getReservationDetails from './services/getReservationDetails'
 import { AxiosError } from 'axios'
 import { toast } from '@/components/ui/toast'
 import { formatDateTime } from '@/utils/date/formatDateTime'
+import { useAuthStore } from '@/stores/auth'
 
+const authStore = useAuthStore()
 const route = useRoute()
 const reservation = ref<Reserve>({
   codigo: '',
@@ -40,20 +42,22 @@ const reservation = ref<Reserve>({
 })
 
 onMounted(async () => {
-  try {
-    const { data } = await getReservationDetails(route.params.code.toString())
-    reservation.value = data
-  } catch (error) {
-    toast({
-      title: 'Erro ao acessar reserva',
-      description:
-        error instanceof AxiosError
-          ? error.response?.data.message
-          : 'Falha ao tentar acessar a reserva',
-      variant: 'destructive',
-      duration: 2500,
-    })
-  }
+  if (authStore.isAuthenticated){
+    try {
+      const { data } = await getReservationDetails(route.params.code.toString())
+      reservation.value = data
+    } catch (error) {
+      toast({
+        title: 'Erro ao acessar reserva',
+        description:
+          error instanceof AxiosError
+            ? error.response?.data.message
+            : 'Falha ao tentar acessar a reserva',
+        variant: 'destructive',
+        duration: 2500,
+      })
+    }
+}
 })
 </script>
 
@@ -72,7 +76,7 @@ onMounted(async () => {
           <ul class="space-y-2">
             <li class="flex gap-2">
               <b>Data:</b>
-              <p>{{ formatDateTime(reservation.data) }}</p>
+              <p>{{ formatDateTime(reservation.voo.data) }}</p>
             </li>
             <li class="flex gap-2">
               <b>Código:</b>

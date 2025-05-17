@@ -1,5 +1,8 @@
 import { ref, watch } from 'vue'
 import type { Ref } from 'vue'
+import { useToast } from '@/components/ui/toast'
+
+const { toast } = useToast()
 
 export function useAddressByCep(cep: Ref<string>) {
   const street = ref('')
@@ -34,7 +37,11 @@ export function useAddressByCep(cep: Ref<string>) {
 
         if (data.erro) {
           resetAddressFields()
-          alert('CEP não encontrado.')
+          toast({
+            title: 'CEP não encontrado.',
+            variant: 'destructive',
+            duration: 2500,
+          })
         } else {
           street.value = data.logradouro || ''
           neighborhood.value = data.bairro || ''

@@ -7,10 +7,8 @@ import {
   DialogDescription,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import { searchReservesByFlightCode, updateReservationStatus } from '@/mock/booking'
 import { useToast } from '@/components/ui/toast'
 import { performFlight } from '@/views/Manager/NextFlightListing/services/NextFlightListingService.ts'
-import type { Reserve } from '@/types/Reserve'
 import { ref } from 'vue'
 
 const props = defineProps<{
@@ -31,17 +29,9 @@ const handleConfirmPerformance = async () => {
       throw new Error('Falha ao atualizar status do voo')
     }
 
-    const reservations = await searchReservesByFlightCode(props.selectedFlightCode) // mudar para api
-    reservations.forEach(async (reservation) => {
-      const newStatus: Reserve['estado'] = reservation.estado === 'EMBARCADA' ? 'REALIZADA' : 'NÃO REALIZADA'
-      
-      await updateReservationStatus(reservation.codigo, newStatus) // mudar para api
-    })
-
     toast({
       title: 'Voo realizado com sucesso concluída com sucesso',
-      description: `Voo ${props.selectedFlightCode} marcado como realizado.
-                   ${reservations.length} reservas atualizadas.`,
+      description: `Voo ${props.selectedFlightCode} marcado como realizado.`,
       variant: 'default',
       duration: 1000,
     })
