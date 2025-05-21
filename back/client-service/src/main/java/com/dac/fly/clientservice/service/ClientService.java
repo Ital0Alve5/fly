@@ -42,6 +42,14 @@ public class ClientService {
         return new ClientResponseDTO(savedClient);
     }
 
+    @Transactional(readOnly = true)
+    public List<ClientResponseDTO> findAll() {
+        return clientRepository.findAll()
+                .stream()
+                .map(ClientResponseDTO::new)
+                .toList();
+    }
+
     public ClientResponseDTO findByCodigo(Long codigo) {
         Client client = clientRepository.findByCodigo(codigo)
                 .orElseThrow(() -> new RuntimeException("Cliente não encontrado com código: " + codigo));

@@ -20,7 +20,22 @@ export async function cancelReservationRoute(app: FastifyTypedInstance) {
           `${Env.SAGA_URL}/reservations/cancela/${codigo_reserva}`,
         )
 
-        return reply.status(reservationResponse.status).send(reservationResponse.data.data)
+
+        try {
+          const { data: flightResponse } = await axios.get(
+            `${Env.FLY_SERVICE_URL}/voos/${reservationResponse.data.data.codigo_voo}`,
+          )
+
+          const combinedResponse = {
+            ...reservationResponse.data.data,
+            voo: flightResponse.data,
+          }
+
+          return reply.send(combinedResponse)
+        } catch (flightError) {
+          console.error(`Erro ao buscar dados do voo ${reservationResponse.data.data.codigo_voo}:`, flightError)
+          return reply.send(reservationResponse.data.data)
+        }
       } catch (err) {
         if (axios.isAxiosError(err) && err.response) {
           return reply
