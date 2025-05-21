@@ -45,7 +45,6 @@ export const getClientFlightListInNext48hrs = async (): Promise<Reserve[]> => {
     if (!response) return []
 
     return response.filter((res) => {
-      console.log(res)
       const inputDate = new Date(res.voo.data)
       const now = new Date()
       const timeDifference = inputDate.getTime() - now.getTime()

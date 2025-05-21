@@ -40,7 +40,6 @@ watchEffect(async () => {
   if (userCode.value) {
     try {
       const response = await getClientTransactionHistory()
-      console.log(response)
 
       const transformed: MilesExtractResponse = {
         codigo: response?.codigo,

@@ -49,7 +49,6 @@ async function handleLoadAirpoirts() {
 
     airpoirtsList.value = aipoirts
   } catch (err) {
-    console.log(err)
 
     globalStore.setNotification({
       title: 'Erro ao carregar os aeroportos!',
