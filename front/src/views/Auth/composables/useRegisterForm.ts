@@ -12,6 +12,7 @@ const registerSchema = toTypedSchema(
       .min(1, 'Campo obrigatório'),
     cpf: z.string().refine((cpf) => isValidCPF(cpf), 'CPF inválido'),
     cep: z.string({ required_error: 'CEP é obrigatório' }).min(1, 'Campo obrigatório'),
+    number: z.string({ required_error: 'Número é obrigatório' }).min(1, 'Campo obrigatório'),
   }),
 )
 
@@ -24,6 +25,7 @@ export function useRegisterForm() {
   const registerEmail = useField<string>('registerEmail')
   const cpf = useField<string>('cpf')
   const cep = useField<string>('cep')
+  const number = useField<string>('number')
 
   return {
     handleSubmit,
@@ -31,5 +33,6 @@ export function useRegisterForm() {
     registerEmail,
     cpf,
     cep,
+    number,
   }
 }

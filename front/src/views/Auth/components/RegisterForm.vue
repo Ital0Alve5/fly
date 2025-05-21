@@ -44,7 +44,7 @@ const onSubmit = handleSubmit(async (values) => {
         cidade: city.value,
         bairro: neighborhood.value,
         rua: street.value,
-        numero: number.value,
+        numero: values.number,
         complemento: complement.value,
       },
     }
@@ -132,12 +132,15 @@ const onSubmit = handleSubmit(async (values) => {
               <Input v-model="street" type="text" disabled />
             </FormControl>
           </FormItem>
-          <FormItem class="max-w-20">
-            <FormLabel>Número</FormLabel>
-            <FormControl>
-              <Input v-model="number" type="number" />
-            </FormControl>
-          </FormItem>
+          <FormField name="number" v-slot="{ componentField }">
+            <FormItem class="max-w-20">
+              <FormLabel>Número</FormLabel>
+              <FormControl>
+                <Input v-bind="componentField" type="text" />
+              </FormControl>
+              <FormMessage>{{ number.errorMessage.value }}</FormMessage>
+            </FormItem>
+          </FormField>
         </div>
 
         <FormItem>
@@ -183,3 +186,4 @@ const onSubmit = handleSubmit(async (values) => {
     </CardContent>
   </Card>
 </template>
+
