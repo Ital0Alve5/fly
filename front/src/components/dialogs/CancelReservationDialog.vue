@@ -10,12 +10,14 @@ import { Button } from '@/components/ui/button'
 import { useToast } from '@/components/ui/toast'
 import { AxiosError } from 'axios'
 import cancelReservation from '@/views/Client/Booking/services/cancelReservation'
+import { useMilesStore } from '@/stores/miles'
 
 const props = defineProps<{
   modelValue: boolean
   reservationCode: string | null
 }>()
 
+const milesStore = useMilesStore()
 const { toast } = useToast()
 
 const emit = defineEmits(['update:modelValue', 'success'])
@@ -29,6 +31,8 @@ async function handleCancelReservation() {
 
   try {
     await cancelReservation(props.reservationCode)
+
+    await milesStore.refreshMiles()
 
     toast({
       title: 'Reserva cancelada com sucesso',

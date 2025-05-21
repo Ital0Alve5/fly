@@ -11,15 +11,11 @@ import {
 import { useToast } from '@/components/ui/toast'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
-import { useAuthStore } from '@/stores/auth'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useMilesStore } from '@/stores/miles'
-import { registerExtract, type ExtractItem } from '@/mock/extract'
-import { getTodayDate } from '@/utils/date/getTodayDate'
 import { addMilesToClient } from '@/clientService/ClientService'
 import router from '@/router'
 
-const authStore = useAuthStore()
 const milesStore = useMilesStore()
 const { toast } = useToast()
 
@@ -36,22 +32,9 @@ const totalPrice = computed(() => milesStore.totalPrice)
 
 const onSubmit = async () => {
   try {
-    const newExtract: ExtractItem = {
-      codigo_cliente: authStore.user?.usuario?.codigo || 0,
-      data: getTodayDate(),
-      codigo_reserva: null,
-      valor_reais: totalPrice.value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
-      quantidade_milhas: currentCheckoutMiles.value,
-      descricao: 'COMPRA DE MILHAS',
-      tipo: 'ENTRADA',
-    }
-
     await addMilesToClient(currentCheckoutMiles.value);
     await milesStore.refreshMiles()
     milesStore.setCurrentCheckoutMiles(10)
-
-    registerExtract(newExtract) //TODO:  mudar para api /reservas POST
-
 
     toast({
       title: 'Pagamento efetuado com sucesso',

@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button'
 import { isValidCPF } from '@/lib/utils'
 import LoadingSpinner from '@/components/ui/LoadingSpinner.vue'
 import addNewEmployee from '../services/addNewEmployee'
+import { AxiosError } from 'axios'
 
 const { toast } = useToast()
 const isLoading = ref(false)
@@ -56,8 +57,8 @@ const onSubmit = handleSubmit(async (values) => {
   try {
     isLoading.value = true
     await addNewEmployee(values)
-    isLoading.value = false
 
+    isLoading.value = false
     emit('added')
 
     toast({
@@ -67,10 +68,40 @@ const onSubmit = handleSubmit(async (values) => {
       duration: 500,
     })
   } catch (error) {
-    console.error('Erro ao adicionar funcionário:', error)
-  }
+    isLoading.value = false
 
-  openDialog.value = false
+    if (error instanceof AxiosError) {
+      if (error.response?.status === 409) {
+        toast({
+          title: 'Erro ao cadastrar funcionário',
+          description: 'CPF ou E-mail já cadastrado.',
+          variant: 'destructive',
+        })
+      } else if (error.response) {
+        toast({
+          title: `Erro ${error.response.status}`,
+          description: error.response.statusText,
+          variant: 'destructive',
+        })
+      } else {
+        toast({
+          title: 'Erro de conexão',
+          description: 'Não foi possível conectar ao servidor.',
+          variant: 'destructive',
+        })
+      }
+    } else {
+      toast({
+        title: 'Erro inesperado',
+        description: 'Tente novamente mais tarde.',
+        variant: 'destructive',
+      })
+    }
+
+    console.error('Erro ao adicionar funcionário:', error)
+  } finally {
+    openDialog.value = false
+  }
 })
 
 const cancel = () => {

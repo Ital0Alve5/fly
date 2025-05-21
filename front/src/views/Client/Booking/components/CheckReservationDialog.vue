@@ -128,14 +128,19 @@ function handleCancelFlight(selectedReservation: string) {
   isCancelDialogOpen.value = true
   selectedReservationCode.value = selectedReservation
 }
+
+function handleSuccess() {
+  emit('refresh')
+  isCancelDialogOpen.value = false
+  openDialog.value = false
+}
 </script>
 
 <template>
   <CancelReservationDialog
     :reservation-code="selectedReservationCode"
-    @success="emit('refresh')"
-    @update:modelValue="openDialog = true"
     v-model="isCancelDialogOpen"
+    @success="handleSuccess"
   />
 
   <Dialog v-model:open="openDialog">

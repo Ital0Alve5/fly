@@ -32,7 +32,7 @@ onMounted(async () => {
 
 async function getBooking() {
   const result = await getClientReservationList()
-  booking.value = result ?? []
+  booking.value = (result ?? []).sort((a, b) => new Date(b.data).getTime() - new Date(a.data).getTime())
 }
 
 const viewReservation = async (codigo: string) => {

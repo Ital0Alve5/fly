@@ -53,7 +53,6 @@ const onSubmit = handleSubmit(async (values) => {
 
     await authStore.register(newUserData)
 
-    loading.value = false
 
     globalStore.setNotification({
       title: 'Cadastro realizado!',
@@ -63,12 +62,16 @@ const onSubmit = handleSubmit(async (values) => {
     emit('registered')
   } catch (error) {
     toast({
-      title: 'Erro no cadastro',
-      description:
-        error instanceof AxiosError ? error.response?.data.message : 'Falha ao tentar cadastrar',
-      variant: 'destructive',
-      duration: 2500,
-    })
+    title: 'Erro no cadastro',
+    description:
+      error instanceof Error
+        ? error.message
+        : 'Falha ao tentar cadastrar',
+    variant: 'destructive',
+    duration: 2500,
+  })
+  } finally {
+    loading.value = false
   }
 })
 </script>
