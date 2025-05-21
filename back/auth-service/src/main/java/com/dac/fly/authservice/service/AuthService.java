@@ -128,8 +128,8 @@ public class AuthService {
     }
 
     private String generateRandomPassword() {
-        StringBuilder password = new StringBuilder(6);
-        for (int i = 0; i < 6; i++) {
+        StringBuilder password = new StringBuilder(4);
+        for (int i = 0; i < 4; i++) {
             password.append(RANDOM.nextInt(10));
         }
         return password.toString();
