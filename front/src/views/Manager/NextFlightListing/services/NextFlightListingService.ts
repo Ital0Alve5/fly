@@ -60,6 +60,20 @@ export const loadAllAirpoirts = async (): Promise<Airport[]> => {
   }
 }
 
+function formatToOffsetIso(dateInput: string): string {
+  const date = new Date(dateInput)
+  const pad = (n: number) => String(n).padStart(2, '0')
+
+  const year = date.getFullYear()
+  const month = pad(date.getMonth() + 1)
+  const day = pad(date.getDate())
+  const hour = pad(date.getHours())
+  const minute = pad(date.getMinutes())
+  const second = pad(date.getSeconds())
+
+  return `${year}-${month}-${day}T${hour}:${minute}:${second}-03:00`
+}
+
 export const registerFlight = async (data: {
   data: string
   valor_passagem: number
@@ -68,5 +82,12 @@ export const registerFlight = async (data: {
   codigo_aeroporto_origem: string
   codigo_aeroporto_destino: string
 }): Promise<AxiosResponse<Flight>> => {
-  return await api.post(`/voos`, data)
+  const dataComFuso = formatToOffsetIso(data.data)
+
+  console.log({ ...data, data: dataComFuso })
+
+  return await api.post(`/voos`, {
+    ...data,
+    data: dataComFuso,
+  })
 }
