@@ -16,7 +16,5 @@ export const createReservationSchema: FastifySchema = {
     milhas_utilizadas: z.number().describe('Quantidade de milhas utilizadas'),
     quantidade_poltronas: z.number().describe('Quantidade de poltronas reservadas'),
     codigo_voo: z.string().describe('Código do voo'),
-    codigo_aeroporto_origem: z.string().describe('Código do aeroporto de origem'),
-    codigo_aeroporto_destino: z.string().describe('Código do aeroporto de destino'),
   }),
 } 
