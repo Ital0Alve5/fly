@@ -27,6 +27,10 @@ import { fetchFlightByCode } from '@/views/Client/FlightListing/services/FlightL
 import { useToast } from '@/components/ui/toast'
 import createReservation from './services/createReservation'
 import { AxiosError } from 'axios'
+import SeatSelector from './components/SeatSelector.vue'
+import MilesSelector from './components/MilesSelector.vue'
+import PriceSummary from './components/PriceSummary.vue'
+
 
 const route = useRoute()
 const router = useRouter()
@@ -130,6 +134,14 @@ async function handleReserveFlight() {
 
   await milesStore.refreshMiles()
 }
+
+watch(seats, (value) => {
+  if (value > availableSeats.value) seats.value = availableSeats.value
+})
+watch(miles, (value) => {
+  if (value > availableMilesToUse.value) miles.value = availableMilesToUse.value
+})
+
 </script>
 <template>
   <Dialog
@@ -150,6 +162,15 @@ async function handleReserveFlight() {
         </div>
       </div>
     </DialogContent>
+    <SeatSelector v-model="seats" :max="availableSeats" />
+
+    <MilesSelector v-model="miles" :max="availableMilesToUse" />
+
+    <PriceSummary :amount="valueToPay" />
+
+    <div v-if="loading" class="text-white text-lg">
+      Carregando dados do voo...
+    </div>
 
     <div class="min-h-screen flex flex-col items-center justify-center p-20">
       <strong class="w-full max-w-[1000px] text-left mb-4 text-xl">
