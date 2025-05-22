@@ -12,7 +12,7 @@ export default async function getFlightsInNext48Hrs(): Promise<Flight[]> {
 
   const response = await api.get('/voos', { params })
 
-  const flights = response.data
+  const flights = response.data.voos
 
   const filtered = flights.filter((f: Flight) => {
     const flightDate = new Date(f.data)

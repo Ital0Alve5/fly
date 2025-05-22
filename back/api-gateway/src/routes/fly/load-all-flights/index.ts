@@ -26,18 +26,16 @@ export async function loadAllFlightsRoute(app: FastifyTypedInstance) {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
-        const raw = request.query as { 
-          data?: string
-          'data-fim'?: string
-          origem?: string
-          destino?: string
-        }
+        const raw = request.query as Record<string, string | undefined>
 
-        const query = {
-          ...raw,
-          data: normalizeDateParam(raw.data),
-          'data-fim': normalizeDateParam(raw['data-fim']),
-        }
+        const start = normalizeDateParam(raw.data ?? raw.inicio)
+        const end   = normalizeDateParam(raw['data-fim'] ?? raw.fim)
+
+        const query: Record<string, string> = {}
+        if (start) query.data      = start
+        if (end)   query['data-fim'] = end
+        if (raw.origem)  query.origem  = raw.origem
+        if (raw.destino) query.destino = raw.destino
         
         const response = await axios.get(`${Env.FLY_SERVICE_URL}/voos`, {
           params: query,

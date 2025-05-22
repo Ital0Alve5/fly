@@ -41,7 +41,7 @@ public class FlightService {
                 this.aeroportoRepository = aeroportoRepository;
         }
 
-        public ResponseEntity<ApiResponse<List<FlightDetailsResponseDto>>> findAll(
+        public List<FlightDetailsResponseDto> findAll(
                         OffsetDateTime data,
                         OffsetDateTime dataFim,
                         String origem,
@@ -62,7 +62,7 @@ public class FlightService {
                 List<FlightDetailsResponseDto> dtos = voos.stream()
                                 .map(FlightDetailsResponseDto::fromEntity)
                                 .collect(Collectors.toList());
-                return ResponseEntity.ok(ApiResponse.success(dtos));
+                return dtos;
         }
 
         public ResponseEntity<ApiResponse<FlightDetailsResponseDto>> findByCode(String codigo) {
