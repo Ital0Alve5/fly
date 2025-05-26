@@ -91,7 +91,7 @@ function openCheckReservationDialog() {
               <TableBody>
                 <TableRow v-for="reservation in booking" :key="reservation.codigo">
                   <TableCell class="text-center px-6 py-4 text-lg">{{
-                    formatDateTime(reservation.data)
+                    formatDateTime(reservation.voo.data)
                   }}</TableCell>
                   <TableCell class="text-center px-6 py-4 text-lg">{{
                     reservation.voo.aeroporto_origem.codigo
