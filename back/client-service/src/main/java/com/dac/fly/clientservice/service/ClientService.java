@@ -183,7 +183,7 @@ public class ClientService {
             clientRepository.save(client);
 
             Transactions tx = createCreditTransaction(client, miles);
-            tx.setDescricao("ESTORNO DE MILHAS POR CANCELAMENTO DE VOO");
+            tx.setDescricao("EXTORNO DE MILHAS DA RESERVA: " + reservationCode);
             transactionsRepository.save(tx);
         }
 
