@@ -1,13 +1,23 @@
 <script setup lang="ts">
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  Table,
+  TableHead,
+  TableRow,
+  TableHeader,
+  TableBody,
+  TableCell,
+} from '@/components/ui/table'
+
 import { ref, onMounted } from 'vue'
-import type { Reserve } from '@/types/Reserve'
+import type { History, Reserve } from '@/types/Reserve'
 import { useRoute } from 'vue-router'
 import getReservationDetails from './services/getReservationDetails'
 import { AxiosError } from 'axios'
 import { toast } from '@/components/ui/toast'
 import { formatDateTime } from '@/utils/date/formatDateTime'
 import { useAuthStore } from '@/stores/auth'
+import getReservationHistory from './services/getReservationHistory'
 
 const authStore = useAuthStore()
 const route = useRoute()
@@ -41,11 +51,16 @@ const reservation = ref<Reserve>({
   },
 })
 
+const history = ref<History>([])
+
 onMounted(async () => {
-  if (authStore.isAuthenticated){
+  if (authStore.isAuthenticated) {
     try {
       const { data } = await getReservationDetails(route.params.code.toString())
+      const { data: historyData } = await getReservationHistory(route.params.code.toString())
       reservation.value = data
+      history.value = historyData
+      history.value.shift()
     } catch (error) {
       toast({
         title: 'Erro ao acessar reserva',
@@ -57,13 +72,13 @@ onMounted(async () => {
         duration: 2500,
       })
     }
-}
+  }
 })
 </script>
 
 <template>
   <div class="flex items-center justify-center min-h-screen">
-    <Card v-if="reservation" class="w-full max-w-md">
+    <Card v-if="reservation" class="w-full max-w-2xl">
       <CardHeader>
         <CardTitle>
           Reserva do voo de {{ reservation.voo.aeroporto_origem.codigo }} à
@@ -72,7 +87,7 @@ onMounted(async () => {
         <CardDescription>Informações de sua reserva:</CardDescription>
       </CardHeader>
       <CardContent>
-        <section>
+        <section class="mb-2">
           <ul class="space-y-2">
             <li class="flex gap-2">
               <b>Data:</b>
@@ -111,6 +126,25 @@ onMounted(async () => {
               <p>{{ reservation.quantidade_poltronas }}</p>
             </li>
           </ul>
+        </section>
+        <hr />
+        <section>
+          <Table class="w-full table-auto border-separate border-spacing-2">
+            <TableHeader>
+              <TableRow>
+                <TableHead class="text-center px-6 py-3 text-lg">Data/Hora</TableHead>
+                <TableHead class="text-center px-6 py-3 text-lg">Estado origem</TableHead>
+                <TableHead class="text-center px-6 py-3 text-lg">Estado destino</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              <TableRow v-for="h in history" :key="h.id">
+                <TableCell class="text-center px-6 py-4"> {{ formatDateTime(h.data) }} </TableCell>
+                <TableCell class="text-center px-6 py-4"> {{ h.estado_origem }} </TableCell>
+                <TableCell class="text-center px-6 py-4"> {{ h.estado_destino }} </TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
         </section>
       </CardContent>
     </Card>
