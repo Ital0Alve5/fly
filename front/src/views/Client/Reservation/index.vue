@@ -90,8 +90,12 @@ onMounted(async () => {
         <section class="mb-2">
           <ul class="space-y-2">
             <li class="flex gap-2">
-              <b>Data:</b>
+              <b>Data do voo:</b>
               <p>{{ formatDateTime(reservation.voo.data) }}</p>
+            </li>
+            <li class="flex gap-2">
+              <b>Data da reserva:</b>
+              <p>{{ formatDateTime(reservation.data) }}</p>
             </li>
             <li class="flex gap-2">
               <b>Código:</b>
