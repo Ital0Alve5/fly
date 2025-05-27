@@ -18,7 +18,7 @@ const formSchema = toTypedSchema(
     email: z.string().email('E-mail inválido'),
     telefone: z.string().min(14, 'Telefone inválido').max(15, 'Telefone inválido'),
     cpf: z.string().min(11, 'CPF inválido'),
-    senha: z.string().regex(/^\d{1,6}$/, 'Senha deve conter até 6 dígitos numéricos'),
+    senha: z.string().regex(/^\d{4}$/, 'Senha deve conter exatamente 4 dígitos numéricos').optional().or(z.literal(''))
   }),
 )
 
@@ -41,7 +41,7 @@ const emit = defineEmits<{
       email: string
       telefone: string
       cpf: string
-      senha: string
+      senha?: string
     },
   ): void
 }>()
@@ -58,7 +58,7 @@ watch(
       setFieldValue('email', props.employee.email)
       setFieldValue('telefone', props.employee.telefone)
       setFieldValue('cpf', props.employee.cpf)
-      setFieldValue('senha', '')
+      setFieldValue('senha', undefined)
     } else {
       resetForm()
     }
@@ -143,7 +143,7 @@ const onSubmit = handleSubmit((values) => {
           <FormItem>
             <FormLabel>Senha</FormLabel>
             <FormControl>
-              <Input v-bind="componentField" type="password" maxlength="6" inputmode="numeric" />
+              <Input v-bind="componentField" type="password" maxlength="4" inputmode="numeric" />
             </FormControl>
             <FormMessage />
           </FormItem>
