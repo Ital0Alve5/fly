@@ -23,7 +23,7 @@ const formSchema = toTypedSchema(
     email: z.string().email('E-mail inválido'),
     telefone: z.string().min(14, 'Telefone inválido').max(15, 'Telefone inválido'),
     cpf: z.string().refine((cpf) => isValidCPF(cpf), 'CPF inválido'),
-    senha: z.string().regex(/^\d{4}$/, 'Senha deve conter exatamente 4 dígitos numéricos')
+    senha: z.string().regex(/^[a-zA-Z0-9]{4}$/, 'Senha deve conter exatamente 4 caracteres')
   }),
 )
 
