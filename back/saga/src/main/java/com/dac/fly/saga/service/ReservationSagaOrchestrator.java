@@ -68,6 +68,11 @@ public class ReservationSagaOrchestrator {
             throw new IllegalArgumentException("Cliente não encontrado: " + createDto.codigo_cliente());
         }
 
+        String[] aeroportos = flightClient.findAeroportosByCode(createDto.codigo_voo());
+
+        String codigoAroportoOrigem = aeroportos[0];
+        String codigoAroportoDestino = aeroportos[1];
+
         String reservationId = ReservationCodeGenerator.generateReservationCode();
         CreateReservationCommand cmd = new CreateReservationCommand(
                 reservationId,
@@ -76,14 +81,14 @@ public class ReservationSagaOrchestrator {
                 createDto.milhas_utilizadas(),
                 createDto.quantidade_poltronas(),
                 createDto.codigo_voo(),
-                createDto.codigo_aeroporto_origem(),
-                createDto.codigo_aeroporto_destino());
+                codigoAroportoOrigem,
+                codigoAroportoDestino);
 
         EnumSet<CreateReservationSagaStep> completedSteps = EnumSet.noneOf(CreateReservationSagaStep.class);
 
         try {
             if (cmd.milhas_utilizadas() != null && cmd.milhas_utilizadas() > 0) {
-                deductMiles(cmd);
+                deductMiles(cmd, codigoAroportoOrigem + "->" + codigoAroportoDestino);
                 completedSteps.add(CreateReservationSagaStep.MILES_DEDUCTED);
             }
 
@@ -105,11 +110,12 @@ public class ReservationSagaOrchestrator {
         }
     }
 
-    private void deductMiles(CreateReservationCommand cmd) {
+    private void deductMiles(CreateReservationCommand cmd, String descricao) {
         UpdateMilesCommand milesCmd = new UpdateMilesCommand(
                 cmd.codigo(),
                 cmd.codigo_cliente(),
                 cmd.milhas_utilizadas(),
+                descricao,
                 false);
         CompletableFuture<MilesUpdatedEvent> future = new CompletableFuture<>();
         milesResponses.put(cmd.codigo(), future);
@@ -137,12 +143,12 @@ public class ReservationSagaOrchestrator {
         } catch (InterruptedException | ExecutionException | TimeoutException ex) {
             // rollback miles
             rabbit.convertAndSend(RabbitConstants.EXCHANGE, RabbitConstants.UPDATE_MILES_CMD_QUEUE,
-                    new UpdateMilesCommand(cmd.codigo(), cmd.codigo_cliente(), cmd.milhas_utilizadas(), true));
+                    new UpdateMilesCommand(cmd.codigo(), cmd.codigo_cliente(), cmd.milhas_utilizadas(), null, true));
             throw new RuntimeException("Timeout/erro ao reservar assentos, milhas revertidas", ex);
         }
         if (!event.success()) {
             rabbit.convertAndSend(RabbitConstants.EXCHANGE, RabbitConstants.UPDATE_MILES_CMD_QUEUE,
-                    new UpdateMilesCommand(cmd.codigo(), cmd.codigo_cliente(), cmd.milhas_utilizadas(), true));
+                    new UpdateMilesCommand(cmd.codigo(), cmd.codigo_cliente(), cmd.milhas_utilizadas(), null, true));
             throw new RuntimeException("Falha ao reservar assentos, milhas revertidas");
         }
     }
@@ -183,6 +189,7 @@ public class ReservationSagaOrchestrator {
                     codigo,
                     cancelResp.codigo_cliente(),
                     cancelResp.milhas_utilizadas(),
+                    null,
                     true);
             CompletableFuture<MilesUpdatedEvent> milesFuture = new CompletableFuture<>();
             milesResponses.put(codigo, milesFuture);
@@ -260,6 +267,7 @@ public class ReservationSagaOrchestrator {
                     codigo,
                     cancelResp.codigo_cliente(),
                     cancelResp.milhas_utilizadas(),
+                    null,
                     false);
             CompletableFuture<MilesUpdatedEvent> milesFut = new CompletableFuture<>();
             milesResponses.put(codigo, milesFut);
@@ -333,6 +341,7 @@ public class ReservationSagaOrchestrator {
                     reservationId,
                     failedCmd.codigo_cliente(),
                     failedCmd.milhas_utilizadas(),
+                    null,
                     true);
             CompletableFuture<MilesUpdatedEvent> fut = new CompletableFuture<>();
             milesResponses.put(reservationId, fut);

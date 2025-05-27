@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS reserva (
   quantidade_poltronas INTEGER,
   codigo_cliente INTEGER,
   estado BIGINT,
-  codigo_voo VARCHAR(6),
+  codigo_voo VARCHAR(8),
   CONSTRAINT fk_estado FOREIGN KEY (estado) REFERENCES estado(codigo)
 );
 

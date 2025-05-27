@@ -70,6 +70,18 @@ public class VooController {
         return flightService.findByCode(codigo);
     }
 
+    @GetMapping("/{codigo}/aeroportos")
+    public ResponseEntity<ApiResponse<String[]>> findAeroportosByCode(@PathVariable String codigo) {
+        ResponseEntity<ApiResponse<FlightDetailsResponseDto>> flight = flightService.findByCode(codigo);
+
+        String[] aeroportos = new String[]{
+                flight.getBody().getData().aeroporto_origem().codigo(),
+                flight.getBody().getData().aeroporto_destino().codigo()
+        };
+
+        return ResponseEntity.ok(ApiResponse.success(aeroportos));
+    }
+
     @PostMapping
     public ResponseEntity<ApiResponse<FlightResponseDto>> create(@RequestBody CreateNewFlightRequestDto dto) {
         return flightService.create(dto);
