@@ -1,14 +1,7 @@
+# back/api-gateway/Dockerfile
 FROM node:20
-
 WORKDIR /app
-
-COPY package*.json ./
-
-RUN npm i
-
-COPY . .
-
-EXPOSE 8000
-
-CMD [ "npm", "run", "start:dev" ]
-
+COPY api-gateway/package*.json ./
+RUN npm install
+COPY api-gateway/ ./
+CMD ["npm","run","start:dev"]

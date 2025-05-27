@@ -1,9 +1,15 @@
 import Auth from '@/views/Auth/index.vue'
-import Booking from '@/views/Client/Booking.vue'
-import Reservation from '@/views/Client/Reservation.vue'
-import Adm from '@/views/Manager/PaginaAdmTeste.vue'
+import Booking from '@/views/Client/Booking/index.vue'
+import Reservation from '@/views/Client/Reservation/index.vue'
+import Search from '@/views/Client/FlightListing/Search.vue'
+import BuyMiles from '@/views/Client/BuyMiles/index.vue'
+import Details from '@/views/Client/ReserveFlight/Details.vue'
+import Next from '@/views/Client/FlightsNext/Next.vue'
+import EmployeesListing from '@/views/Manager/EmployeesListing/index.vue'
 
 import { createRouter, createWebHistory } from 'vue-router'
+import ExtractMiles from '@/views/Client/ExtractMiles/index.vue'
+import NextFlightListing from '@/views/Manager/NextFlightListing/index.vue'
 import { useAuthStore } from '@/stores/auth'
 
 const router = createRouter({
@@ -21,16 +27,56 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
-      path: '/reservas/reserva/:reservationId(\\d+)',
+      path: '/reservas/reserva/:code',
       name: 'reserva',
       component: Reservation,
       meta: { requiresAuth: true },
     },
     {
-      path: '/admTeste',
-      name: 'admTeste',
-      component: Adm,
+      path: '/voos',
+      name: 'voos',
+      component: Search,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/voos/voos/:code',
+      name: 'flightDetails',
+      component: Details,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/comprar-milhas',
+      name: 'comprarMilhas',
+      component: BuyMiles,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/extrato-milhas',
+      name: 'extratoDeMilhas',
+      component: ExtractMiles,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/fazer-check-in',
+      name: 'fazerCheckin',
+      component: Next,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/adm',
       meta: { requiresAuth: true, isManager: true },
+      children: [
+        {
+          path: 'voos',
+          name: 'admVoos',
+          component: NextFlightListing,
+        },
+        {
+          path: 'todos-funcionarios',
+          name: 'todosFuncionarios',
+          component: EmployeesListing,
+        },
+      ],
     },
   ],
 })
@@ -40,11 +86,15 @@ router.beforeEach((to) => {
 
   if (
     (!authStore.user && to.meta.requiresAuth) ||
-    (authStore.user && !authStore.user.isManager && to.meta.isManager) ||
-    (authStore.user && authStore.user.isManager && !to.meta.isManager && to.name !== 'auth')
+    (authStore.user && authStore.user.tipo !== 'FUNCIONARIO' && to.meta.isManager) ||
+    (authStore.user &&
+      authStore.user.tipo === 'FUNCIONARIO' &&
+      !to.meta.isManager &&
+      to.name !== 'auth')
   ) {
     return { name: 'auth' }
   }
 })
+
 
 export default router

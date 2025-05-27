@@ -1,21 +1,49 @@
-version: '3.8'
-
 services:
   pgdb:
-    image: postgres:alpine 
+    image: postgres:alpine
     ports:
-      - 5432:5432
+      - "5432:5432"
     volumes:
-      - .docker/pgdb/data:/var/lib/postgresql/data
-      - .docker/pgdb/entrypoint.sh:/docker-entrypoint-initdb.d/entrypoint.sh
+      - ./.docker/pgdb/data:/var/lib/postgresql/data
     environment:
       - POSTGRES_USER=admin
       - POSTGRES_PASSWORD=admin
-      - POSTGRES_MULTIPLE_DATABASES=fly_service, employee_service, client_service, reservation_service_query, reservation_service_command
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U root"]
+      test: ["CMD-SHELL", "pg_isready -U admin"]
       interval: 10s
       timeout: 5s
+      retries: 5
+    networks:
+      - flynetwork
+
+  init-db:
+    image: postgres:alpine
+    depends_on:
+      pgdb:
+        condition: service_healthy
+    entrypoint: ["/bin/sh", "-c"]
+    command: >
+      "until pg_isready -h pgdb -U admin;
+      do echo 'Esperando pgdb...'; sleep 2; done &&
+      (psql -h pgdb -U admin -d postgres -tc \"SELECT 1 FROM pg_database WHERE datname = 'fly_service'\" | grep -q 1 || psql -h pgdb -U admin -d postgres -c \"CREATE DATABASE fly_service\") &&
+      (psql -h pgdb -U admin -d postgres -tc \"SELECT 1 FROM pg_database WHERE datname = 'employee_service'\" | grep -q 1 || psql -h pgdb -U admin -d postgres -c \"CREATE DATABASE employee_service\") &&
+      (psql -h pgdb -U admin -d postgres -tc \"SELECT 1 FROM pg_database WHERE datname = 'client_service'\" | grep -q 1 || psql -h pgdb -U admin -d postgres -c \"CREATE DATABASE client_service\") &&
+      (psql -h pgdb -U admin -d postgres -tc \"SELECT 1 FROM pg_database WHERE datname = 'reservation_service_query'\" | grep -q 1 || psql -h pgdb -U admin -d postgres -c \"CREATE DATABASE reservation_service_query\") &&
+      (psql -h pgdb -U admin -d postgres -tc \"SELECT 1 FROM pg_database WHERE datname = 'reservation_service_command'\" | grep -q 1 || psql -h pgdb -U admin -d postgres -c \"CREATE DATABASE reservation_service_command\")"
+    environment:
+      PGPASSWORD: admin
+    networks:
+      - flynetwork
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    healthcheck:
+      test: ["CMD-SHELL", "rabbitmqctl status"]
+      interval: 10s
+      timeout: 10s
       retries: 5
     networks:
       - flynetwork
@@ -25,7 +53,7 @@ services:
     environment:
       - MONGO_INITDB_ROOT_USERNAME=admin
       - MONGO_INITDB_ROOT_PASSWORD=admin
-      - MONGO_INITDB_DATABASE=auth_service    
+      - MONGO_INITDB_DATABASE=auth_service
     ports:
       - 27017:27017
     volumes:
@@ -33,28 +61,12 @@ services:
     networks:
       - flynetwork
 
-  rabbitmq:
-    image: rabbitmq
-    command: rabbitmq-server
-    expose:
-      - "5672"
-      - "15672"
-    healthcheck:
-      test: [ "CMD", "nc", "-z", "localhost", "5672" ]
-      interval: 10s
-      timeout: 10s
-      retries: 5
-    networks:
-      - flynetwork
-
   api-gateway:
     build:
-      context: ./back/api-gateway
-      dockerfile: Dockerfile
+      context: ./back
+      dockerfile: api-gateway/Dockerfile
     ports:
-      - 8000:8000
-    volumes:
-      - ./back/api-gateway:/app
+      - "8000:8000"
     depends_on:
       - pgdb
     networks:
@@ -62,16 +74,12 @@ services:
 
   auth-service:
     build:
-      context: ./back/auth-service
-      dockerfile: Dockerfile
+      context: ./back
+      dockerfile: auth-service/Dockerfile
     ports:
-      - 8080:8080
-    volumes:
-      - ./back/auth-service:/app
+      - "8080:8080"
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://pgdb:5432/auth_service
-      - SPRING_DATASOURCE_USERNAME=admin
-      - SPRING_DATASOURCE_PASSWORD=admin
+      - MONGO_URI=mongodb://admin:admin@mongodb:27017/auth_service?authSource=admin
     depends_on:
       - pgdb
       - rabbitmq
@@ -81,90 +89,104 @@ services:
 
   fly-service:
     build:
-      context: ./back/fly-service
-      dockerfile: Dockerfile
+      context: ./back
+      dockerfile: fly-service/Dockerfile
     ports:
-      - 8081:8080
-    volumes:
-      - ./back/fly-service:/app
+      - "8081:8080"
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://pgdb:5432/fly_service
       - SPRING_DATASOURCE_USERNAME=admin
       - SPRING_DATASOURCE_PASSWORD=admin
     depends_on:
-      - pgdb
-      - rabbitmq
+      pgdb:
+        condition: service_healthy
+      init-db:
+        condition: service_completed_successfully
+      rabbitmq:
+        condition: service_healthy
     networks:
       - flynetwork
 
   client-service:
     build:
-      context: ./back/client-service
-      dockerfile: Dockerfile
+      context: ./back
+      dockerfile: client-service/Dockerfile
     ports:
-      - 8082:8080
-    volumes:
-      - ./back/client-service:/app
+      - "8082:8080"
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://pgdb:5432/client_service
       - SPRING_DATASOURCE_USERNAME=admin
       - SPRING_DATASOURCE_PASSWORD=admin
     depends_on:
-      - pgdb
-      - rabbitmq
+      pgdb:
+        condition: service_healthy
+      init-db:
+        condition: service_completed_successfully
+      rabbitmq:
+        condition: service_healthy
     networks:
       - flynetwork
 
   employee-service:
     build:
-      context: ./back/employee-service
-      dockerfile: Dockerfile
+      context: ./back
+      dockerfile: employee-service/Dockerfile
     ports:
-      - 8083:8080
-    volumes:
-      - ./back/employee-service:/app
+      - "8083:8080"
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://pgdb:5432/employee_service
       - SPRING_DATASOURCE_USERNAME=admin
       - SPRING_DATASOURCE_PASSWORD=admin
     depends_on:
-      - pgdb
-      - rabbitmq
+      pgdb:
+        condition: service_healthy
+      init-db:
+        condition: service_completed_successfully
+      rabbitmq:
+        condition: service_healthy
     networks:
       - flynetwork
 
   reservation-service:
     build:
-      context: ./back/reservation-service
-      dockerfile: Dockerfile
+      context: ./back
+      dockerfile: reservation-service/Dockerfile
     ports:
-      - 8084:8080
-    volumes:
-      - ./back/reservation-service:/app
+      - "8084:8080"
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://pgdb:5432/reservation_service_query
-      - SPRING_DATASOURCE_USERNAME=admin
-      - SPRING_DATASOURCE_PASSWORD=admin
+      - COMMAND_DB_URL=jdbc:postgresql://pgdb:5432/reservation_service_command
+      - COMMAND_DB_USER=admin
+      - COMMAND_DB_PASS=admin
+      - QUERY_DB_URL=jdbc:postgresql://pgdb:5432/reservation_service_query
+      - QUERY_DB_USER=admin
+      - QUERY_DB_PASS=admin
     depends_on:
-      - pgdb
-      - rabbitmq
+      pgdb:
+        condition: service_healthy
+      init-db:
+        condition: service_completed_successfully
+      rabbitmq:
+        condition: service_healthy
     networks:
       - flynetwork
 
   saga:
     build:
-      context: ./back/saga
-      dockerfile: Dockerfile
+      context: ./back
+      dockerfile: saga/Dockerfile
     ports:
-      - 8085:8080
-    volumes:
-      - ./back/saga:/app
+      - "8085:8080"
     environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://pgdb:5432/saga_service
       - SPRING_DATASOURCE_USERNAME=admin
       - SPRING_DATASOURCE_PASSWORD=admin
     depends_on:
-      - pgdb
-      - rabbitmq
+      pgdb:
+        condition: service_healthy
+      init-db:
+        condition: service_completed_successfully
+      rabbitmq:
+        condition: service_healthy
     networks:
       - flynetwork
 

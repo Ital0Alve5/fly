@@ -1,0 +1,29 @@
+spring:
+  data:
+    mongodb:
+      uri: mongodb://admin:admin@mongodb:27017/auth_service?authSource=admin&retryWrites=true&w=majority
+  rabbitmq:
+    host: rabbitmq
+    port: 5672
+    username: guest
+    password: guest
+  jwt:
+    secret: 43c1e4027670f041724ecc9848663f1a67328b27daa6162f94469f6b79ce54d5c249dbb38a1e1ed287eb63a0f7c52d274f4ae55b32d9c5dc41abcf35cd498241bf92c52e41116da59923269a11c8ba778478b5e0dd296ae12778cf7a85d342819f131136f7c95690e7d34a2c42c44534798173478f4f3eb612aab5c609a25fc3f3b5ec82fc92c9236a11430d3682527556ae733cba825853d8bcbc5a58138ab7a24a4532af8841888be467215baea111bade60e2e6aa0f7fd863ee2b28fea25275639f2e905654994bf2dd42ca9de7aeac332c55ab6ce94f2da14667a3faaf6634521082b3f56fb48a181b656b66b1c8d12d137817c3896983ad961aec1a9de0
+    # 1 hora
+    expiration: 3600000
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: flydaccompany@gmail.com
+    password: shxp wfhw cijb tous
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+          connectiontimeout: 25000
+          timeout: 25000
+          writetimeout: 25000
+        debug: true
+

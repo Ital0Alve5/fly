@@ -1,0 +1,25 @@
+spring:
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+    properties:
+      hibernate:
+        '[format_sql]': true
+
+  jackson:
+    time-zone: America/Sao_Paulo
+    date-format: yyyy-MM-dd'T'HH:mm:ssXXX
+    serialization:
+      write-dates-as-timestamps: false
+
+  rabbitmq:
+    host: rabbitmq
+    port: 5672
+    username: guest
+    password: guest
