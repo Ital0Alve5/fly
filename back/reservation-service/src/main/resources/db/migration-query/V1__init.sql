@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS reserva (
   quantidade_poltronas INTEGER,
   codigo_cliente INTEGER,
   estado VARCHAR(30),
-  codigo_voo VARCHAR(6),
+  codigo_voo VARCHAR(8),
   aeroporto_origem VARCHAR(4),
   aeroporto_destino VARCHAR(4),
   valor NUMERIC(10,2),

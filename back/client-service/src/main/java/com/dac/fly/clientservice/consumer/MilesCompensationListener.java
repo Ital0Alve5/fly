@@ -25,7 +25,7 @@ public class MilesCompensationListener {
         try {
             boolean success = clientService.updateMiles(
                     cmd.codigoCliente(),
-                    cmd.milhasUtilizadas(), cmd.codigo_reserva());
+                    cmd.milhasUtilizadas(), cmd.codigo_reserva(), cmd.descricao());
 
             rabbit.convertAndSend(
                     RabbitConstants.EXCHANGE,

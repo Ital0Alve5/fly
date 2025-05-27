@@ -104,6 +104,7 @@ public class FlightSagaOrchestrator {
                                 key,
                                 cm.codigoCliente(),
                                 cm.milhasUtilizadas(),
+                                null,
                                 true));
 
                 getWithTimeout(milesResponses, key);
@@ -142,6 +143,7 @@ public class FlightSagaOrchestrator {
                                 key,
                                 cm.codigoCliente(),
                                 cm.milhasUtilizadas(),
+                                null,
                                 false));
             }
         }

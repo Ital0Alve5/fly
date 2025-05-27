@@ -5,16 +5,10 @@ import java.security.SecureRandom;
 public class FlightCodeGenerator {
 
     private static final SecureRandom RANDOM = new SecureRandom();
-    private static final String LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    private static final String PREFIX = "TADS";
 
     public static String generateReservationCode() {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < 3; i++) {
-            sb.append(LETTERS.charAt(RANDOM.nextInt(LETTERS.length())));
-        }
-        for (int i = 0; i < 3; i++) {
-            sb.append(RANDOM.nextInt(10));
-        }
-        return sb.toString();
+        int number = RANDOM.nextInt(10_000);
+        return String.format("%s%04d", PREFIX, number);
     }
 }
