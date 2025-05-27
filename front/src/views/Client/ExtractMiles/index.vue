@@ -51,7 +51,7 @@ watchEffect(async () => {
           quantidade_milhas: item.quantidade_milhas,
           descricao: item.descricao,
           tipo: item.tipo,
-        })),
+        })).filter(item => item.quantidade_milhas > 0),
       }
 
       data.value = transformed
