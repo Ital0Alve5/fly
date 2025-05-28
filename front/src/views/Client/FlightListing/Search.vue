@@ -34,9 +34,15 @@ async function handleSearch(originAirport: string, destinationAirport: string) {
       flights = await fetchFilteredFlights(originAirport, destinationAirport)
     }
 
-    flightsList.value = flights
-      .filter((flight: Flight) => flight.estado !== 'CANCELADO' && flight.estado !== 'REALIZADO')
-      .sort((a: Flight, b: Flight) => new Date(a.data).getTime() - new Date(b.data).getTime())
+    if (flights.voos) {
+      flightsList.value = flights.voos
+        .filter((flight: Flight) => flight.estado !== 'CANCELADO' && flight.estado !== 'REALIZADO')
+        .sort((a: Flight, b: Flight) => new Date(a.data).getTime() - new Date(b.data).getTime())
+    } else {
+      flightsList.value = flights
+        .filter((flight: Flight) => flight.estado !== 'CANCELADO' && flight.estado !== 'REALIZADO')
+        .sort((a: Flight, b: Flight) => new Date(a.data).getTime() - new Date(b.data).getTime())
+    }
 
     fetchedFlights.value = true
   } catch (error) {
