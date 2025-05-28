@@ -19,10 +19,10 @@ const isLoading = ref(false)
 
 const formSchema = toTypedSchema(
   z.object({
-    nome: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres'),
-    email: z.string().email('E-mail inválido'),
-    telefone: z.string().min(14, 'Telefone inválido').max(15, 'Telefone inválido'),
-    cpf: z.string().refine((cpf) => isValidCPF(cpf), 'CPF inválido'),
+    nome: z.string({required_error: 'Nome é obrigatório'}).min(2, 'Nome deve ter pelo menos 2 caracteres'),
+    email: z.string({required_error: 'E-mail é obrigatório'}).email('E-mail inválido'),
+    telefone: z.string({required_error: 'Telefone é obrigatório'}).min(14, 'Telefone inválido').max(15, 'Telefone inválido'),
+    cpf: z.string({required_error: 'CPF é obrigatório'}).refine((cpf) => isValidCPF(cpf), 'CPF inválido'),
     senha: z.string().regex(/^[a-zA-Z0-9]{4}$/, 'Senha deve conter exatamente 4 caracteres')
   }),
 )
