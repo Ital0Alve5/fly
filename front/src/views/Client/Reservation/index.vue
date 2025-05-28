@@ -60,7 +60,6 @@ onMounted(async () => {
       const { data: historyData } = await getReservationHistory(route.params.code.toString())
       reservation.value = data
       history.value = historyData
-      history.value.shift()
     } catch (error) {
       toast({
         title: 'Erro ao acessar reserva',
