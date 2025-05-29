@@ -183,7 +183,8 @@ public class ClientService {
             clientRepository.save(client);
 
             Transactions tx = createCreditTransaction(client, miles);
-            tx.setDescricao("EXTORNO DE MILHAS DA RESERVA: " + reservationCode);
+            tx.setcodigo_reserva(reservationCode);
+            tx.setDescricao("EXTORNO DE MILHAS");
             transactionsRepository.save(tx);
         }
 
