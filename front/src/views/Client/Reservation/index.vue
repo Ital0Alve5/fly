@@ -135,7 +135,7 @@ onMounted(async () => {
           <Table class="w-full table-auto border-separate border-spacing-2">
             <TableHeader>
               <TableRow>
-                <TableHead class="text-center px-6 py-3 text-lg">Data/Hora</TableHead>
+                <TableHead class="text-center px-6 py-3 text-lg">Data</TableHead>
                 <TableHead class="text-center px-6 py-3 text-lg">Estado origem</TableHead>
                 <TableHead class="text-center px-6 py-3 text-lg">Estado destino</TableHead>
               </TableRow>

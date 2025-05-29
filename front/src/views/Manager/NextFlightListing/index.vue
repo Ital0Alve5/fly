@@ -111,10 +111,10 @@ async function handelCancelFlight() {
         <TableCaption>Voos das próximas 48h.</TableCaption>
         <TableHeader>
           <TableRow>
-            <TableHead> Data/hora </TableHead>
+            <TableHead> Data </TableHead>
             <TableHead>Código</TableHead>
-            <TableHead>Origem</TableHead>
-            <TableHead>Destino</TableHead>
+            <TableHead>Aeroport Origem</TableHead>
+            <TableHead>Aeroporto Destino</TableHead>
             <TableHead>Status</TableHead>
             <TableHead></TableHead>
           </TableRow>
