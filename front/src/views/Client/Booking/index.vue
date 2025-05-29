@@ -81,8 +81,8 @@ function openCheckReservationDialog() {
             <Table class="w-full table-auto border-separate border-spacing-2">
               <TableHeader>
                 <TableRow>
-                  <TableHead class="text-center px-6 py-3 text-lg">Data/Hora do voo</TableHead>
-                  <TableHead class="text-center px-6 py-3 text-lg">Data/Hora da reserva</TableHead>
+                  <TableHead class="text-center px-6 py-3 text-lg">Data do voo</TableHead>
+                  <TableHead class="text-center px-6 py-3 text-lg">Data da reserva</TableHead>
                   <TableHead class="text-center px-6 py-3 text-lg">Aeroporto Origem</TableHead>
                   <TableHead class="text-center px-6 py-3 text-lg">Aeroporto Destino</TableHead>
                   <TableHead class="text-center px-6 py-3 text-lg">Status</TableHead>
