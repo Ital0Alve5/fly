@@ -7,6 +7,7 @@ import * as z from 'zod'
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Separator } from '@/components/ui/separator'
 import { Button } from '@/components/ui/button'
 import type { Employee } from '@/types/Auth/AuthenticatedUserData'
 
@@ -48,6 +49,7 @@ const emit = defineEmits<{
 
 
 const openDialog = ref(props.open)
+const isSubmitting = ref(false)
 
 watch(
   () => props.open,
@@ -69,89 +71,102 @@ watch(openDialog, (newVal) => {
   emit('update:open', newVal)
 })
 
-const onSubmit = handleSubmit((values) => {
+const onSubmit = handleSubmit(async (values) => {
   if (!props.employee) return
-  emit('updated', {
-    codigo: props.employee.codigo,
-    nome: values.nome,
-    email: values.email,
-    telefone: values.telefone,
-    cpf: values.cpf,
-    senha: values.senha,
-  })
-  toast({
-    title: 'Funcionário atualizado',
-    description: 'Os dados foram enviados para atualização.',
-    variant: 'default',
-    duration: 400,
-  })
 
-  openDialog.value = false
+  isSubmitting.value = true
+  try {
+    emit('updated', {
+      codigo: props.employee.codigo,
+      nome: values.nome,
+      email: values.email,
+      telefone: values.telefone,
+      cpf: values.cpf,
+      senha: values.senha,
+    })
+    toast({
+      title: 'Funcionário atualizado',
+      description: 'Os dados foram enviados para atualização.',
+      variant: 'default',
+      duration: 800,
+    })
+    openDialog.value = false
+  } finally {
+    isSubmitting.value = false
+  }
 })
 
 </script>
 
 <template>
   <Dialog v-model:open="openDialog">
-    <DialogContent>
+    <DialogContent class="max-w-md w-full px-6 py-8">
       <DialogHeader>
         <DialogTitle>Editar Funcionário</DialogTitle>
+        <p class="text-sm text-muted-foreground">
+          Atualize os dados cadastrais do funcionário.
+        </p>
       </DialogHeader>
 
-      <form @submit.prevent="onSubmit" class="flex flex-col gap-4">
+      <form @submit.prevent="onSubmit" class="flex flex-col gap-6 mt-4">
         <FormField v-slot="{ componentField }" name="nome">
           <FormItem>
-            <FormLabel>Nome</FormLabel>
+            <FormLabel>Nome <span class="text-destructive">*</span></FormLabel>
             <FormControl>
-              <Input v-bind="componentField" type="text" />
+              <Input v-bind="componentField" type="text" class="focus-visible:ring-2 focus-visible:ring-primary" />
             </FormControl>
-            <FormMessage />
+            <FormMessage class="text-xs text-destructive mt-1" />
           </FormItem>
         </FormField>
 
         <FormField v-slot="{ componentField }" name="email">
           <FormItem>
-            <FormLabel>E-mail</FormLabel>
+            <FormLabel>E-mail <span class="text-destructive">*</span></FormLabel>
             <FormControl>
-              <Input v-bind="componentField" type="email" />
+              <Input v-bind="componentField" type="email" class="focus-visible:ring-2 focus-visible:ring-primary" />
             </FormControl>
-            <FormMessage />
+            <FormMessage class="text-xs text-destructive mt-1" />
           </FormItem>
         </FormField>
 
         <FormField v-slot="{ componentField }" name="cpf">
           <FormItem>
-            <FormLabel>CPF</FormLabel>
+            <FormLabel>CPF <span class="text-destructive">*</span></FormLabel>
             <FormControl>
-              <Input v-bind="componentField" type="text" v-mask="'###.###.###-##'" disabled />
+              <Input v-bind="componentField" type="text" v-mask="'###.###.###-##'" disabled class="opacity-70 cursor-not-allowed" />
             </FormControl>
-            <FormMessage />
+            <FormMessage class="text-xs text-destructive mt-1" />
           </FormItem>
         </FormField>
 
         <FormField v-slot="{ componentField }" name="telefone">
           <FormItem>
-            <FormLabel>Telefone</FormLabel>
+            <FormLabel>Telefone <span class="text-destructive">*</span></FormLabel>
             <FormControl>
-              <Input v-bind="componentField" type="text" v-mask="'(##) #####-####'" />
+              <Input v-bind="componentField" type="text" v-mask="'(##) #####-####'" class="focus-visible:ring-2 focus-visible:ring-primary" />
             </FormControl>
-            <FormMessage />
+            <FormMessage class="text-xs text-destructive mt-1" />
           </FormItem>
         </FormField>
 
         <FormField v-slot="{ componentField }" name="senha">
           <FormItem>
-            <FormLabel>Senha</FormLabel>
+            <FormLabel>Senha <span class="text-muted-foreground text-xs">(4 caracteres)</span></FormLabel>
             <FormControl>
-              <Input v-bind="componentField" type="password" maxlength="4" inputmode="numeric" />
+              <Input v-bind="componentField" type="password" maxlength="4" inputmode="numeric" class="focus-visible:ring-2 focus-visible:ring-primary" />
             </FormControl>
-            <FormMessage />
+            <FormMessage class="text-xs text-destructive mt-1" />
           </FormItem>
         </FormField>
 
-        <div class="flex justify-end gap-2 mt-4">
-          <Button variant="destructive" type="button" @click="openDialog = false">Cancelar</Button>
-          <Button type="submit">Salvar</Button>
+        <Separator class="my-4" />
+
+        <div class="flex justify-end gap-2">
+          <Button variant="outline" type="button" @click="openDialog = false">Cancelar</Button>
+          <Button type="submit" :disabled="isSubmitting">
+            <template v-if="isSubmitting">Salvando...</template>
+            <template v-else>Salvar</template>
+          </Button>
         </div>
       </form>
     </DialogContent>
