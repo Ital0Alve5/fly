@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { onMounted, ref, watch } from 'vue'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
@@ -103,69 +103,83 @@ async function handelCancelFlight() {
     <PerformFlightDialog v-model="isPerformDialogOpen" :selectedFlightCode="selectedFlight" />
     <CancelFlightDialog v-model="isCancelDialogOpen" @confirm="handelCancelFlight" />
     <ConfirmBoardingDialog v-model="isBoardingDialogOpen" :selectedFlightCode="selectedFlight" />
-    <div class="min-h-screen flex flex-col justify-center items-center">
+    <div class="flex flex-col justify-center h-screen">
       <div @click="isRegisterFlightFormOpen = true" class="flex justify-end mb-4 pr-8 w-full">
         <Button>Cadastrar Voo</Button>
       </div>
-      <Table>
-        <TableCaption>Voos das próximas 48h.</TableCaption>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Data</TableHead>
-            <TableHead>Código</TableHead>
-            <TableHead>Aeroport Origem</TableHead>
-            <TableHead>Aeroporto Destino</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead></TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          <TableRow v-for="flight in flights" :key="flight.codigo">
-            <TableCell>
-              {{ formatDateTime(flight.data) }}
-            </TableCell>
-            <TableCell>
-              {{ flight.codigo }}
-            </TableCell>
-            <TableCell> {{ flight.aeroporto_origem.codigo }} </TableCell>
-            <TableCell>{{ flight.aeroporto_destino.codigo }}</TableCell>
-            <TableCell><span
-                      :class="{
-                        'text-green-500': flight.estado === 'REALIZADO',
-                        'text-blue-500': flight.estado === 'CONFIRMADO',
-                        'text-red-500': flight.estado === 'CANCELADO',
-                      }"
-                    >
-                      {{ flight.estado }}
-                    </span></TableCell>
-            <TableCell class="w-[200px]">
-              <Button
-                v-if="flight.estado === 'CONFIRMADO'"
-                class="bg-green bg-green-500"
-                @click="handleConfirmBoarding(flight.codigo)"
-                >Confirmar embarque</Button
-              >
-            </TableCell>
-            <TableCell class="w-[150px]">
-              <Button
-                v-if="flight.estado === 'CONFIRMADO'"
-                variant="destructive"
-                @click="handleCancelFlightDialog(flight.codigo)"
-              >
-                Cancelar voo
-              </Button>
-            </TableCell>
-            <TableCell class="w-[150px]">
-              <Button
-                v-if="flight.estado === 'CONFIRMADO'"
-                @click="handlePerformFlight(flight.codigo)"
-              >
-                Realizar Voo
-              </Button>
-            </TableCell>
-          </TableRow>
-        </TableBody>
-      </Table>
+      <div class="max-h-[500px] overflow-y-auto">
+        <br>
+        <Card>
+            <CardHeader>
+              <CardTitle class="text-2xl">Voos das próximas 48h.</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Table class="w-full table-auto border-separate border-spacing-2">
+                <TableHeader>
+                  <TableRow>
+                    <TableHead class="text-center px-6 py-3 text-lg">Data</TableHead>
+                    <TableHead class="text-center px-6 py-3 text-lg">Código</TableHead>
+                    <TableHead class="text-center px-6 py-3 text-lg">Aeroport Origem</TableHead>
+                    <TableHead class="text-center px-6 py-3 text-lg">Aeroporto Destino</TableHead>
+                    <TableHead class="text-center px-6 py-3 text-lg">Status</TableHead>
+                    <TableHead class="text-center px-6 py-3 text-lg"></TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  <TableRow v-for="flight in flights" :key="flight.codigo">
+                    <TableCell class="text-center px-6 py-4 text-lg">{{ 
+                    formatDateTime(flight.data) 
+                    }}</TableCell>
+                    <TableCell class="text-center px-6 py-4 text-lg">{{ 
+                    flight.codigo 
+                    }}</TableCell>
+                    <TableCell class="text-center px-6 py-4 text-lg"> {{ 
+                    flight.aeroporto_origem.codigo 
+                    }}</TableCell>
+                    <TableCell class="text-center px-6 py-4 text-lg">{{ 
+                    flight.aeroporto_destino.codigo 
+                    }}</TableCell>
+                    <TableCell class="text-center px-6 py-4 text-lg">
+                      <span
+                              :class="{
+                                'text-green-500': flight.estado === 'REALIZADO',
+                                'text-blue-500': flight.estado === 'CONFIRMADO',
+                                'text-red-500': flight.estado === 'CANCELADO',
+                              }"
+                            >
+                              {{ flight.estado }}
+                            </span></TableCell>
+                    <TableCell class="w-[200px]">
+                      <Button
+                        v-if="flight.estado === 'CONFIRMADO'"
+                        class="bg-green bg-green-500"
+                        @click="handleConfirmBoarding(flight.codigo)"
+                        >Confirmar embarque</Button
+                      >
+                    </TableCell>
+                    <TableCell class="w-[150px]">
+                      <Button
+                        v-if="flight.estado === 'CONFIRMADO'"
+                        variant="destructive"
+                        @click="handleCancelFlightDialog(flight.codigo)"
+                      >
+                        Cancelar voo
+                      </Button>
+                    </TableCell>
+                    <TableCell class="w-[150px]">
+                      <Button
+                        v-if="flight.estado === 'CONFIRMADO'"
+                        @click="handlePerformFlight(flight.codigo)"
+                      >
+                        Realizar Voo
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
+            </CardContent>
+        </Card>
+      </div>
     </div>
   </div>
 </template>
