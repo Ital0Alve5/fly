@@ -129,7 +129,15 @@ async function handelCancelFlight() {
             </TableCell>
             <TableCell> {{ flight.aeroporto_origem.codigo }} </TableCell>
             <TableCell>{{ flight.aeroporto_destino.codigo }}</TableCell>
-            <TableCell>{{ flight.estado }}</TableCell>
+            <TableCell><span
+                      :class="{
+                        'text-green-500': flight.estado === 'REALIZADO',
+                        'text-blue-500': flight.estado === 'CONFIRMADO',
+                        'text-red-500': flight.estado === 'CANCELADO',
+                      }"
+                    >
+                      {{ flight.estado }}
+                    </span></TableCell>
             <TableCell class="w-[200px]">
               <Button
                 v-if="flight.estado === 'CONFIRMADO'"

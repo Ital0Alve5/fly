@@ -160,23 +160,27 @@ function handleSuccess() {
         <div>
           <section>
             <ul class="space-y-2">
-              <li class="flex gap-2">
-                <b>Data:</b>
+              <li class="flex gap-2 text-base">
+                <b>Data do voo:</b>
                 <p>{{ formatDateTime(reserveFound.voo.data) }}</p>
               </li>
-              <li class="flex gap-2">
+              <li class="flex gap-2 text-base">
+                <b>Data da reserva:</b>
+                <p>{{ formatDateTime(reserveFound.data) }}</p>
+              </li>
+              <li class="flex gap-2 text-base">
                 <b>Código:</b>
                 <p>{{ reserveFound.codigo }}</p>
               </li>
-              <li class="flex gap-2">
+              <li class="flex gap-2 text-base">
                 <b>Origem:</b>
                 <p>{{ reserveFound.voo.aeroporto_origem.nome }}</p>
               </li>
-              <li class="flex gap-2">
+              <li class="flex gap-2 text-base">
                 <b>Destino:</b>
                 <p>{{ reserveFound.voo.aeroporto_destino.nome }}</p>
               </li>
-              <li class="flex gap-2">
+              <li class="flex gap-2 text-base">
                 <b>Valor:</b>
                 <p>
                   {{
@@ -187,13 +191,17 @@ function handleSuccess() {
                   }}
                 </p>
               </li>
-              <li class="flex gap-2">
+              <li class="flex gap-2 text-base">
                 <b>Milhas gastas:</b>
                 <p>{{ reserveFound.milhas_utilizadas }}</p>
               </li>
-              <li class="flex gap-2">
+              <li class="flex gap-2 text-base">
                 <b>Estado da reserva:</b>
                 <p>{{ reserveFound.estado }}</p>
+              </li>
+              <li class="flex gap-2 text-base">
+                <b>Quantidade de poltronas:</b>
+                <p>{{ reserveFound.quantidade_poltronas }}</p>
               </li>
             </ul>
           </section>
