@@ -15,6 +15,8 @@ import com.dac.fly.clientservice.dto.response.MilesResponseDTO;
 import com.dac.fly.clientservice.dto.response.MilesStatementResponseDTO;
 import com.dac.fly.clientservice.service.ClientService;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/clientes")
 public class ClientController {
@@ -23,6 +25,18 @@ public class ClientController {
 
     public ClientController(ClientService clientService) {
         this.clientService = clientService;
+    }
+
+
+    @GetMapping("")
+    public ResponseEntity<ApiResponse<ClientResponseDTO[]>> getClients() {
+        try {
+            List<ClientResponseDTO> list = clientService.findAll();
+            ClientResponseDTO[] array = list.toArray(new ClientResponseDTO[0]);
+            return ResponseEntity.ok(ApiResponse.success(array));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage(), 400));
+        }
     }
 
     @GetMapping("/{codigoCliente}")

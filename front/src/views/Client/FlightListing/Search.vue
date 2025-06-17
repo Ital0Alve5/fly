@@ -6,7 +6,10 @@ import { useAuthStore } from '@/stores/auth'
 import { useGlobalStore } from '@/stores/global'
 import type { Flight } from '@/types/Flight'
 import { ref } from 'vue'
-import { fetchAllFlights,fetchFilteredFlights } from '@/views/Client/FlightListing/services/FlightListingService'
+import {
+  fetchAllFlights,
+  fetchFilteredFlights,
+} from '@/views/Client/FlightListing/services/FlightListingService'
 
 const authStore = useAuthStore()
 const globalStore = useGlobalStore()
@@ -23,15 +26,24 @@ async function handleSearch(originAirport: string, destinationAirport: string) {
 
     loading.value = true
 
-    let flights;
+    let flights
 
     if (originAirport === '' && destinationAirport === '') {
-      flights = await fetchAllFlights();
+      flights = await fetchAllFlights()
     } else {
-      flights = await fetchFilteredFlights(originAirport, destinationAirport);
+      flights = await fetchFilteredFlights(originAirport, destinationAirport)
     }
 
-    flightsList.value = flights
+    if (flights.voos) {
+      flightsList.value = flights.voos
+        .filter((flight: Flight) => flight.estado !== 'CANCELADO' && flight.estado !== 'REALIZADO')
+        .sort((a: Flight, b: Flight) => new Date(a.data).getTime() - new Date(b.data).getTime())
+    } else {
+      flightsList.value = flights
+        .filter((flight: Flight) => flight.estado !== 'CANCELADO' && flight.estado !== 'REALIZADO')
+        .sort((a: Flight, b: Flight) => new Date(a.data).getTime() - new Date(b.data).getTime())
+    }
+
     fetchedFlights.value = true
   } catch (error) {
     console.log(error)

@@ -18,3 +18,11 @@ export type Reserve = {
   quantidade_poltronas: number
   voo: Flight
 }
+
+export type History = {
+  id: number
+  codigo_reserva: string
+  data: string
+  estado_origem: string
+  estado_destino: string
+}[]

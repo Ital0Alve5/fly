@@ -184,7 +184,7 @@ watch(miles, (value) => {
         <ResizablePanel :default-size="60" class="bg-black">
           <div class="flex h-full items-center justify-center p-6">
             <div class="w-full max-w-[700px]">
-              <FlightDetails :flight="flight" />
+              <FlightDetails :flight="flight" :valueToPay="valueToPay" />
             </div>
           </div>
         </ResizablePanel>

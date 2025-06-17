@@ -32,7 +32,7 @@ onMounted(async () => {
 
 async function getBooking() {
   const result = await getClientReservationList()
-  booking.value = result ?? []
+  booking.value = (result ? result : []).sort((a, b) => new Date(b.data).getTime() - new Date(a.data).getTime())
 }
 
 const viewReservation = async (codigo: string) => {
@@ -81,7 +81,8 @@ function openCheckReservationDialog() {
             <Table class="w-full table-auto border-separate border-spacing-2">
               <TableHeader>
                 <TableRow>
-                  <TableHead class="text-center px-6 py-3 text-lg">Data/Hora</TableHead>
+                  <TableHead class="text-center px-6 py-3 text-lg">Data do voo</TableHead>
+                  <TableHead class="text-center px-6 py-3 text-lg">Data da reserva</TableHead>
                   <TableHead class="text-center px-6 py-3 text-lg">Aeroporto Origem</TableHead>
                   <TableHead class="text-center px-6 py-3 text-lg">Aeroporto Destino</TableHead>
                   <TableHead class="text-center px-6 py-3 text-lg">Status</TableHead>
@@ -90,6 +91,9 @@ function openCheckReservationDialog() {
               </TableHeader>
               <TableBody>
                 <TableRow v-for="reservation in booking" :key="reservation.codigo">
+                  <TableCell class="text-center px-6 py-4 text-lg">{{
+                    formatDateTime(reservation.voo.data)
+                  }}</TableCell>
                   <TableCell class="text-center px-6 py-4 text-lg">{{
                     formatDateTime(reservation.data)
                   }}</TableCell>

@@ -29,27 +29,6 @@ export const performFlight = async (code: string): Promise<boolean> => {
   }
 }
 
-export const fetchFlightsNext48Hours = async (): Promise<Flight[]> => {
-  try {
-    const today = new Date()
-    const endDate = new Date(today)
-    endDate.setDate(today.getDate() + 2)
-
-    const formatDate = (date: Date) => date.toISOString().split('T')[0]
-    const startDate = formatDate(today)
-    const formattedEndDate = formatDate(endDate)
-
-    const response = await api.get(
-      `/voos?data=${encodeURIComponent(startDate)}&data-fim=${encodeURIComponent(formattedEndDate)}`,
-    )
-
-    return response.data || []
-  } catch (error) {
-    console.error('Erro ao buscar voos das próximas 48 horas:', error)
-    return []
-  }
-}
-
 export const loadAllAirpoirts = async (): Promise<Airport[]> => {
   try {
     const response = await api.get(`/aeroportos`)
@@ -60,6 +39,20 @@ export const loadAllAirpoirts = async (): Promise<Airport[]> => {
   }
 }
 
+function formatToOffsetIso(dateInput: string): string {
+  const date = new Date(dateInput)
+  const pad = (n: number) => String(n).padStart(2, '0')
+
+  const year = date.getFullYear()
+  const month = pad(date.getMonth() + 1)
+  const day = pad(date.getDate())
+  const hour = pad(date.getHours())
+  const minute = pad(date.getMinutes())
+  const second = pad(date.getSeconds())
+
+  return `${year}-${month}-${day}T${hour}:${minute}:${second}-03:00`
+}
+
 export const registerFlight = async (data: {
   data: string
   valor_passagem: number
@@ -68,5 +61,12 @@ export const registerFlight = async (data: {
   codigo_aeroporto_origem: string
   codigo_aeroporto_destino: string
 }): Promise<AxiosResponse<Flight>> => {
-  return await api.post(`/voos`, data)
+  const dataComFuso = formatToOffsetIso(data.data)
+
+  console.log({ ...data, data: dataComFuso })
+
+  return await api.post(`/voos`, {
+    ...data,
+    data: dataComFuso,
+  })
 }

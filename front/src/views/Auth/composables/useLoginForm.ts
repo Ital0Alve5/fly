@@ -11,7 +11,7 @@ const loginSchema = toTypedSchema(
     password: z
       .string({ required_error: 'Senha é obrigatória' })
       .min(1, 'Campo obrigatório')
-      .length(6, 'Senha deve ter 6 dígitos')
+      .length(4, 'Senha deve ter 4 dígitos')
   }),
 )
 

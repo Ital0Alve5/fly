@@ -2,30 +2,22 @@ import axios, { HttpStatusCode } from 'axios'
 import { FastifyTypedInstance } from 'src/shared/types'
 import { FastifyReply, FastifyRequest } from 'fastify'
 import { Env } from 'src/shared/env'
-import { loadClientByCodeSchema } from './schema'
 import { clientAuthMiddleware } from 'src/middlewares/client-auth'
+import { loadAllClientsSchema } from './schema'
 
-export async function loadClientByCodeRoute(app: FastifyTypedInstance) {
-  const path = '/clientes/:codigoCliente'
+export async function loadAllClientsRoute(app: FastifyTypedInstance) {
+  const path = '/clientes'
 
   app.get(
     path,
     {
-      schema: loadClientByCodeSchema,
+      schema: loadAllClientsSchema,
       preHandler: clientAuthMiddleware,
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
-        const { codigoCliente } = request.params as { codigoCliente: string }
-
-        if (request.user?.data.codigoExterno.toString() !== codigoCliente) {
-          return reply
-            .status(HttpStatusCode.NotFound)
-            .send({ message: 'Cliente não encontrado' })
-        }
-
         const response = await axios.get(
-          `${Env.CLIENT_SERVICE_URL}/clientes/${codigoCliente}`,
+          `${Env.CLIENT_SERVICE_URL}/clientes`,
           {
             headers: {
               Authorization: `Bearer ${request.user?.token}`,

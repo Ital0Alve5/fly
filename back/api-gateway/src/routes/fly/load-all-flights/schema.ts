@@ -10,10 +10,13 @@ export const loadAllFlightsSchema: FastifySchema = {
       bearerAuth: [],
     },
   ],
-  querystring: z.object({
-    data: z.string().optional().describe('Data inicial para filtrar os voos (formato: YYYY-MM-DD)'),
-    'data-fim': z.string().optional().describe('Data final para filtrar os voos (formato: YYYY-MM-DD)'),
-    origem: z.string().optional().describe('Código IATA do aeroporto de origem'),
-    destino: z.string().optional().describe('Código IATA do aeroporto de destino'),
-  }),
+  querystring: z
+    .object({
+      data: z.string().optional().describe('Data inicial (YYYY-MM-DD)'),
+      'data-fim': z.string().optional().describe('Data final (YYYY-MM-DD)'),
+      inicio: z.string().optional().describe('Alias para data inicial'),
+      fim: z.string().optional().describe('Alias para data final'),
+      origem: z.string().optional().describe('Código IATA de origem'),
+      destino: z.string().optional().describe('Código IATA de destino'),
+    })
 } 

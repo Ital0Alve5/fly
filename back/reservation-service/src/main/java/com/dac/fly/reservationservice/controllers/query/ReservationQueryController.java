@@ -64,4 +64,11 @@ public class ReservationQueryController {
         boolean exists = reservaQueryRepository.existsById(codigo);
         return ResponseEntity.ok(exists);
     }
+
+    @GetMapping("/{codigo}/historico")
+    public ResponseEntity<ApiResponse<String>> historico(@PathVariable("codigo") String codigo) {
+        Reserva reserva = reservaQueryRepository.findById(codigo)
+                .orElseThrow(() -> new RuntimeException("Reserva não encontrada: " + codigo));
+        return ResponseEntity.ok(ApiResponse.success(reserva.getHistorico()));
+    }
 }

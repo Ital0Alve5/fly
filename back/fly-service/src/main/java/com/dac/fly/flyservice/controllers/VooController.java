@@ -3,6 +3,9 @@ package com.dac.fly.flyservice.controllers;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -52,12 +55,31 @@ public class VooController {
             return flightService.findByAirport(inicio, origem, destino);
         }
 
-        return flightService.findAll(inicio, fim, origem, destino);
+        List<FlightDetailsResponseDto> voos = flightService.findAll(inicio, fim, origem, destino);
+
+        Map<String, Object> resp = new LinkedHashMap<>();
+        resp.put("inicio", data != null ? data.toString() : null);
+        resp.put("fim", dataFim != null ? dataFim.toString() : null);
+        resp.put("voos", voos);
+
+        return ResponseEntity.ok(ApiResponse.success(resp));
     }
 
     @GetMapping("/{codigo}")
     public ResponseEntity<ApiResponse<FlightDetailsResponseDto>> findByCode(@PathVariable String codigo) {
         return flightService.findByCode(codigo);
+    }
+
+    @GetMapping("/{codigo}/aeroportos")
+    public ResponseEntity<ApiResponse<String[]>> findAeroportosByCode(@PathVariable String codigo) {
+        ResponseEntity<ApiResponse<FlightDetailsResponseDto>> flight = flightService.findByCode(codigo);
+
+        String[] aeroportos = new String[]{
+                flight.getBody().getData().aeroporto_origem().codigo(),
+                flight.getBody().getData().aeroporto_destino().codigo()
+        };
+
+        return ResponseEntity.ok(ApiResponse.success(aeroportos));
     }
 
     @PostMapping
@@ -73,7 +95,7 @@ public class VooController {
 
     @GetMapping("/{codigo}/estado")
     public ResponseEntity<ApiResponse<String>> findEstadoByCode(@PathVariable("codigo") String codigo) {
-      return  flightService.findEstadoByCode(codigo);
+        return flightService.findEstadoByCode(codigo);
     }
 
 }

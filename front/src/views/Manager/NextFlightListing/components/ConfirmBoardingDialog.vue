@@ -52,8 +52,6 @@ const handleConfirmBoarding = async () => {
       throw new Error('Reserva não encontrada.')
     }
 
-    console.log(data.voo.codigo)
-    console.log(props.selectedFlightCode)
     if (data.voo.codigo !== props.selectedFlightCode) {
       throw new Error('Esta reserva não pertence a este voo.')
     }
@@ -87,7 +85,6 @@ const handleConfirmBoarding = async () => {
       })
     }
   } catch (error) {
-    console.log(typeof error)
     toast({
       title: 'Erro ao buscar dados da reserva!',
       description:

@@ -12,17 +12,18 @@ import { Button } from '@/components/ui/button'
 import { isValidCPF } from '@/lib/utils'
 import LoadingSpinner from '@/components/ui/LoadingSpinner.vue'
 import addNewEmployee from '../services/addNewEmployee'
+import { AxiosError } from 'axios'
 
 const { toast } = useToast()
 const isLoading = ref(false)
 
 const formSchema = toTypedSchema(
   z.object({
-    nome: z.string().min(2, 'Nome deve ter pelo menos 2 caracteres'),
-    email: z.string().email('E-mail inválido'),
-    telefone: z.string().min(14, 'Telefone inválido').max(15, 'Telefone inválido'),
-    cpf: z.string().refine((cpf) => isValidCPF(cpf), 'CPF inválido'),
-    senha: z.string().regex(/^\d{1,6}$/, 'Senha deve conter apenas números e até 6 dígitos'),
+    nome: z.string({required_error: 'Nome é obrigatório'}).min(2, 'Nome deve ter pelo menos 2 caracteres'),
+    email: z.string({required_error: 'E-mail é obrigatório'}).email('E-mail inválido'),
+    telefone: z.string({required_error: 'Telefone é obrigatório'}).min(14, 'Telefone inválido').max(15, 'Telefone inválido'),
+    cpf: z.string({required_error: 'CPF é obrigatório'}).refine((cpf) => isValidCPF(cpf), 'CPF inválido'),
+    senha: z.string().regex(/^[a-zA-Z0-9]{4}$/, 'Senha deve conter exatamente 4 caracteres')
   }),
 )
 
@@ -56,8 +57,8 @@ const onSubmit = handleSubmit(async (values) => {
   try {
     isLoading.value = true
     await addNewEmployee(values)
-    isLoading.value = false
 
+    isLoading.value = false
     emit('added')
 
     toast({
@@ -67,10 +68,40 @@ const onSubmit = handleSubmit(async (values) => {
       duration: 500,
     })
   } catch (error) {
-    console.error('Erro ao adicionar funcionário:', error)
-  }
+    isLoading.value = false
 
-  openDialog.value = false
+    if (error instanceof AxiosError) {
+      if (error.response?.status === 409) {
+        toast({
+          title: 'Erro ao cadastrar funcionário',
+          description: 'CPF ou E-mail já cadastrado.',
+          variant: 'destructive',
+        })
+      } else if (error.response) {
+        toast({
+          title: `Erro ${error.response.status}`,
+          description: error.response.statusText,
+          variant: 'destructive',
+        })
+      } else {
+        toast({
+          title: 'Erro de conexão',
+          description: 'Não foi possível conectar ao servidor.',
+          variant: 'destructive',
+        })
+      }
+    } else {
+      toast({
+        title: 'Erro inesperado',
+        description: 'Tente novamente mais tarde.',
+        variant: 'destructive',
+      })
+    }
+
+    console.error('Erro ao adicionar funcionário:', error)
+  } finally {
+    openDialog.value = false
+  }
 })
 
 const cancel = () => {

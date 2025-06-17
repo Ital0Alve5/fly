@@ -2,6 +2,7 @@ package com.dac.fly.clientservice.service;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
@@ -40,6 +41,14 @@ public class ClientService {
 
         Client savedClient = clientRepository.save(client);
         return new ClientResponseDTO(savedClient);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ClientResponseDTO> findAll() {
+        return clientRepository.findAll()
+                .stream()
+                .map(ClientResponseDTO::new)
+                .toList();
     }
 
     public ClientResponseDTO findByCodigo(Long codigo) {
@@ -151,7 +160,7 @@ public class ClientService {
                 transaction.getTipo());
     }
 
-    public boolean updateMiles(Long clientId, Integer miles, String reservationCode) {
+    public boolean updateMiles(Long clientId, Integer miles, String reservationCode, String description) {
         Client client = clientRepository.findById(clientId)
                 .orElseThrow(() -> new RuntimeException("Cliente não encontrado: " + clientId));
 
@@ -166,7 +175,7 @@ public class ClientService {
                     client,
                     Math.abs(miles),
                     reservationCode,
-                    "Uso de milhas");
+                    Objects.nonNull(description) ? description : "Uso de milhas");
             tx.setvalor_reais(calculateRealValue(Math.abs(miles)));
             transactionsRepository.save(tx);
         } else {
@@ -174,7 +183,8 @@ public class ClientService {
             clientRepository.save(client);
 
             Transactions tx = createCreditTransaction(client, miles);
-            tx.setDescricao("ESTORNO DE MILHAS POR CANCELAMENTO DE VOO");
+            tx.setcodigo_reserva(reservationCode);
+            tx.setDescricao("EXTORNO DE MILHAS");
             transactionsRepository.save(tx);
         }
 
