@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { Pencil, Trash2, Plus } from 'lucide-vue-next'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import {
   Table,
@@ -79,44 +80,62 @@ async function handleDeleteEmployee(employee: Employee) {
   />
 
   <AddEmployeeDialog v-model:open="isAddEmployeeDialog" @added="fetchEmployees" />
-
-  <div class="min-h-screen flex flex-col justify-center gap-10 items-end">
-    <Button class="w-52 h-9" @click="goToCreate">
+  <div class="flex flex-col justify-center h-screen">
+    <nav class="p-1 shadow-md mt-6 flex justify-end" >
+      <Button class="w-52 h-9" @click="goToCreate">
       <Plus class="mr-2 h-4 w-4" />
       Novo Funcionário
     </Button>
-
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead>Nome</TableHead>
-          <TableHead>CPF</TableHead>
-          <TableHead>E-mail</TableHead>
-          <TableHead>Telefone</TableHead>
-          <TableHead class="text-center">Ações</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        <TableRow v-for="employee in employees" :key="employee.email">
-          <TableCell>{{ employee.nome }}</TableCell>
-          <TableCell>{{ employee.cpf }}</TableCell>
-          <TableCell>{{ employee.email }}</TableCell>
-          <TableCell>{{ employee.telefone }}</TableCell>
-          <TableCell class="flex justify-center gap-2">
-            <Button size="icon" variant="secondary" @click="editEmployee(employee)">
-              <Pencil class="h-4 w-4" />
-            </Button>
-            <Button
-              v-if="employee.codigo !== authStore.user?.usuario?.codigo"
-              size="icon"
-              variant="destructive"
-              @click="handleDeleteEmployee(employee)"
-            >
-              <Trash2 class="h-4 w-4" />
-            </Button>
-          </TableCell>
-        </TableRow>
-      </TableBody>
-    </Table>
+    </nav>
+    <br>
+    <div class="max-h-[500px] overflow-y-aut0">
+      <Card>
+        <CardHeader>
+          <CardTitle class="text-2xl">Empregados</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Table class="w-full table-auto border-separate border-spacing-2">
+            <TableHeader>
+              <TableRow>
+                <TableHead class="text-center px-6 py-3 text-lg">Nome</TableHead>
+                <TableHead class="text-center px-6 py-3 text-lg">CPF</TableHead>
+                <TableHead class="text-center px-6 py-3 text-lg">E-mail</TableHead>
+                <TableHead class="text-center px-6 py-3 text-lg">Telefone</TableHead>
+                <TableHead class="text-center px-6 py-3 text-lg">Ações</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              <TableRow v-for="employee in employees" :key="employee.email">
+                <TableCell class="text-center px-6 py-4 text-lg">{{ 
+                  employee.nome 
+                  }}</TableCell>
+                <TableCell class="text-center px-6 py-4 text-lg">{{ 
+                employee.cpf 
+                }}</TableCell>
+                <TableCell class="text-center px-6 py-4 text-lg">{{ 
+                employee.email 
+                }}</TableCell>
+                <TableCell class="text-center px-6 py-4 text-lg">{{ 
+                employee.telefone 
+                }}</TableCell>
+                <TableCell class="flex justify-center gap-2">
+                  <Button size="icon" variant="secondary" @click="editEmployee(employee)">
+                    <Pencil class="h-4 w-4" />
+                  </Button>
+                  <Button
+                    v-if="employee.codigo !== authStore.user?.usuario?.codigo"
+                    size="icon"
+                    variant="destructive"
+                    @click="handleDeleteEmployee(employee)"
+                  >
+                    <Trash2 class="h-4 w-4" />
+                  </Button>
+                </TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+    </div>
   </div>
 </template>

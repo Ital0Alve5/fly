@@ -77,38 +77,38 @@ onMounted(async () => {
 
 <template>
   <div class="flex items-center justify-center min-h-screen">
-    <Card v-if="reservation" class="w-full max-w-2xl">
+    <Card v-if="reservation" class="w-full max-w-2xl text-base">
       <CardHeader>
-        <CardTitle>
+        <CardTitle class="text-base">
           Reserva do voo de {{ reservation.voo.aeroporto_origem.codigo }} à
           {{ reservation.voo.aeroporto_destino.codigo }}
         </CardTitle>
         <CardDescription>Informações de sua reserva:</CardDescription>
       </CardHeader>
       <CardContent>
-        <section class="mb-2">
+        <section class="mb-4">
           <ul class="space-y-2">
-            <li class="flex gap-2">
+            <li class="flex gap-2 text-base">
               <b>Data do voo:</b>
               <p>{{ formatDateTime(reservation.voo.data) }}</p>
             </li>
-            <li class="flex gap-2">
+            <li class="flex gap-2 text-base">
               <b>Data da reserva:</b>
               <p>{{ formatDateTime(reservation.data) }}</p>
             </li>
-            <li class="flex gap-2">
+            <li class="flex gap-2 text-base">
               <b>Código:</b>
               <p>{{ reservation.codigo }}</p>
             </li>
-            <li class="flex gap-2">
+            <li class="flex gap-2 text-base">
               <b>Origem:</b>
               <p>{{ reservation.voo.aeroporto_origem.nome }}</p>
             </li>
-            <li class="flex gap-2">
+            <li class="flex gap-2 text-base">
               <b>Destino:</b>
               <p>{{ reservation.voo.aeroporto_destino.nome }}</p>
             </li>
-            <li class="flex gap-2">
+            <li class="flex gap-2 text-base">
               <b>Valor:</b>
               <p>
                 {{
@@ -116,15 +116,15 @@ onMounted(async () => {
                 }}
               </p>
             </li>
-            <li class="flex gap-2">
+            <li class="flex gap-2 text-base">
               <b>Milhas gastas:</b>
               <p>{{ reservation.milhas_utilizadas }}</p>
             </li>
-            <li class="flex gap-2">
+            <li class="flex gap-2 text-base">
               <b>Estado da reserva:</b>
               <p>{{ reservation.estado }}</p>
             </li>
-            <li class="flex gap-2">
+            <li class="flex gap-2 text-base">
               <b>Quantidade de poltronas:</b>
               <p>{{ reservation.quantidade_poltronas }}</p>
             </li>

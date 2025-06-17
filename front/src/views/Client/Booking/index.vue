@@ -73,6 +73,7 @@ function openCheckReservationDialog() {
         </div>
       </nav>
       <div class="max-h-[500px] overflow-y-auto">
+        <br>
         <Card>
           <CardHeader>
             <CardTitle class="text-2xl">Minhas Reservas e Voos</CardTitle>
@@ -110,6 +111,10 @@ function openCheckReservationDialog() {
                         'text-blue-500': reservation.estado === 'CRIADA',
                         'text-red-500': reservation.estado === 'CANCELADA',
                         'text-purple-500': reservation.estado === 'CHECK-IN',
+                        'text-yellow-500': reservation.estado === 'VOO',
+                        'text-orange-500': reservation.estado === 'EMBARCADA',
+                        'text-pink-500': reservation.estado === 'NÃO REALIZADA',
+                        'text-scarlate-500': reservation.estado === 'CANCELADO VOO',
                       }"
                     >
                       {{ reservation.estado }}
